@@ -1,4 +1,4 @@
 OUT
 B_model_input
-A_source_code/libs/mocsy/_source/*
+./A_source_code/libs/mocsy/_source/*
 *__pycache__*
