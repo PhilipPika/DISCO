@@ -595,7 +595,7 @@ def convert_output(inputdir,outformat,norders=6):
                 shutil.copyfile(fn, os.path.join(budget_dir, '..', os.path.basename(fn).replace("_order6", "")))  
 
     #post_processing.post_processing_states(params,dformat='NETCDF')
-    post_processing.post_processing(params, outformat)
+    post_processing.post_processing(params, outformat) # PP This script converts pH and pCO2 for the given data
     #post_processing.post_processing_budgets(params, outformat)
     #analysis.do(params)	  
 
