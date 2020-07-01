@@ -50,7 +50,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
     '''
     Calculates all processes in the subgrid in all stream orders
     '''
-    #print("icell " + str(icell))
+   # print("icell " + str(icell))
     
     timeint = []
     if (lsteady):
