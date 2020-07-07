@@ -1,4 +1,5 @@
 OUT
+*.swp
 B_model_input
 A_source_code/libs/mocsy/
 *.pyc
