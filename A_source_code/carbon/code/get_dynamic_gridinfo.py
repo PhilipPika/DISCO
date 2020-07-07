@@ -212,6 +212,7 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
          
           print(nc_list)
           for nc_file in nc_list:
+            print(nc_file)
             os.remove(nc_file)
         # Determine the years that are given for this parameter
         nctimes = ncdata.variables['time']
@@ -219,11 +220,11 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
         #print('years  ' + str(years))
     
         # Find begin and end point for this time period
+        print(varname)
         istart,iend = general_func.find_within_range(years,params.starttime,params.endtime)
-        #print(varname)
-        #print("istart,iend")
-        #print(istart,iend)
-        #print(min(iend+1,len(nctimes[:])))
+        print("istart,iend")
+        print(istart,iend)
+        print(min(iend+1,len(nctimes[:])))
         all_dat_period = ncdata.variables[varname][istart:min(iend+1,len(nctimes[:])),:,:] #wj
         
         # For each cell, create temp time series
