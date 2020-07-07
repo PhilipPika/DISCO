@@ -170,6 +170,7 @@ def find_within_range(list1,begin,end):
     This means that the last element before begin is taken into acount and the the first after end is included.
     list1 must be sorted!
     '''
+    #print(list1)
     ibegin = 0
     iend = len(list1) 
     for item in range(1,len(list1)):
