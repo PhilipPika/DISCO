@@ -4,3 +4,6 @@ B_model_input
 A_source_code/libs/mocsy/
 *.pyc
 *__pycache__*
+C_spin_up_data/
+A_source_code/carbon/startups/*
+A_source_code/carbon/startups/start1951.000.pkl
