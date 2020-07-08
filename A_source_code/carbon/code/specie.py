@@ -172,9 +172,9 @@ class Spec(general_class.General):
         self.exch_rate += val
 
     def reset_budget(self, nproc):
-        #changes due to reactions processes + load + outflow + dvoldt + exchanges
+        #changes due to: reactions processes + load + outflow + dvoldt + exchanges
         #self.budget = [0.0] * (nproc + 4)
-        #changes due to load + outflow + dvoldt + exchanges
+        #changes due to:                       load + outflow + dvoldt + exchanges
         self.budget = [0.0] * 4
 
     def set_budget(self, val, i):
