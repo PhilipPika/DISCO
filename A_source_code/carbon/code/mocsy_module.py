@@ -14,7 +14,7 @@ except ModuleNotFoundError:
   if "/User" in root:
       # working in Mac OS
       path = os.path.join(root,"libs","mocsy","mac")
-  elif "/work" in root:
+  elif "/theia" in root:
       # working in linux OS
       path = os.path.join(root,"libs","mocsy","linux")
   elif "/" in root:
