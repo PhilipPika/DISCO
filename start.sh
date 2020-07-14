@@ -11,27 +11,22 @@ export DGNM_USER=carbon
 DIR=~/Desktop/DISCO
 TOCODE=~/Desktop/DISCO/A_source_code/core
 
-echo "Mess: Removing current results"
-rm -r $DIR/OUT
-
 echo "Mess: Switching to Core Directory"
 pwd
 cd $TOCODE
 pwd
 
+echo "Mess: Removing current results"
+rm -r $DIR/OUT
+
 echo "Mess: Start SpinUp"
-python dgnm_main.py --endtime=1951 --maskid=39 --lspinup=1 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
-cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1950.000.pkl
+python dgnm_main.py --endtime=1951 --maskid=38 --lspinup=1 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
+cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
 echo "Note: First iteration done"
 
-#echo "Mess: Repeat SpinUp Run"
-#for idx in {1..2};do
-python dgnm_main.py i--starttime=1950 --endtime=1960 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
-cp $DIR/OUT/bio/pkl/start1960.000.pkl $DIR/A_source_code/carbon/startups/start1950.000.pkl
-#python $TOCODE/../carbon/startups/ResetsYear.py
-#echo "Note: Loop $idx done"
-#done
-#
+python dgnm_main.py --endtime=1960 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
+cp $DIR/OUT/bio/pkl/start1960.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
+
 echo "Mess: Start real run"
 python dgnm_main.py --endtime=1970 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
 #
