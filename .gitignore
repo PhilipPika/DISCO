@@ -7,3 +7,12 @@ A_source_code/libs/mocsy/
 C_spin_up_data/
 A_source_code/carbon/startups/*
 A_source_code/carbon/startups/start1951.000.pkl
+.DS_Store
+A_source_code/.DS_Store
+A_source_code/carbon/.DS_Store
+A_source_code/carbon/code/.DS_Store
+A_source_code/core/.DS_Store
+A_source_code/generalcode/.DS_Store
+A_source_code/generalcode/trunk/.DS_Store
+A_source_code/libs/.DS_Store
+OUT_copy/

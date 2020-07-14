@@ -20,20 +20,20 @@ cd $TOCODE
 pwd
 
 echo "Mess: Start SpinUp"
-python dgnm_main.py --endtime=1951 --maskid=39 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini
-cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1988.000.pkl
+python dgnm_main.py --endtime=1951 --maskid=39 --lspinup=1 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
+cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1950.000.pkl
 echo "Note: First iteration done"
 
 #echo "Mess: Repeat SpinUp Run"
 #for idx in {1..2};do
-python dgnm_main.py i--starttime=1988 --endtime=1999 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
-cp $DIR/OUT/bio/pkl/start1999.000.pkl $DIR/A_source_code/carbon/startups/start1999.000.pkl
+python dgnm_main.py i--starttime=1950 --endtime=1960 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
+cp $DIR/OUT/bio/pkl/start1960.000.pkl $DIR/A_source_code/carbon/startups/start1950.000.pkl
 #python $TOCODE/../carbon/startups/ResetsYear.py
 #echo "Note: Loop $idx done"
 #done
 #
-#echo "Mess: Start real run"
-#python dgnm_main.py --endtime=1953 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
+echo "Mess: Start real run"
+python dgnm_main.py --endtime=1970 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
 #
 echo "Mess: Start Outout conversion"
 cd $DIR/OUT
