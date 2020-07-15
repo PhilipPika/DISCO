@@ -5,20 +5,20 @@
 '''
 imports mocsy module
 '''
-try: 
+try:
   import mocsy
 except ModuleNotFoundError:
   import os
   import sys
   root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
   if "/User" in root:
-      # working in Mac OS
+      print('Working in Mac OS')
       path = os.path.join(root,"libs","mocsy","mac")
   elif "/theia" in root:
-      # working in linux OS
+      print('Working in linux OS')
       path = os.path.join(root,"libs","mocsy","linux")
   elif "/" in root:
-      # working in linux OS - original statement
+      print('Working in linux OS - original statement')
       path = os.path.join(root,"libs","mocsy","linux")
   if (os.path.exists(path)):
       sys.path.insert(3, path)
