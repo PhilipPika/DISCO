@@ -12,7 +12,6 @@ try:
   import traceback
   import pickle
   import numpy as np
-  import shutil
   from netCDF4 import Dataset
     
   # Import own general modules
