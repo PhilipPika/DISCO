@@ -58,3 +58,5 @@ A_source_code/generalcode/trunk/general_class.pyc
 A_source_code/generalcode/trunk/iround.pyc
 A_source_code/generalcode/trunk/my_sys.pyc
 A_source_code/generalcode/trunk/pointer_class.pyc
+
+*.pkl
