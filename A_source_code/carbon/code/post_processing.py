@@ -26,6 +26,7 @@ try:
     import make_index_species
     import make_mask
     import manip
+    import mocsy_module
     import mocsy
     import output_conversion
     import pointer_class
@@ -55,6 +56,7 @@ except:
     import make_index_species
     import manip
     import make_mask
+    import mocsy_module
     import mocsy
     import output_conversion
     import pointer_class
