@@ -4,47 +4,26 @@
 # ******************************************************
 
 import general_path
-try:
-  # Import general python modules
-  import os
-  import sys
-  import shutil
-  import traceback
-  import pickle
-  import numpy as np
-  from netCDF4 import Dataset
-    
-  # Import own general modules
-  import ascraster
-  import directory
-  import manip
-  from error import MyError
-
-  # Import local modules
-  import general_func
-  #import analysis
-  import post_processing
-except:
 
   # Import general python modules
-  import os
-  import sys
-  import shutil
-  import traceback
-  import pickle
-  import numpy as np
-  from netCDF4 import Dataset
-    
-  # Import own general modules
-  import ascraster
-  import directory
-  import manip
-  from error import MyError
+import os
+import sys
+import shutil
+import traceback
+import pickle
+import numpy as np
+from netCDF4 import Dataset
+  
+# Import own general modules
+import ascraster
+import directory
+import manip
+from error import MyError
 
-  # Import local modules
-  import general_func
-  #import analysis
-  import post_processing
+# Import local modules
+import general_func
+#import analysis
+import post_processing
 
 
 def pkl_to_ascraster_allorders(filename,outputdir,unmask_raster,new_raster=None,label='',norders=6):
