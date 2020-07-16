@@ -25,11 +25,14 @@ except ImportError:
     print("Environment parameter DGNM_ROOT found: ",root)
     sys.exit(1)
   # put mocsy directory in the sys.path.
-  if "/" in root:
-      # working in linux OS
+  if "/User" in root:
+      print('Working in Mac OS')
+      path = os.path.join(root,"libs","mocsy","mac")
+  elif "/theia" in root:
+      print('Working in linux OS')
       path = os.path.join(root,"libs","mocsy","linux")
-  elif "\\" in root:
-      # working in windows OS
-      path = os.path.join(root,"libs","mocsy","win")
+  elif "/" in root:
+      print('Working in linux OS - original statement')
+      path = os.path.join(root,"libs","mocsy","linux")
   if (os.path.exists(path)):
       sys.path.insert(3, path)
