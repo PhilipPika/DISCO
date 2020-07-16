@@ -21,15 +21,15 @@ echo "Mess: Removing current results"
 rm -r $DIR/OUT
 
 echo "Mess: Start SpinUp"
-python dgnm_main.py --endtime=1951 --maskid=600 --lspinup=1 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
+python dgnm_main.py --endtime=1951 --maskid=800 --lspinup=1 --inifile ../ini/Testing_cmd_m_50yrs_bio_def.ini
 cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
 echo "Note: First iteration done"
 
-python dgnm_main.py --endtime=1952 --maskid=600 --lspinup=0 --inifile ../ini/cmd_m_100yrs_SpinUp_bio.ini
-cp $DIR/OUT/bio/pkl/start1960.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
-
-echo "Mess: Start real run"
-python dgnm_main.py --endtime=1953 --maskid=600 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
+#python dgnm_main.py --endtime=1952 --maskid=800 --lspinup=0 --inifile ../ini/Testing_cmd_m_50yrs_bio_def.ini
+#cp $DIR/OUT/bio/pkl/start1960.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
+#
+#echo "Mess: Start real run"
+#python dgnm_main.py --endtime=1953 --maskid=800 --lspinup=0 --inifile ../ini/Testing_cmd_m_50yrs_bio_def.ini
 
 echo "Mess: Start Outout conversion"
 cd $DIR/OUT
