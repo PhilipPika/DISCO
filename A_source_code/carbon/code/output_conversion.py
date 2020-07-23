@@ -118,7 +118,7 @@ def init_ncdata(inputdir, ncdata, varname, basinid, unit='Mmol', long_name='None
                 institution='Dept. of Earth Sciences - Geochemistry, Utrecht University',\
                 description='Conversion of DGNM output with output_conversion.py'):
     '''
-    Fills meta data and creates dimensions of NETCDF data
+    Initializes NetCDF file and fills metadata and creates dimensions of NETCDF data
     '''
     
     ncdata.institution = institution
@@ -217,8 +217,11 @@ def init_ncdata(inputdir, ncdata, varname, basinid, unit='Mmol', long_name='None
         var.unit = unit
     
 def pkl2netcdf_allorders(filename,spec_data,netcdf_mask,basinid,fill_value=-999999999.,label="",norders=6):
-    # Convert output file in pkl format from rive_framework to NETCDF format for each specie.
-    # Open pkl file and read the header.
+    '''
+    Convert output file in pkl format from rive_framework to NETCDF format for each specie.
+    Open pkl file and read the header.
+    '''
+    
     fp = open(filename,'rb')
     time,names = general_func.read_header(fp=fp)
 
@@ -267,6 +270,7 @@ def pkl2netcdf_allorders(filename,spec_data,netcdf_mask,basinid,fill_value=-9999
 def convert_output(inputdir,outformat,norders=6):
     '''
     Read output of rive model and create output grids in wanted format (ASCII, NETCDF or both).
+    By default norders is set to Strahler order = 6
     '''
     
     # Check if the format conversion asked by the user is possible
@@ -345,7 +349,7 @@ def convert_output(inputdir,outformat,norders=6):
                             budgetfiles.append([fullname,time])                           
                 except ValueError:
                     pass
-
+    # Sorting the list of input data
     outputfiles.sort()
     conc_outputfiles.sort()
     outputfiles_allorders.sort()
@@ -353,7 +357,7 @@ def convert_output(inputdir,outformat,norders=6):
     argumentfiles.sort()
     budgetfiles.sort()
 
-        
+        # Conversion to ASCII - var 'outputdir' not undefined - potential error?
     if ((outformat == 'ASCII') or (outformat == 'ALL')):
         
         # Create a dummy grid which is not masked. This is used to convert coordinates.
@@ -389,13 +393,17 @@ def convert_output(inputdir,outformat,norders=6):
 
         for filename,time in argumentfiles:
             pkl_to_ascraster_allorders(filename,outputdir,dummy,label='arguments_')
-            
+
+
+
+
     if ((outformat == 'NETCDF') or (outformat == 'ALL')):
         
         if (len(outputfiles) == 0) and (len(outputfiles_allorders) == 0)\
             and (len(argumentfiles) ==0) and (len(budgetfiles) == 0):
             raise MyError("There is nothing to do!")      
         
+        ### Conversion of the species concentration ###
         if (len(outputfiles) > 0):
             filename = outputfiles[0][0]
             # Read header of one output file to get species names
@@ -408,7 +416,8 @@ def convert_output(inputdir,outformat,norders=6):
             # Use speciesnames to create NETCDF datasets in output directory
             conc_spec_data = []
             for name in names:
-                # Create NETCDF STATES files
+                #### Create NETCDF STATES files with species concentation ####
+                # in the STATES DIR
                 states_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STATES'))
                 ncfile = os.path.join(states_dir,'conc_'+name+'.nc')
                 conc_spec_data.append(Dataset(ncfile,'w'))
@@ -424,6 +433,7 @@ def convert_output(inputdir,outformat,norders=6):
                 conc_spec_data[item].sync()
                 conc_spec_data[item].close()
 
+        ### Conversion of the species concentration in subgrid orders ###
         if (len(outputfiles_allorders) > 0):
             filename = outputfiles_allorders[0][0]
             # Read header of one output file to get species names
@@ -434,13 +444,13 @@ def convert_output(inputdir,outformat,norders=6):
           
             conc_spec_data_allorders = []
 
-
+            # Calculates the concentration of the subgrid orders
             for iorder in range(norders):
                 conc_spec_data_allorders.append([])              
                 orderlabel = '_order'+str(iorder+1)
                   
                 for name in names:
-                    # Create concentration files
+                    # Create concentration files for subgrid orders
                     subgrid_states_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STATES', 'subgrid'))
                     ncfile = os.path.join(subgrid_states_dir,'conc_'+name+orderlabel+'.nc')
                     conc_spec_data_allorders[-1].append(Dataset(ncfile,'w'))
@@ -457,7 +467,8 @@ def convert_output(inputdir,outformat,norders=6):
             
             for fn in directory.get_files_with_str(subgrid_states_dir, "*order6*"):
                 shutil.copyfile(fn, os.path.join(subgrid_states_dir, '..', os.path.basename(fn).replace("_order6", "")))        
-
+        
+        ### Conversion of the environmental parameters and hydrology ###
         if (len(argumentfiles)>0):
             filename = argumentfiles[0][0]
             # Read header of one output file to get argument names
@@ -535,7 +546,8 @@ def convert_output(inputdir,outformat,norders=6):
 
             for fn in directory.get_files_with_str(subgrid_arg_dir, "*order6*"):
                 shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
-         
+        
+        ### Conversion of the species processes ###
         if (len(budgetfiles)>0):
             filename = budgetfiles[0][0]
             # Read header of one output file to get argument names
