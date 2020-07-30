@@ -18,15 +18,15 @@ cd $TOCODE/core
 pwd
 
 echo "Mess: Removing current results"
-#rm -r $DIR/OUT
+rm -r $DIR/OUT
 
 echo "Mess: Start SpinUp"
-python dgnm_main.py --endtime=1952 --maskid=1 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_Arctic.ini
+python dgnm_main.py --endtime=1952 --lspinup=1 --mask_bool_operator=GT --inifile ../ini/cmd_m_50yrs_bio_Arctic.ini
 cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
 echo "Note: First iteration done"
 
 echo "Mess: Start real run"
-python dgnm_main.py --endtime=2000 --maskid=1 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_Arctic.ini
+python dgnm_main.py --endtime=2000 --lspinup=0 --mask_bool_operator=GT --inifile ../ini/cmd_m_50yrs_bio_Arctic.ini
 
 echo "Mess: Start Outout conversion"
 cd $DIR/OUT
