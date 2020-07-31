@@ -213,7 +213,7 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
           print(nc_list)
           for nc_file in nc_list:
             print(nc_file)
-            os.remove(nc_file)
+            #os.remove(nc_file)
         # Determine the years that are given for this parameter
         nctimes = ncdata.variables['time']
         years = manip_netcdf.convert_numdate2year(nctimes[:], nctimes.units)
