@@ -5,7 +5,7 @@ eval "$(/usr/local/anaconda3/bin/conda shell.zsh hook)";conda activate p37
 # DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 echo "Mess: Exporting Dir for model"
 
-DIR=/Users/pippo/Desktop/DISCO
+DIR=/Users/pippo/Documents/SurfDrive/Research/Projects/UU_project/MyVersion/DISCO
 TOCODE=$DIR/A_source_code
 
 export DGNM_ROOT=$TOCODE
