@@ -193,12 +193,16 @@ def all_inputs_to_dict(params,add_color=False):
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1: # Used to be 1, but issues with start/end index for time series, as input not long enough PP 9.2020 
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
       endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
+      
+      print(               np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]-1)
+
+      
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]-1
       all_dat_startindex=max(all_dat_startindex, 0)
       all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
@@ -208,11 +212,17 @@ def all_inputs_to_dict(params,add_color=False):
         all_dat_endindex +=1
       mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
     else:
+      print("ALTERNATE 101 DATA")
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
       endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
+      
+      
+      print(               np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0])
+      
+      
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
       all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
@@ -232,14 +242,24 @@ def all_inputs_to_dict(params,add_color=False):
     ## this is still a bit too specific for carbon; to be formulated more generic
     for source in sources:
       src_nc = Dataset(os.path.join(src_folder, source.get_val('name')+'.nc'), 'r')
+      # print(src_nc)
       for attrib in source.get_attrib():
           if 'fr_' in attrib:
             if (not 'TSS' in attrib) and (not 'PIM' in attrib):
               fraction = getattr(source, attrib)
             elif ('tss' in source.get_val('name').lower() and ('TSS' in attrib)) or ('pim' in source.get_val('name').lower() and ('PIM' in attrib)):
               fraction = 1
+      all_dat_startindex=0
+      all_dat_endindex=25
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
+      # print(source.get_val('name'))
+      # A=src_nc[source.get_val('name')]
+      # print(A.shape)
+      # print(all_dat_startindex)
+      # print(all_dat_endindex)
+      # print(src_grid)
       src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
+      # print(src_series)
       for attrib in source.get_attrib():
         if 'fr_' in attrib:
           if (not 'TSS' in attrib) and (not 'ALK' in attrib) and (not 'PIM' in attrib):
