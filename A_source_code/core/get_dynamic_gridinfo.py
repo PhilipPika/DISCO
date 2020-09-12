@@ -220,7 +220,7 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
     
         # Find begin and end point for this time period
         istart,iend = general_func.find_within_range(years,params.starttime,params.endtime)
-        #print(varname)
+        print(varname)
         #print("istart,iend")
         #print(istart,iend)
         #print(min(iend+1,len(nctimes[:])))
