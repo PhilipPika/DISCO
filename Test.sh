@@ -5,7 +5,7 @@ eval "$(/usr/local/anaconda3/bin/conda shell.zsh hook)";conda activate p37
 # DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 echo "Mess: Exporting Dir for model"
 
-DIR=/Users/pippo/Desktop/DISCO
+DIR=/Users/pippo/Documents/SurfDrive/Research/Projects/UU_project/MyVersion/DISCO
 TOCODE=$DIR/A_source_code
 
 export DGNM_ROOT=$TOCODE
@@ -22,7 +22,7 @@ rm -r $DIR/OUT
 
 echo "Mess: Start SpinUp"
 #python dgnm_main.py --endtime=1959 --maskid=800 --lspinup=1 --inifile ../ini/cmd_y_SS_bio.ini
-python dgnm_main.py --endtime=1959 --maskid=800 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini
+python dgnm_main.py --endtime=1952 --maskid=800 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini
 cp $DIR/OUT/bio/pkl/start1951.000.pkl $DIR/A_source_code/carbon/startups/start1951.000.pkl
 echo "Note: First iteration done"
 
