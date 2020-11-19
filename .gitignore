@@ -65,3 +65,7 @@ A_source_code/core/doc_sewage_RTS.nc
 *.pyc
 
 *.pyc
+
+*.nc
+
+OUT_water_temperature_commented/bio/pkl/1990_1992.log
