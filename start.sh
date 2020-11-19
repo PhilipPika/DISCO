@@ -21,8 +21,8 @@ echo "Mess: Removing current results"
 #rm -r $DIR/OUT
 
 echo "Mess: Start SpinUp"
-#nice -n 19 python dgnm_main.py --starttime=1990 --endtime=1992 --maskid=99 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini
-#cp $DIR/OUT/bio/pkl/start1992.000.pkl $DIR/A_source_code/carbon/startups/start1990.000.pkl
+nice -n 19 python dgnm_main.py --starttime=1990 --endtime=1992 --maskid=99 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini
+cp $DIR/OUT/bio/pkl/start1992.000.pkl $DIR/A_source_code/carbon/startups/start1990.000.pkl
 echo "Note: First iteration done"
 
 python dgnm_main.py --starttime=1990 --endtime=1992 --maskid=99 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
