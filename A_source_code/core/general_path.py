@@ -6,7 +6,7 @@
 #print("Import general_path.")
 import os
 import sys
-
+print("***** IM IN GENERAL PATH ******")
 # Read the name of the user for the personal version of modules.
 name = 'carbon'
 if (name == None):
@@ -58,3 +58,7 @@ path = os.path.join(root,name,'code')
 if os.path.exists(path):
     sys.path.insert(0, path)
     print(path + " is added to the python search path for modules.")
+
+os.environ["DGNM_ROOT"] = "/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/DISCO/A_source_code"
+os.environ["DGNM_GENERALCODE"] = "/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/DISCO/A_source_code/generalcode/trunk"
+os.environ["DGNM_USER"] = "carbon"

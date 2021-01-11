@@ -20,13 +20,16 @@ pwd
 echo "Mess: Removing current results"
 rm -r $DIR/OUT
 
+Spinstart=2000
+Spinend=2002
+SimuEnd=2010 #Remember to also change the file name in params.ini
 echo "Mess: Start SpinUp"
-python dgnm_main.py  --endtime=1992 --maskid=38 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_discharge.ini
-cp $DIR/OUT/bio/pkl/start1992.000.pkl $DIR/A_source_code/carbon/startups/start1990.000.pkl
+nice -n 19 python dgnm_main.py --starttime=$Spinstart --endtime=$Spinend --maskid=13 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_Q_and_T.ini
+cp $DIR/OUT/bio/pkl/start$Spinend.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
 echo "Note: First iteration done"
 
-python dgnm_main.py  --endtime=1992 --maskid=38 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_discharge.ini #--species_ini ../ini/mon_bio_RTS.ini
-cp $DIR/OUT/bio/pkl/start1992.000.pkl $DIR/A_source_code/carbon/startups/start1990.000.pkl
+nice -n 19 python dgnm_main.py  --starttime=$Spinstart --endtime=$SimuEnd --maskid=13 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_Q_and_T.ini
+cp $DIR/OUT/bio/pkl/start$SimuEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
 
 #
 #echo "Mess: Start real run"

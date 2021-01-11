@@ -24,6 +24,7 @@ from error import *
 from iround import *
 import my_sys
 
+print("***** IM IN main PATH ******")
 # Import local modules.
 import define_subgrid_streamorder
 import dgnm_river
