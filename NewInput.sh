@@ -24,18 +24,18 @@ Spinstart=1950
 Spinend=1951
 SimuEnd=2000 #Remember to also change the file name in params.ini
 echo "Mess: Start SpinUp"
-nice -n 19 python dgnm_main.py --starttime=$Spinstart --endtime=$Spinend --maskid=99 --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_Q_and_T.ini
+nice -n 19 python dgnm_main.py --starttime=$Spinstart --endtime=$Spinend  --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
 cp $DIR/OUT/bio/pkl/start$Spinend.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
 echo "Note: First iteration done"
 
-nice -n 19 python dgnm_main.py  --starttime=$Spinstart --endtime=$SimuEnd --maskid=99 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_Q_and_T.ini
+nice -n 19 python dgnm_main.py  --starttime=$Spinstart --endtime=$SimuEnd --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
 cp $DIR/OUT/bio/pkl/start$SimuEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
 
-#
-#echo "Mess: Start real run"
-#python dgnm_main.py --endtime=1953 --maskid=99 --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini
 
 echo "Mess: Start Outout conversion"
 cd $DIR/OUT
 python ../A_source_code/carbon/code/output_conversion.py bio/pkl/ NETCDF
 echo "Note: Outout conversion done"
+
+cd $TOCODE/core
+python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
