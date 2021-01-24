@@ -193,41 +193,26 @@ def all_inputs_to_dict(params,add_color=False):
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
 
-    if params.outputtime < 1: # Used to be 1, but issues with start/end index for time series, as input not long enough PP 9.2020 
-      print(params.outputtime)
-      print("ALTERNATE 1200 DATA")
+    if params.outputtime < 1: 
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
       endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
-
-      print(               np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]-1)
-
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]-1
       all_dat_startindex=max(all_dat_startindex, 0)
       all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+2
-      print('Model start index')
-      print(modeldat_startindex)
-      print('Model end index')
-      print(modeldat_endindex)
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
-      print('Mask size')
-      print(mask_3d.shape)
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
     else:
-      print("ALTERNATE 101 DATA")
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
       endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
-      
-      print(               np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0])
-      
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
       all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
@@ -255,14 +240,6 @@ def all_inputs_to_dict(params,add_color=False):
             elif ('tss' in source.get_val('name').lower() and ('TSS' in attrib)) or ('pim' in source.get_val('name').lower() and ('PIM' in attrib)):
               fraction = 1
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
-      print(source.get_val('name'))
-      A=src_nc[source.get_val('name')]
-      print('Source size')
-      print(A.shape)
-      print('Data start index')
-      print(all_dat_startindex)
-      print('Data end index')
-      print(all_dat_endindex)
       src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
       for attrib in source.get_attrib():
         if 'fr_' in attrib:
@@ -405,7 +382,7 @@ def all_atm_exch_to_dict(params):
           mask_major_streams_3d[:,:,:] = True
           mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-          #atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_subgrid'])).tolist()
+          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_subgrid'])).tolist()
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
@@ -668,7 +645,7 @@ def all_fluxes_to_dict(params):
               mask_major_streams_3d[:,:,:] = True
               mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-              #flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_subgrid'])).tolist()
+              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_subgrid'])).tolist()
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]     
 
@@ -720,9 +697,7 @@ def all_fluxes_to_dict(params):
         flux_series[specie.get_val('name')][specie.get_name()+'_expflux'] = np.nansum(np.nansum(np.ma.array(tot_exp, mask=mouthmask_3d),axis=2),axis=1)  
       flux_series[specie.get_val('name')]['budget'] = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,0,0]))
       for flux in flux_series[specie.get_val('name')]:
-        print(specie.get_val('name'))
         if 'flux' in flux:
-          print(flux)
           flux_series[specie.get_val('name')]['budget'] += flux_series[specie.get_val('name')][flux]
     dummy_nc.close()
     waterbodyoutlet.close()
@@ -840,7 +815,7 @@ def all_sec_to_dict(params):
                 mask_major_streams_3d[:,:,:] = True
                 mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-                #sec_series[arg][arg+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(sec_series[arg][arg+'_subgrid'])).tolist()
+                sec_series[arg][arg+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(sec_series[arg][arg+'_subgrid'])).tolist()
                 sec_series[arg][arg+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
      
