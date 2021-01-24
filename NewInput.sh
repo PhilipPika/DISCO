@@ -20,8 +20,8 @@ pwd
 echo "Mess: Removing current results"
 rm -r $DIR/OUT
 
-Spinstart=1950
-Spinend=1951
+Spinstart=1970
+Spinend=1971
 SimuEnd=2000 #Remember to also change the file name in params.ini
 echo "Mess: Start SpinUp"
 nice -n 19 python dgnm_main.py --starttime=$Spinstart --endtime=$Spinend  --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
