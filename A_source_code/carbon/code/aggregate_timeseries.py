@@ -130,9 +130,9 @@ def make_time_indices(params, dummy_nc):
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
-      all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
+      all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]+1
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
-      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
+      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+2
       
       print('Model start index')
       print(modeldat_startindex)
