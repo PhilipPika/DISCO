@@ -317,25 +317,25 @@ def calculate(iriv,lock,params,species,proc,sources):
         #volume_cells,depth_cells, volume_fp_cells, depth_fp_cells = volumes_depths.calculate(params,rivmask,tmpdir,pointer1,outlakes_dict,str(jobid),False)
         volume_cells,depth_cells, volume_fp_cells, depth_fp_cells, vel_cells = vol_depth_vel.calculate(params,rivmask,tmpdir,pointer1,outlakes_dict) #LV 14-02-2018
         #print "vel_cells[3]  " + str(vel_cells[3])
-            
-        # Read surface water area of lakes and reservoirs m2
+
+        print('Read surface water area of lakes and reservoirs m2')
         water_area_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.water_area),params.water_area_varname) #LV 29-11-2017
-            
-        # Read the runoff for the whole period and put this time dependent object mm/yr.
+
+        print('Read the runoff for the whole period and put this time dependent object mm/yr.')
         runoff_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.pnet),params.pnet_varname)
-            
-        # Read the lake information for the whole period and put this time dependent object.
+
+        print('Read the lake information for the whole period and put this time dependent object.')
         lakeid_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.lakeid),params.lakeid_varname)
         outlakeid_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.outlakeid),params.outlakeid_varname)
         endo_lakes_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.endo_lakes),params.endo_lakes_varname)
 
-        # Read the discharge for the whole period and put this time dependent object km3/yr.
+        print('Read the discharge for the whole period and put this time dependent object km3/yr.')
         discharge_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.discharge),params.discharge_varname)
 
-        # Read the temperature for the whole period and put this time dependent object in degree Celcius.
+        print('Read the temperature for the whole period and put this time dependent object in degree Celcius.')
         temperature_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.temperature),params.temperature_varname)
 
-        # Read the global radiation for the whole period and put this time dependent object in degree W/m2
+        print('Read the global radiation for the whole period and put this time dependent object in degree W/m2')
         globrad_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir,params.global_radiation),params.global_radiation_varname)
 
         low_veg_fr_cells = get_dynamic_gridinfo.get_dynamic_gridinfo(params,pointer1,os.path.join(params.water_inputdir, params.low_veg_fr),params.low_veg_fr_varname)
