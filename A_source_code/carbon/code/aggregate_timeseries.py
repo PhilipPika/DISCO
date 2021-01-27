@@ -4,10 +4,10 @@
 # ******************************************************
 
 from netCDF4 import Dataset
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 import numpy as np
-import imageio
+#import imageio
 #import csv
 import copy
 import pandas as pd
@@ -20,19 +20,19 @@ import general_path
 import read_parameter
 
 import ascraster
-import cmd_options_dgnm
+#import cmd_options_dgnm
 import directory
-import get_dynamic_gridinfo
+#import get_dynamic_gridinfo
 import general_startup
-import interpolate_list
+#import interpolate_list
 import make_index_species
-import make_outlakes_dict
+#import make_outlakes_dict
 import make_mask
 import output_conversion
 import pickle
-import pointer_class
+#import pointer_class
 import reactions
-import specie
+#import specie
 import define_subgrid_streamorder
 
 import manip
