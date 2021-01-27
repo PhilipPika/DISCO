@@ -305,9 +305,9 @@ def all_atm_exch_to_dict(params):
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
 
-    waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
+    #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
+    #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     waterbodyid.close()
     endo_waterbodyid.close()
@@ -517,9 +517,9 @@ def all_fluxes_to_dict(params):
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
 
-    waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
+    #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
+    #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
@@ -674,9 +674,9 @@ def all_sec_to_dict(params):
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
 
-    waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
+    #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]    
+    #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]    
 
     sec_series = dict()
     for arg in arguments:
