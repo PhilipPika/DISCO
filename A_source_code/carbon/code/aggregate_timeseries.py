@@ -130,19 +130,17 @@ def make_time_indices(params, dummy_nc):
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
-      all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]+1
-      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
-      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+2
-      
-      print('Model start index')
-      print(modeldat_startindex)
-      print('Model end index')
-      print(modeldat_endindex)
-
       print('Data start index')
       print(all_dat_startindex)
+      all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]+1
       print('Data end index')
       print(all_dat_endindex)
+      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
+      print('Model start index')
+      print(modeldat_startindex)
+      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+2
+      print('Model end index')
+      print(modeldat_endindex)
       
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1  
@@ -310,7 +308,7 @@ def all_atm_exch_to_dict(params):
     #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     waterbodyid.close()
-    endo_waterbodyid.close()
+    #endo_waterbodyid.close()
 
     atm_exch_series = dict()
     atm_exch_series["time"] = manip.convert_numdate2year(dummy_nc['time'][:], dummy_nc['time'].units)[modeldat_startindex:modeldat_endindex]
