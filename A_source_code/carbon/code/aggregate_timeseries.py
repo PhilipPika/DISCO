@@ -206,7 +206,8 @@ def all_inputs_to_dict(params,add_color=False):
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = make_time_indices(params, dummy_nc)
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+        make_time_indices(params, dummy_nc)
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)   
     
     src_series = dict()
@@ -299,7 +300,8 @@ def all_atm_exch_to_dict(params):
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = make_time_indices(params, dummy_nc)
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+        make_time_indices(params, dummy_nc)
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
 
@@ -403,7 +405,8 @@ def all_exports_to_dict(params,add_color=False):
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
         
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = make_time_indices(params, dummy_nc)
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+    make_time_indices(params, dummy_nc)
 
 
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
@@ -511,9 +514,10 @@ def all_fluxes_to_dict(params):
     mask_2d[:,:] = True
     mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = make_time_indices(params, dummy_nc)
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+        make_time_indices(params, dummy_nc)
+    
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
-
 
     #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
@@ -668,13 +672,12 @@ def all_sec_to_dict(params):
     mask_2d[:,:] = True
     mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
     
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = make_time_indices(params, dummy_nc)
-    mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+        make_time_indices(params, dummy_nc)
+    
+    mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
-
-    #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]    
 
     sec_series = dict()
     for arg in arguments:
