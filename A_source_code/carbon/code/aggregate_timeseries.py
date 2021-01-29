@@ -68,10 +68,22 @@ def get_river_name(params):
       rivername = 'Mississippi'
     elif params.maskid==5:
       rivername = 'Nile'
+    elif params.maskid==7:
+      rivername = 'Yenisei'
+    elif params.maskid==8:
+      rivername = 'Ob'
+    elif params.maskid==9:
+      rivername = 'Lena'
     elif params.maskid==10:
       rivername = 'Yangtze'
     elif params.maskid==11:
       rivername = 'Amur'
+    elif params.maskid==13:
+      rivername = 'Mackenzie'
+    elif params.maskid==28:
+      rivername = 'Yukon'
+    elif params.maskid==38:
+      rivername = 'Kolyma'
     elif params.maskid==231:
       rivername = 'Seine'
     elif params.maskid==433:
@@ -305,9 +317,7 @@ def all_atm_exch_to_dict(params):
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
 
-    #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     waterbodyid.close()
     #endo_waterbodyid.close()
@@ -519,9 +529,7 @@ def all_fluxes_to_dict(params):
     
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
-    #waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    #endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
