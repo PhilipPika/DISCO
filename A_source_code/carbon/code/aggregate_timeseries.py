@@ -130,29 +130,54 @@ def geographical_reach_npmask(params):
     d['maxlat']=maxlat
     return d
 
+def debugprint(params, print_statement):
+    if params.ldebug: print(print_statement)
+
 def make_time_indices(params, dummy_nc):
     if params.outputtime < 1:
-      print('Time step')  
-      print(params.outputtime)
-      print("ALTERNATE 1200 DATA")
+      debugprint(params,'Time step')  
+      debugprint(params,params.outputtime)
+      debugprint(params,"ALTERNATE 1200 DATA")
+      debugprint(params,'size dummt nc')
+      debugprint(params,dummy_nc)
+      debugprint(params,dummy_nc['time'][:])
+      
+      debugprint(params,os.path.join(params.water_inputdir))
+      
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
       endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
-      print('Data start index')
-      print(all_dat_startindex)
+      debugprint(params,'Data start index')
+      debugprint(params,all_dat_startindex)
+      debugprint(params,np.where(waterbodyoutlet['time'][:] >= modelrun_start))
+      debugprint(params,np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0])
+      debugprint(params,np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0])
+      
       all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]+1
-      print('Data end index')
-      print(all_dat_endindex)
+      debugprint(params,'Data end index')
+      debugprint(params,all_dat_endindex)
+
+      debugprint(params,'TEST')
+      debugprint(params,waterbodyoutlet['time'][-1])
+      debugprint(params,waterbodyoutlet['time'][0])
+      debugprint(params,waterbodyoutlet['time'][1])
+      debugprint(params,waterbodyoutlet['time'][1199])
+      debugprint(params,dummy_nc['time'][:])
+
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
-      print('Model start index')
-      print(modeldat_startindex)
+      debugprint(params,'Model start index')
+      debugprint(params,modeldat_startindex)
+      
+
+
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+2
-      print('Model end index')
-      print(modeldat_endindex)
+      debugprint(params,'Model end index')
+      debugprint(params,modeldat_endindex)
       
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1  
@@ -233,7 +258,7 @@ def all_inputs_to_dict(params,add_color=False):
     ## this is still a bit too specific for carbon; to be formulated more generic
     for source in sources:
       src_nc = Dataset(os.path.join(src_folder, source.get_val('name')+'.nc'), 'r')
-      print(src_nc)
+      debugprint(params,src_nc)
       for attrib in source.get_attrib():
           if 'fr_' in attrib:
             if (not 'TSS' in attrib) and (not 'PIM' in attrib):
@@ -241,21 +266,21 @@ def all_inputs_to_dict(params,add_color=False):
             elif ('tss' in source.get_val('name').lower() and ('TSS' in attrib)) or ('pim' in source.get_val('name').lower() and ('PIM' in attrib)):
               fraction = 1
       
-      print(source.get_val('name'))
+      debugprint(params,source.get_val('name'))
       A=src_nc[source.get_val('name')]
-      print('Source size')
-      print(A.shape)
+      debugprint(params,'Source size')
+      debugprint(params,A.shape)
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
       
-      print('Source size')
-      print(src_grid.shape)
-      print('Mask size')
-      print(mask_3d.shape)
+      debugprint(params,'Source size')
+      debugprint(params,src_grid.shape)
+      debugprint(params,'Mask size')
+      debugprint(params,mask_3d.shape)
       
       src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
-      
 
-      
+
+
       for attrib in source.get_attrib():
         if 'fr_' in attrib:
           if (not 'TSS' in attrib) and (not 'ALK' in attrib) and (not 'PIM' in attrib):
@@ -635,8 +660,8 @@ def all_fluxes_to_dict(params):
         flux_series[specie.get_val('name')][specie.get_name()+'_expflux'] = np.nansum(np.nansum(np.ma.array(tot_exp, mask=mouthmask_3d),axis=2),axis=1)  
       flux_series[specie.get_val('name')]['budget'] = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,0,0]))
       for flux in flux_series[specie.get_val('name')]:
-        #print(specie.get_val('name'))
-        #print(flux)
+        #debugprint(params,specie.get_val('name'))
+        #debugprint(params,flux)
         if 'flux' in flux:
           flux_series[specie.get_val('name')]['budget'] += flux_series[specie.get_val('name')][flux]
     dummy_nc.close()
