@@ -563,6 +563,7 @@ def all_fluxes_to_dict(params):
     
     flux_series = dict()
     for specie in species:
+      print(specie.name)
       flux_series[specie.get_val('name')] = dict()
       flux_series[specie.get_val('name')]["time"] = manip.convert_numdate2year(dummy_nc['time'][:], dummy_nc['time'].units)[modeldat_startindex:modeldat_endindex]
       stoich = reactions.specie_dy(proc,specie.get_name())
