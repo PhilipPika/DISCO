@@ -17,19 +17,15 @@ pwd
 cd $TOCODE/core
 pwd
 
-#echo "Mess: Removing current results"
-#rm -r $DIR/OUT
-#
-Spinstart=1970
-Spinend=1971
-SimuEnd=2000 #Remember to also change the file name in params.ini
-echo "Mess: Start SpinUp"
-nice -n 19 python dgnm_main.py --starttime=$Spinstart --endtime=$Spinend  --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
-cp $DIR/OUT/bio/pkl/start$Spinend.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
-echo "Note: First iteration done"
+echo "Mess: Removing current results"
+rm -r $DIR/OUT
 
-nice -n 19 python dgnm_main.py  --starttime=$Spinstart --endtime=$SimuEnd --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
-cp $DIR/OUT/bio/pkl/start$SimuEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
+echo "Mess: Start SpinUp"
+nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini --endtime=1992
+cp $DIR/OUT/bio/pkl/start1991.000.pkl $DIR/A_source_code/carbon/startups/start1990.000.pkl
+
+echo "Note: First iteration done"
+#nice -n 19 python dgnm_main.py  --lspinup=0 --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
 
 
 echo "Mess: Start Outout conversion"
@@ -37,5 +33,8 @@ cd $DIR/OUT
 python ../A_source_code/carbon/code/output_conversion.py bio/pkl/ NETCDF
 echo "Note: Outout conversion done"
 
+echo "Mess: Start aggregate time series"
 cd $TOCODE/core
 python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_50yrs_bio_def.ini --parameter_ini ../ini/params_m_bio.ini --species_ini=mon_bio_1200.ini
+
+echo "Mess: Aggregate time series done"
