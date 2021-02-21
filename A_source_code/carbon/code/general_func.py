@@ -36,6 +36,8 @@ def calc_o2_sat(temperature):
     #print("csat  " + str(math.exp(ln_csat)))
     return math.exp(ln_csat)
 
+def debugprint(params, print_statement): #Added by PP 1.2021
+    if params.ldebug: print(print_statement)
 
 def start_process(p,jobs,max_number_of_processes):
     '''
