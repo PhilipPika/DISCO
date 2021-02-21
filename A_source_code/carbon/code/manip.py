@@ -471,31 +471,6 @@ def convert_numdate2year(numdates, units):
     dtdates = num2date(numdates, units)
     years = convert_datetime2year(dtdates)
     return years
-    
-    #ndays_mon = [31,28,31,30,31,30,31,31,30,31,30,31]
-    #dtdates = num2date(numdates, units)
-    #years = []
-
-    # num2date returns a single datetime object if only one time is to be converted
-    # and a numpy array of datetime objects if more than one need conversion
-    #if (type(dtdates) == dt.datetime):
-    #    dtdates = [dtdates]
-    
-    #for idate in range(len(dtdates)):
-    #    year = float(dtdates[idate].year)
-    #    ndays = 365
-    #    if (year%400==0 or (year%4==0 and year%100!=0)):
-    #        ndays += 1
-    #    days = sum(ndays_mon[0:dtdates[idate].month-1])
-    #    days += dtdates[idate].day-1 #We consider the value is always given at hour 00:00:00 - 2 change
-    #    year += float(days) / ndays
-    #    years.append(year)
-
-    #if (len(years) == 1):
-    #    return years[0]
-    #else:
-    #    return years
-    
 
 ############
 ### Test ###
