@@ -558,6 +558,10 @@ def procfunc(spec,params,species,proc,Q,arguments):
         elif (name == "atmospheric_exchange_DIC"):
             dic_exch = atmospheric_exchange_DIC(spec,params,species,temperature,windspeed,Q,vel,vol,width,length)
             out.append(dic_exch)
+
+        elif (name == "transformation_terrPOC2DOC"):
+            out.append(gen_mineralization(params, species[params.ipocterr_lowCN], spec[params.ipocterr_lowCN], temperature))
+
         else:
             print(name)
             MyError.write("Function %s has not been defined." % name)
