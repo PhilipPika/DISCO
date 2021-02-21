@@ -73,3 +73,5 @@ OUT_water_temperature_commented/bio/pkl/1990_1992.log
 *.csv
 
 *.log
+
+*.vim
