@@ -36,6 +36,7 @@ import reactions
 import define_subgrid_streamorder
 
 import manip
+import time
 
 global_colors = cm.Set1(np.linspace(0,1,8))
 
