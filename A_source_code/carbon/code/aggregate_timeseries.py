@@ -37,23 +37,36 @@ import define_subgrid_streamorder
 
 import manip
 
+import time
 global_colors = cm.Set1(np.linspace(0,1,8))
 
 def do(params):
     ## make all tables
+    starttime_main = time.time()
     all_inputs_to_table(params)
-    print('all_inputs_to_table finished')   
+    endtime_main = time.time()
+    print('all_inputs_to_table finished (in s):  ' + str(endtime_main-starttime_main))
+    starttime_main = time.time()
     all_atm_exch_to_table(params)
-    print('all_atm_exch_to_table finished') 
+    endtime_main = time.time()
+    print('all_atm_exch_to_table finished (in s):  ' + str(endtime_main-starttime_main)) 
+    starttime_main = time.time()
     all_exports_to_table(params)
-    print('all_exports_to_table finished') 
+    endtime_main = time.time()
+    print('all_exports_to_table finished (in s):  ' + str(endtime_main-starttime_main)) 
+    starttime_main = time.time()
     all_budget_to_table(params)
-    print('all_budget_to_table finished')    
+    endtime_main = time.time()
+    print('all_budget_to_table finished (in s):  ' + str(endtime_main-starttime_main))
+    starttime_main = time.time()
     all_fluxes_to_table(params)
-    print('all_fluxes_to_table finished')
+    endtime_main = time.time()
+    print('all_fluxes_to_table finished (in s):  ' + str(endtime_main-starttime_main))
+    starttime_main = time.time()
     conv_all_tables_to_Tg(params)
-    print('aggregate timeseries.py finished')
-	    
+    endtime_main = time.time()
+    print('aggregate timeseries.py finished (in s):  ' + str(endtime_main-starttime_main))
+        
 def get_river_name(params):
   if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
     if params.maskid==99:
@@ -194,7 +207,7 @@ def make_time_indices(params, dummy_nc):
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
-        all_dat_endindex +=1       
+        all_dat_endindex +=1
     return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid
 
 def make_3d_mask(mask_2d, modeldat_startindex, modeldat_endindex, dummy_nc, dummy_name):
@@ -583,9 +596,9 @@ def all_fluxes_to_dict(params):
             elif (ifn == len(proc_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
               grid_3d_dum = copy.deepcopy(grid_3d) 
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-			  # store main stream without lakes and reservoirs
+              # store main stream without lakes and reservoirs
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
-			  
+              
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_order'+str(proc_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
@@ -729,9 +742,9 @@ def all_sec_to_dict(params):
             elif (ifn == len(arg_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
               grid_3d_dum = copy.deepcopy(grid_3d) 
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-			  # store main stream without lakes and reservoirs
+              # store main stream without lakes and reservoirs
               sec_series[arg][arg+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
-			  
+              
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
@@ -868,4 +881,4 @@ if __name__ == "__main__":
     #except SystemExit:
     #  raise MyError("Error has occured in the reading of the commandline options.")
     
-    do(params)	
+    do(params)    
