@@ -402,10 +402,10 @@ def erosion(spec, ispec_benth, params, species, proc, width, depth, bedarea, vel
     spec_benth_amount = spec[ispec_benth]
     if bedarea>0. and vol>0. and vel>0. and spec_benth_amount>0.:
       try:
-        bsed = (spec[params.ipim_benth]+spec[params.idetritushighcn_benth]*24+spec[params.idetrituslowcn_benth]*24) / bedarea #sediment stock per bed surface area
+        bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24+spec[params.idetrituslowcn_benth]*24) / bedarea #sediment stock per bed surface area
       except(AttributeError):
         try:
-          bsed = (spec[params.ipim_benth]+spec[params.idetritushighcn_benth]*24) / bedarea #sediment stock per bed surface area          
+          bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24) / bedarea #sediment stock per bed surface area          
         except(AttributeError):
           bsed = spec[params.ipim_benth] / bedarea #sediment stock per bed surface area
     else:
@@ -423,10 +423,10 @@ def erosion(spec, ispec_benth, params, species, proc, width, depth, bedarea, vel
     ero_tss = factor*species[params.itss_benth].get_val("kero1")/(1e-3*6.66) * slope * vel * bedarea
 
     try:
-      ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth]+spec[params.idetritushighcn_benth]*24+spec[params.idetrituslowcn_benth]*24)
+      ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24+spec[params.idetrituslowcn_benth]*24)
     except(AttributeError):
       try:
-        ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth]+spec[params.idetritushighcn_benth]*24)
+        ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24)
       except(AttributeError):
         try:
           ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth])
@@ -447,10 +447,10 @@ def burial(spec, ispec, params, species, depth, vol):
         bedarea = vol * 1.e3/depth # km2
 
         try:
-          bsed = (spec[params.ipim_benth]+spec[params.idetritushighcn_benth]*24+spec[params.idetrituslowcn_benth]*24) / bedarea #sediment stock per bed surface area
+          bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24+spec[params.idetrituslowcn_benth]*24) / bedarea #sediment stock per bed surface area
         except(AttributeError):
             try:
-              bsed = (spec[params.ipim_benth]+spec[params.idetritushighcn_benth]*24) / bedarea #sediment stock per bed surface area
+              bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24) / bedarea #sediment stock per bed surface area
             except(AttributeError):
               bsed = (spec[params.ipim_benth]) / bedarea #sediment stock per bed surface area
         try:
@@ -524,18 +524,18 @@ def procfunc(spec,params,species,proc,Q,arguments):
             out.append(gen_mineralization(params, species[params.idetrituslowcn], spec[params.idetrituslowcn], temperature))
         elif (name == "oxidation_DETRITUSlowCN_benth"):
             out.append(gen_mineralization(params, species[params.idetrituslowcn_benth], spec[params.idetrituslowcn_benth], temperature))
-        elif (name == "oxidation_DETRITUShighCN"):
-            out.append(gen_mineralization(params, species[params.idetritushighcn], spec[params.idetritushighcn], temperature))
-        elif (name == "oxidation_DETRITUShighCN_benth"):
-            out.append(gen_mineralization(params, species[params.idetritushighcn_benth], spec[params.idetritushighcn_benth], temperature))
+        elif (name == "oxidation_POChighCN"):
+            out.append(gen_mineralization(params, species[params.ipochighcn], spec[params.ipochighcn], temperature))
+        elif (name == "oxidation_POChighCN_benth"):
+            out.append(gen_mineralization(params, species[params.ipochighcn_benth], spec[params.ipochighcn_benth], temperature))
         elif (name == "oxidation_DOC"):
             out.append(gen_mineralization(params, species[params.idoc], spec[params.idoc], temperature))
         elif (name == "sedimentation_TSS"):
             out.append(sedimentation(species, spec, params.itss, proc, depth, vol, area))
         elif (name == "sedimentation_PIM"):
             out.append(sedimentation(species, spec, params.ipim, proc, depth, vol, area))
-        elif (name == "sedimentation_DETRITUShighCN"):
-            out.append(sedimentation(species,spec,params.idetritushighcn,proc,depth, vol, area))
+        elif (name == "sedimentation_POChighCN"):
+            out.append(sedimentation(species,spec,params.ipochighcn,proc,depth, vol, area))
         elif (name == "sedimentation_DETRITUSlowCN"):
             out.append(sedimentation(species,spec,params.idetrituslowcn,proc,depth, vol, area))
 
@@ -543,15 +543,15 @@ def procfunc(spec,params,species,proc,Q,arguments):
             out.append(erosion(spec, params.itss_benth, params, species, proc, width, depth, area, vel, slope, area, vol, Q))
         elif (name == "erosion_PIM"):
             out.append(erosion(spec, params.ipim_benth, params, species, proc, width, depth, area, vel, slope, area, vol, Q))
-        elif (name == "erosion_DETRITUShighCN"):
-            out.append(erosion(spec,params.idetritushighcn_benth,params,species,proc,width,depth, area, vel, slope, area, vol, Q))
+        elif (name == "erosion_POChighCN"):
+            out.append(erosion(spec,params.ipochighcn_benth,params,species,proc,width,depth, area, vel, slope, area, vol, Q))
         elif (name == "erosion_DETRITUSlowCN"):
             out.append(erosion(spec,params.idetrituslowcn_benth,params,species,proc,width,depth,area, vel, slope, area, vol, Q))
 
         elif (name == "burial_PIM"):
             out.append(burial(spec, params.ipim_benth, params, species, depth, vol))
-        elif (name == "burial_DETRITUShighCN"):
-            out.append(burial(spec, params.idetritushighcn_benth, params, species, depth, vol))
+        elif (name == "burial_POChighCN"):
+            out.append(burial(spec, params.ipochighcn_benth, params, species, depth, vol))
         elif (name == "burial_DETRITUSlowCN"):
             out.append(burial(spec, params.idetrituslowcn_benth, params, species, depth, vol))
 
