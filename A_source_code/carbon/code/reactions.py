@@ -139,7 +139,7 @@ def gen_mortality(params,sp,amount,temperature,vol, area):
     return 0
 
 
-def gen_doc_excretion(params,sp,amount,temperature, vol):
+def gen_excretion_doc(params,sp,amount,temperature, vol):
   if amount>0 and vol>0.:
     np.seterr(all='raise')
     try:	
@@ -515,10 +515,10 @@ def procfunc(spec,params,species,proc,Q,arguments):
         elif (name == "mortality_PERIPHYTON"):
             out.append(gen_mortality(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature,vol,area)) 
 
-        elif (name == "doc_excretion_PHYTO"):
-            out.append(gen_doc_excretion(params,species[params.iphyto],spec[params.iphyto],temperature, vol))
-        elif (name == "doc_excretion_PERIPHYTON"):
-            out.append(gen_doc_excretion(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))  
+        elif (name == "excretion_DOC_PHYTO"):
+            out.append(gen_excretion_doc(params,species[params.iphyto],spec[params.iphyto],temperature, vol))
+        elif (name == "excretion_DOC_PERIPHYTON"):
+            out.append(gen_excretion_doc(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))  
 
         elif (name == "oxidation_POClowCN"):
             out.append(gen_mineralization(params, species[params.ipoclowcn], spec[params.ipoclowcn], temperature))
