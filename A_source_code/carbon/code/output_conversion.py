@@ -25,6 +25,7 @@ import general_func
 #import analysis
 import post_processing
 
+import time
 
 def pkl_to_ascraster_allorders(filename,outputdir,unmask_raster,new_raster=None,label='',norders=6):
     # Convert output file in pkl format from rive_framework to ascraster format for each specie.
@@ -604,7 +605,14 @@ if __name__ == "__main__":
     outformat = sys.argv[2]
     
     print("OUTPUT CONVERSION OF " , inputdir, " TO ", outformat)
+    
+    starttime_main = time.time()
+    
     convert_output(inputdir,outformat)
+    
+    endtime_main = time.time()
+    print('OUTPUT CONVERSION OF lasted (in s):  ' + str(endtime_main-starttime_main))
+
     #except MyError, val:
     #    val.write()
     #except (optparse.OptionValueError,
