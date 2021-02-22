@@ -79,7 +79,7 @@ def stryear(year):
     '''
     
     if (isinstance(year, float)):
-        strtime = '%.3f' % round(year,3)
+        strtime = str(round(year, 3))
     else:
         strtime = str(year)
     return strtime

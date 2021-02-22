@@ -185,6 +185,7 @@ def run_dgnm(args):
             else:
                 total_cells += riverid_num[list_riverid[item]]
                 numbers.append(list_riverid[item])
+
         if (params.llocal):
             # Define the process with riverid "num", return value p is process "handler"
             p=mp.Process(target= dgnm_river.calculate, args=(numbers,lock,params,species,proc,sources))
