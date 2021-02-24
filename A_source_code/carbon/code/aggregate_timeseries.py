@@ -66,12 +66,10 @@ def do(params):
     conv_all_tables_to_Tg(params)
     endtime_main = time.time()
     print('aggregate timeseries.py finished (in s):  ' + str(endtime_main-starttime_main))
-	    
+
 def get_river_name(params):
   if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
-    if params.maskid==99:
-      rivername = "Rhine"
-    elif params.maskid==1:
+    if params.maskid==1:
       rivername = 'Amazon'
     elif params.maskid==2:
       rivername = 'Congo'
@@ -97,6 +95,8 @@ def get_river_name(params):
       rivername = 'Yukon'
     elif params.maskid==38:
       rivername = 'Kolyma'
+    elif params.maskid==99:
+      rivername = "Rhine"
     elif params.maskid==231:
       rivername = 'Seine'
     elif params.maskid==433:
@@ -447,8 +447,12 @@ def all_exports_to_dict(params,add_color=False):
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
     folder = os.path.join(params.outputdir, '..', "BUDGET", "subgrid")
+    if(params.ldebug):
+        print(folder)
 
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
+    if(params.ldebug):
+        print(proclist)
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
@@ -471,10 +475,13 @@ def all_exports_to_dict(params,add_color=False):
 
     export_series = dict()
     export_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units) 
-
+    if(params.ldebug):
+        print(export_series.items())
     tot_export = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
 
     for specie in species:
+      if(params.ldebug):
+          print(specie.name)
       all_export = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
       export_files = directory.get_files_with_str(folder, specie.get_name()+"loadOUT_order6*")
       for fn in export_files:
@@ -482,7 +489,11 @@ def all_exports_to_dict(params,add_color=False):
         grid_3d = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
         grid_3d[np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)] = nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:][np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)]
         nc.close()
+        if(params.ldebug):
+            print(grid_3d.sum())
         all_export = np.add(grid_3d, all_export)
+        if(params.ldebug):
+            print(all_export.shape)
         if (not specie.get_name().lower()=='alk') and (not 'tss' in specie.get_name().lower()) and (not 'pim' in specie.get_name().lower()):
           tot_export = np.add(grid_3d, tot_export)
       export_series[specie.get_name().upper()+"loadOUT"] = np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
@@ -492,10 +503,14 @@ def all_exports_to_dict(params,add_color=False):
         export_series[specie.get_name().upper()+"loadOUT"] = np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
 
     export_series["total_loadOUT"] = np.nansum(np.nansum(np.ma.array(tot_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
+    if(params.ldebug):
+        print(np.nansum(np.nansum(np.ma.array(tot_export, mask=mouthmask_3d),axis=2),axis=1).tolist())
     return export_series
 
 def all_exports_to_table(params):
     export_series = all_exports_to_dict(params)
+    if(params.ldebug):
+        print(export_series)
     folder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "tables"))
     filename = os.path.join(folder, 'exports_'+get_river_name(params)+'.csv')
     dict_to_csv(filename, export_series)
