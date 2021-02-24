@@ -157,38 +157,36 @@ def make_time_indices(params, dummy_nc):
       
       debugprint(params,os.path.join(params.water_inputdir))
       
-      waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
       
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
-      all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
+      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
       debugprint(params,'Data start index')
       debugprint(params,all_dat_startindex)
-      debugprint(params,np.where(waterbodyoutlet['time'][:] >= modelrun_start))
-      debugprint(params,np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0])
-      debugprint(params,np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0])
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_start))
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_start)[0])
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_start)[0][0])
       
-      all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]+1
+      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_end)[0][-1]+1
       debugprint(params,'Data end index')
       debugprint(params,all_dat_endindex)
 
       debugprint(params,'TEST')
-      debugprint(params,waterbodyoutlet['time'][-1])
-      debugprint(params,waterbodyoutlet['time'][0])
-      debugprint(params,waterbodyoutlet['time'][1])
-      debugprint(params,waterbodyoutlet['time'][1199])
+      debugprint(params,waterbodyid['time'][-1])
+      debugprint(params,waterbodyid['time'][0])
+      debugprint(params,waterbodyid['time'][1])
+      debugprint(params,waterbodyid['time'][1199])
       debugprint(params,dummy_nc['time'][:])
 
-      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
+      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
       debugprint(params,'Model start index')
       debugprint(params,modeldat_startindex)
       
 
 
-      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+2
+      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+2
       debugprint(params,'Model end index')
       debugprint(params,modeldat_endindex)
       
@@ -196,19 +194,17 @@ def make_time_indices(params, dummy_nc):
         all_dat_endindex +=1  
     else:
       print("ALTERNATE 101 DATA")
-      waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
-      all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
+      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
-      all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
-      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
-      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
+      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_end)[0][-1]
+      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
+      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1       
-    return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid
+    return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid
 
 def make_3d_mask(mask_2d, modeldat_startindex, modeldat_endindex, dummy_nc, dummy_name):
     return np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape) 
@@ -256,7 +252,7 @@ def all_inputs_to_dict(params,add_color=False):
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
         make_time_indices(params, dummy_nc)
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)   
     
@@ -350,19 +346,16 @@ def all_atm_exch_to_dict(params):
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
         make_time_indices(params, dummy_nc)
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
 
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-
     waterbodyid.close()
-    #endo_waterbodyid.close()
 
     atm_exch_series = dict()
     atm_exch_series["time"] = manip.convert_numdate2year(dummy_nc['time'][:], dummy_nc['time'].units)[modeldat_startindex:modeldat_endindex]
-    waterbodyoutlet.close()
     for specie in species:
       atm_exch_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))
       if len(atm_exch_files):
@@ -457,7 +450,7 @@ def all_exports_to_dict(params,add_color=False):
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
         
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
     make_time_indices(params, dummy_nc)
 
 
@@ -577,12 +570,13 @@ def all_fluxes_to_dict(params):
     mask_2d[:,:] = True
     mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
         make_time_indices(params, dummy_nc)
     
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
 
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
+    waterbodyid.close()
 
     mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
@@ -694,7 +688,6 @@ def all_fluxes_to_dict(params):
         if 'flux' in flux:
           flux_series[specie.get_val('name')]['budget'] += flux_series[specie.get_val('name')][flux]
     dummy_nc.close()
-    waterbodyoutlet.close()
     return flux_series
 
 def all_fluxes_to_table(params):
@@ -734,12 +727,13 @@ def all_sec_to_dict(params):
     mask_2d[:,:] = True
     mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
     
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyoutlet, waterbodyid, endo_waterbodyid = \
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
         make_time_indices(params, dummy_nc)
     
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
+    waterbodyid.close()
 
     sec_series = dict()
     for arg in arguments:
@@ -817,7 +811,6 @@ def all_sec_to_dict(params):
   
       sec_series[arg][arg+'_tot'] = np.nansum(np.nansum(np.ma.array(tot_arg, mask=mask_3d),axis=2),axis=1).tolist()
     dummy_nc.close()
-    waterbodyoutlet.close()
     return sec_series
 
 def all_stream_env_conditions_to_table(params):
