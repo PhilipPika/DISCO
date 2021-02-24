@@ -203,7 +203,7 @@ def make_time_indices(params, dummy_nc):
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
-        all_dat_endindex +=1       
+        all_dat_endindex +=1
     return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid
 
 def make_3d_mask(mask_2d, modeldat_startindex, modeldat_endindex, dummy_nc, dummy_name):
@@ -449,10 +449,8 @@ def all_exports_to_dict(params,add_color=False):
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-        
     modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
-    make_time_indices(params, dummy_nc)
-
+        make_time_indices(params, dummy_nc)
 
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
     mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
@@ -461,10 +459,12 @@ def all_exports_to_dict(params,add_color=False):
     if len(dum_mask)>0:
       mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
     else: #endoreic basin
-      mouthmask_fn = os.path.join(params.water_inputdir, "rivermouths_exporting_to_endoreic_lakes.asc")    
+      mouthmask_fn = os.path.join(params.water_inputdir, "rivermouths_exporting_to_endoreic_lakes.asc")
+
 
     mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid',logical=params.mask_bool_operator)
     mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
+    
 
     export_series = dict()
     export_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units) 
@@ -480,10 +480,12 @@ def all_exports_to_dict(params,add_color=False):
       for fn in export_files:
         nc = Dataset(fn, 'r')
         grid_3d = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
-        grid_3d[np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)] = nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:][np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)]
+        grid_3d[np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)] = \
+            nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:][np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)]
         nc.close()
+        # print(grid_3d.mean[:,:,:])
         if(params.ldebug):
-            print(grid_3d.sum())
+            print(grid_3d.sum()>1)
         all_export = np.add(grid_3d, all_export)
         if(params.ldebug):
             print(all_export.shape)
@@ -550,17 +552,35 @@ def all_fluxes_to_dict(params):
 
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
-
-    if params.lfloodplains:
-      mainstream_id = 2
-    else: 
-      mainstream_id = 1
-
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
+    if(params.ldebug):
+        print(folder)
 
+    proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
+    if(params.ldebug):
+        print(proclist)
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
+
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
+        make_time_indices(params, dummy_nc)
+
+    dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
+    mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
+    dum_mask = ascraster.create_mask(mouthmask_fn, params.maskid, logical = params.mask_bool_operator, numtype=int)
+
+    if len(dum_mask)>0:
+      mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
+    else: #endoreic basin
+      mouthmask_fn = os.path.join(params.water_inputdir, "rivermouths_exporting_to_endoreic_lakes.asc")
+
+
+    mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid',logical=params.mask_bool_operator)
+    mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
+
+
+    waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
+    waterbodyid.close()
 
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
     mask_2d_dum = make_mask.do(params.file_mask, params.maskid, dum_asc, logical=params.mask_bool_operator, mask_type='np_grid')
@@ -568,21 +588,16 @@ def all_fluxes_to_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
-    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
-        make_time_indices(params, dummy_nc)
-    
-    mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+    mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
-    waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    waterbodyid.close()
-
-    mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
-    dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
-    mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid', logical=params.mask_bool_operator)
-    mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
-    
+    if params.lfloodplains:
+      mainstream_id = 2
+    else:
+      mainstream_id = 1
+      
+      
     flux_series = dict()
     for specie in species:
       print(specie.name)
