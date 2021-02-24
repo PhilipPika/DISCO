@@ -401,8 +401,10 @@ def all_atm_exch_to_dict(params):
           mask_major_streams_3d[:,:,:] = True
           mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_subgrid'])).tolist()
-          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_smallstreams'] = \
+              (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_subgrid'])).tolist()
+          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = \
+              np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
         # store sum of cell
@@ -437,15 +439,13 @@ def all_atm_exch_to_table(params):
     dict_to_csv(filename, atm_exch_series)
 
 def all_exports_to_dict(params,add_color=False):
+    setattr(params, 'ldebug', True)
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
     folder = os.path.join(params.outputdir, '..', "BUDGET", "subgrid")
-    if(params.ldebug):
-        print(folder)
+    if(params.ldebug): print(folder)
 
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
-    if(params.ldebug):
-        print(proclist)
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
@@ -464,17 +464,12 @@ def all_exports_to_dict(params,add_color=False):
 
     mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid',logical=params.mask_bool_operator)
     mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
-    
 
     export_series = dict()
     export_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units) 
-    if(params.ldebug):
-        print(export_series.items())
     tot_export = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
 
     for specie in species:
-      if(params.ldebug):
-          print(specie.name)
       all_export = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
       export_files = directory.get_files_with_str(folder, specie.get_name()+"loadOUT_order6*")
       for fn in export_files:
@@ -483,29 +478,20 @@ def all_exports_to_dict(params,add_color=False):
         grid_3d[np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)] = \
             nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:][np.where(nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]<1e12)]
         nc.close()
-        # print(grid_3d.mean[:,:,:])
-        if(params.ldebug):
-            print(grid_3d.sum()>1)
         all_export = np.add(grid_3d, all_export)
-        if(params.ldebug):
-            print(all_export.shape)
         if (not specie.get_name().lower()=='alk') and (not 'tss' in specie.get_name().lower()) and (not 'pim' in specie.get_name().lower()):
           tot_export = np.add(grid_3d, tot_export)
       export_series[specie.get_name().upper()+"loadOUT"] = np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
       if add_color:
-         export_series[specie.get_name().upper()+"loadOUT"] = [np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist(), specie.get_val('color')]
+          export_series[specie.get_name().upper()+"loadOUT"] = [np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist(), specie.get_val('color')]
       else:
-        export_series[specie.get_name().upper()+"loadOUT"] = np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
+          export_series[specie.get_name().upper()+"loadOUT"] = np.nansum(np.nansum(np.ma.array(all_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
 
     export_series["total_loadOUT"] = np.nansum(np.nansum(np.ma.array(tot_export, mask=mouthmask_3d),axis=2),axis=1).tolist()
-    if(params.ldebug):
-        print(np.nansum(np.nansum(np.ma.array(tot_export, mask=mouthmask_3d),axis=2),axis=1).tolist())
     return export_series
 
 def all_exports_to_table(params):
     export_series = all_exports_to_dict(params)
-    if(params.ldebug):
-        print(export_series)
     folder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "tables"))
     filename = os.path.join(folder, 'exports_'+get_river_name(params)+'.csv')
     dict_to_csv(filename, export_series)
@@ -553,12 +539,10 @@ def all_fluxes_to_dict(params):
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    if(params.ldebug):
-        print(folder)
+    if(params.ldebug): print(folder)
 
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
-    if(params.ldebug):
-        print(proclist)
+    if(params.ldebug): print(proclist)
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
@@ -646,8 +630,10 @@ def all_fluxes_to_dict(params):
               mask_major_streams_3d[:,:,:] = True
               mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
-              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_subgrid'])).tolist()
-              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_smallstreams'] = \
+              (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_subgrid'])).tolist()
+              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = \
+              np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]     
 
             # store sum of cell

@@ -45,7 +45,7 @@ def readfile(filename):
         # (first character is a "[" ). 
         if option[0].startswith("["):
            # Start of a new class
-           print(option[0].strip().upper())
+           #print(option[0].strip().upper())
            if (option[0].strip().upper() == "[PROCES]"):
                # Save old obj
                if (obj != None):
@@ -148,8 +148,8 @@ def readfile(filename):
     # Make one general object for the parameters.
     params_local = general_class.General()
     for item in remove_list:
-        print(type(params_local),dir(params_local))
-        print(type(proclist[item]),dir(proclist[item]))
+        #print(type(params_local),dir(params_local))
+        #print(type(proclist[item]),dir(proclist[item]))
         params_local.merge(proclist[item])
     # Correct the names list of general class
     params_local.names = list(set(params_local.names))
@@ -157,7 +157,7 @@ def readfile(filename):
     # Delete the parameters entries in the proclist
     for item in range(len(remove_list)-1,-1,-1):
         del proclist[remove_list[item]]
-    print("BASIN: read_parameter ")
+    #print("BASIN: read_parameter ")
         
     #return speclist,proclist,params_local
     return speclist,srclist,proclist,params_local
