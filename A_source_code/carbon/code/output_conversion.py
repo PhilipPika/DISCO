@@ -611,7 +611,7 @@ if __name__ == "__main__":
     convert_output(inputdir,outformat)
     
     endtime_main = time.time()
-    print('OUTPUT CONVERSION OF lasted (in s):  ' + str(endtime_main-starttime_main))
+    print('OUTPUT CONVERSION lasted (in s):  ' + str(endtime_main-starttime_main))
 
     #except MyError, val:
     #    val.write()

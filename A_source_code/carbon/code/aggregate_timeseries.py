@@ -403,8 +403,7 @@ def all_atm_exch_to_dict(params):
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_smallstreams'] = \
               (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_subgrid'])).tolist()
-          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = \
-              np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
         # store sum of cell
@@ -439,7 +438,7 @@ def all_atm_exch_to_table(params):
     dict_to_csv(filename, atm_exch_series)
 
 def all_exports_to_dict(params,add_color=False):
-    setattr(params, 'ldebug', True)
+    # setattr(params, 'ldebug', True)
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
     folder = os.path.join(params.outputdir, '..', "BUDGET", "subgrid")
