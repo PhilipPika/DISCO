@@ -560,7 +560,7 @@ def procfunc(spec,params,species,proc,Q,arguments):
             out.append(dic_exch)
 
         elif (name == "transformation_terrPOC2DOC"):
-            out.append(gen_mineralization(params, species[params.ipocterr_lowCN], spec[params.ipocterr_lowCN], temperature))
+            out.append(gen_mineralization(params, species[params.ipocterr_lowcn], spec[params.ipocterr_lowcn], temperature))
 
         else:
             print(name)
