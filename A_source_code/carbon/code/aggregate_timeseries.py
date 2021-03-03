@@ -66,6 +66,8 @@ def do(params):
     conv_all_tables_to_Tg(params)
     endtime_main = time.time()
     print('aggregate timeseries.py finished (in s):  ' + str(endtime_main-starttime_main))
+    
+    #all_stream_env_conditions_to_table(params)
 
 def get_river_name(params):
   if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
@@ -521,7 +523,10 @@ def all_budget_to_dict(params):
     budget_series['input'] = (np.array(src_series['totalIN'])).tolist()
     budget_series['export'] = (-1*np.array(exp_series['total_loadOUT'])).tolist()
     budget_series['emission'] = (-1*np.array(atm_series["atmospheric_exchange_DIC_total"])).tolist()
-    budget_series['retention'] = ((np.array(budget_series['input'])+np.array(budget_series['emission'])+np.array(budget_series['export']))).tolist()
+    budget_series['retention'] = \
+        ((np.array(budget_series['input'])+\
+          np.array(budget_series['emission'])+\
+          np.array(budget_series['export']))).tolist()
     return budget_series
 
 def all_budget_to_table(params):

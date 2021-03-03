@@ -13,16 +13,17 @@ export DGNM_GENERALCODE=$TOCODE/generalcode/trunk
 export DGNM_USER=carbon
 
 echo "Mess: Switching to Core Directory"
-pwd
 cd $TOCODE/core
-pwd
 
 echo "Mess: Removing current results"
 rm -r $DIR/OUT
+Spinstart=1988
+SpinUpEnd=1990
+SimuEnd=1999 #Remember to also change the file name in params.ini
 
 echo "Mess: Start SpinUp"
-nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/Ccmd_m_50yrs_bio_def.ini --endtime=1990
-cp $DIR/OUT/bio/pkl/start1990.000.pkl $DIR/A_source_code/carbon/startups/start1988.000.pkl
+nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/Ccmd_m_50yrs_bio_def.ini --endtime=$SpinUpEnd
+cp $DIR/OUT/bio/pkl/start$SpinUpEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
 
 cp $DIR/OUT $DIR/OUT_nonSS
 
@@ -36,5 +37,5 @@ echo "Note: Outout conversion done"
 
 echo "Mess: Start aggregate time series"
 cd $TOCODE/core
-python ../carbon/code/aggregate_timeseries.py --inifile ../ini/Ccmd_m_50yrs_bio_def.ini --endtime=1990
+python ../carbon/code/aggregate_timeseries.py --inifile ../ini/Ccmd_m_50yrs_bio_def.ini --endtime=$SimuEnd
 echo "Mess: Aggregate time series done"

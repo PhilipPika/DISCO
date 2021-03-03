@@ -61,15 +61,15 @@ def do(params):
     #all_speciefluxes_to_multiplots(params)
 
     #all_fluxes_to_stackserieplots(params)
-    all_fluxes_to_stackserieplots_TgPerYear(params)
+#    all_fluxes_to_stackserieplots_TgPerYear(params)
     #all_fluxes_to_maps(params)
-    all_budget_to_stackserieplots_Tg_year(params)
+#    all_budget_to_stackserieplots_Tg_year(params)
     #map_net_budget(params)
 
     all_stream_env_conditions_to_table(params)
-    if params.maskid==0 and params.mask_bool_operator=='GT':
-      all_stream_env_conditions_to_climate_tables(params)
-      all_fluxes_to_climate_tables(params)
+#    if params.maskid==0 and params.mask_bool_operator=='GT':
+#      all_stream_env_conditions_to_climate_tables(params)
+#      all_fluxes_to_climate_tables(params)
     conv_all_tables_to_Tg(params)
 
 
