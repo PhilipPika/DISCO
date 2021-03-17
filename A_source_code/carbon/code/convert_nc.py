@@ -55,8 +55,8 @@ def convert_101_1200_nc(nc_in_fn):
     nc_dat = Dataset(nc_in_fn, 'r')
     varname = extract_varname.do(nc_dat)
     new_varname = varname.replace('101', '1200')
-    basin_asc = ascraster.Asciigrid(ascii_file="/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/Monthly_B_model_input/hydro/basin.map")
-    dum_mon_nc = Dataset("/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/Monthly_B_model_input/hydro/runoff_monthly.nc", "r")
+    basin_asc = ascraster.Asciigrid(ascii_file="/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/B_model_input/hydro/basin.map")
+    dum_mon_nc = Dataset("/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/B_model_input/hydro/runoff_monthly.nc", "r")
 
     new_nc_in_fn = nc_in_fn.replace('101', '1200')
     new_nc_dat = Dataset(new_nc_in_fn, 'w')
@@ -76,7 +76,7 @@ def convert_45_to_101_nc(nc_in_fn, interpolate='nearest'):
     nc_dat = Dataset(nc_in_fn, 'r')
     varname = extract_varname.do(nc_dat)
     time_array = make_time_array(101)
-    basin_asc = ascraster.Asciigrid(ascii_file="/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/Monthly_B_model_input/hydro/basin.map")
+    basin_asc = ascraster.Asciigrid(ascii_file="/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/B_model_input/hydro/basin.map")
     new_nc_in_fn = nc_in_fn[:-3]+'_101.nc'
     new_nc_dat = Dataset(new_nc_in_fn, 'w')
     output_conversion.init_ncdata(os.getcwd(), new_nc_dat, varname, basin_asc,unit='', long_name='')
@@ -108,7 +108,7 @@ def convert_45_to_101_nc(nc_in_fn, interpolate='nearest'):
 def convert_27_to_101_nc(nc_in_fn, varname, interpolate=False):
     nc_dat = Dataset(nc_in_fn, 'r')
     time_array = make_time_array(101)
-    basin_asc = ascraster.Asciigrid(ascii_file="/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/Monthly_B_model_input/hydro/basin.map")
+    basin_asc = ascraster.Asciigrid(ascii_file="/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/B_model_input/hydro/basin.map")
     new_nc_in_fn = nc_in_fn[:-3]+'_101.nc'
     new_nc_dat = Dataset(new_nc_in_fn, 'w')
     output_conversion.init_ncdata(os.getcwd(), new_nc_dat, varname+'_101', basin_asc,unit='[Mg C/km2/yr]', long_name='Aggregated net primary production (Mg C/km2/yr)')
