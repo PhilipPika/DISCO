@@ -97,8 +97,12 @@ def get_river_name(params):
       rivername = 'Yukon'
     elif params.maskid==38:
       rivername = 'Kolyma'
+    elif params.maskid==55:
+      rivername = 'Indigirka'
     elif params.maskid==99:
       rivername = "Rhine"
+    elif params.maskid==220:
+      rivername = 'Peel'
     elif params.maskid==231:
       rivername = 'Seine'
     elif params.maskid==433:
@@ -152,44 +156,62 @@ def make_time_indices(params, dummy_nc):
     if params.outputtime < 1:
       debugprint(params,'Time step')  
       debugprint(params,params.outputtime)
-      debugprint(params,"ALTERNATE 1200 DATA")
-      debugprint(params,'size dummt nc')
+      debugprint(params,"find index for outputtime ")
+      debugprint(params,'size dummy nc')
+      print('print dummy nc')
       debugprint(params,dummy_nc)
+      print('print dummy nc TIME')
       debugprint(params,dummy_nc['time'][:])
       
       debugprint(params,os.path.join(params.water_inputdir))
       
-      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
+#     waterbodyid = Dataset(os.path.join(params.water_inputdir, "discharge_monthAvg_outputCorr.nc"), 'r')
+#     waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
+#      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon70_00.nc"), 'r')
+#      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_BigTITS.nc"), 'r')
+      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1970_2010.nc"), 'r')
       
-      modelrun_start = max(dummy_nc['time'][0],0)
-      modelrun_end = dummy_nc['time'][-1]
-      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_start)[0][0]
+      print('Print waterbody id time vector')
+      print(waterbodyid['time'][:])
+      
+      
+      modelrun_dummy_start = max(dummy_nc['time'][0],0)
+      print('modelrun_dummy_start')
+      print(modelrun_dummy_start)
+      
+      
+      modelrun_dummy_end = dummy_nc['time'][-1]
+      print('modelrun_dummy_end')
+      print(modelrun_dummy_end)
+      
+      print('TEST')
+      print(np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
+      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
-      debugprint(params,'Data start index')
+      debugprint(params,'All data start index')
       debugprint(params,all_dat_startindex)
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_start))
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_start)[0])
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_start)[0][0])
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start))
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0])
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
       
-      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_end)[0][-1]+1
-      debugprint(params,'Data end index')
+      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]+1
+      debugprint(params,'All data end index')
       debugprint(params,all_dat_endindex)
 
-      debugprint(params,'TEST')
+      debugprint(params,'waterbodyid time steps: -1, 0, 1')
       debugprint(params,waterbodyid['time'][-1])
       debugprint(params,waterbodyid['time'][0])
       debugprint(params,waterbodyid['time'][1])
-      debugprint(params,waterbodyid['time'][1199])
-      debugprint(params,dummy_nc['time'][:])
+      #debugprint(params,waterbodyid['time'][1199])
 
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
-      debugprint(params,'Model start index')
+      debugprint(params,'Overlap In-/output start index')
       debugprint(params,modeldat_startindex)
       
 
 
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+2
-      debugprint(params,'Model end index')
+      debugprint(params,'Overlap In-/output end index')
       debugprint(params,modeldat_endindex)
       
       if modeldat_endindex==len(dummy_nc['time'][:]):
@@ -197,11 +219,11 @@ def make_time_indices(params, dummy_nc):
     else:
       print("ALTERNATE 101 DATA")
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
-      modelrun_start = max(dummy_nc['time'][0],0)
-      modelrun_end = dummy_nc['time'][-1]
-      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_start)[0][0]
+      modelrun_dummy_start = max(dummy_nc['time'][0],0)
+      modelrun_dummy_end = dummy_nc['time'][-1]
+      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
-      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_end)[0][-1]
+      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
@@ -247,13 +269,14 @@ def all_inputs_to_dict(params,add_color=False):
     mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    src_folder = params.load_inputdir
+    #src_folder = params.load_inputdir
     
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
     
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
-
+    print('Print dummy nc name')
+    print(dummy_name)
     modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
         make_time_indices(params, dummy_nc)
     mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)   
@@ -263,12 +286,13 @@ def all_inputs_to_dict(params,add_color=False):
 
     tot_in = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
 
-    for specie in species:
-      src_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))    
+#    for specie in species:
+#      src_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))    
 
     ## this is still a bit too specific for carbon; to be formulated more generic
     for source in sources:
-      src_nc = Dataset(os.path.join(src_folder, source.get_val('name')+'.nc'), 'r')
+      src_nc = Dataset(os.path.join(params.load_inputdir, source.get_val('name')+'.nc'), 'r')
+      debugprint(params,'Current src_nc read')
       debugprint(params,src_nc)
       for attrib in source.get_attrib():
           if 'fr_' in attrib:
@@ -279,17 +303,19 @@ def all_inputs_to_dict(params,add_color=False):
       
       debugprint(params,source.get_val('name'))
       A=src_nc[source.get_val('name')]
-      debugprint(params,'Source size')
+      debugprint(params,'src_nc size pre modification')
       debugprint(params,A.shape)
+      print(all_dat_startindex)
+      print(all_dat_endindex)
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
       
-      debugprint(params,'Source size')
+      debugprint(params,'src_nc size post modification')
       debugprint(params,src_grid.shape)
       debugprint(params,'Mask size')
       debugprint(params,mask_3d.shape)
       
       src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
-
+      print('FINISHED SOURCE MULTIPLICATION')
 
 
       for attrib in source.get_attrib():
@@ -895,4 +921,4 @@ if __name__ == "__main__":
     #except SystemExit:
     #  raise MyError("Error has occured in the reading of the commandline options.")
     
-    do(params)	
+    do(params)
