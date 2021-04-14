@@ -17,8 +17,8 @@ cd $TOCODE/core
 
 echo "Mess: Removing current results"
 rm -r $DIR/OUT
-Spinstart=1988
-SpinUpEnd=1990
+Spinstart=1970
+SpinUpEnd=1999
 SimuEnd=1999 #Remember to also change the file name in params.ini
 
 echo "Mess: Start SpinUp"
@@ -30,12 +30,12 @@ cp $DIR/OUT $DIR/OUT_nonSS
 echo "Note: First iteration done"
 nice -n 19 python dgnm_main.py  --lspinup=0 --inifile ../ini/Ccmd_m_50yrs_bio_def.ini
 
-echo "Mess: Start Outout conversion"
-cd $DIR/OUT
-python ../A_source_code/carbon/code/output_conversion.py bio/pkl/ NETCDF
-echo "Note: Outout conversion done"
-
-echo "Mess: Start aggregate time series"
-cd $TOCODE/core
-python ../carbon/code/aggregate_timeseries.py --inifile ../ini/Ccmd_m_50yrs_bio_def.ini --endtime=$SimuEnd
-echo "Mess: Aggregate time series done"
+#echo "Mess: Start Outout conversion"
+#cd $DIR/OUT
+#python ../A_source_code/carbon/code/output_conversion.py bio/pkl/ NETCDF
+#echo "Note: Outout conversion done"
+#
+#echo "Mess: Start aggregate time series"
+#cd $TOCODE/core
+#python ../carbon/code/aggregate_timeseries.py --inifile ../ini/Ccmd_m_50yrs_bio_def.ini --endtime=$SimuEnd
+#echo "Mess: Aggregate time series done"
