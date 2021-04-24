@@ -158,9 +158,9 @@ def make_time_indices(params, dummy_nc):
       debugprint(params,params.outputtime)
       debugprint(params,"find index for outputtime ")
       debugprint(params,'size dummy nc')
-      print('print dummy nc')
+      debugprint(params,'print dummy nc')
       debugprint(params,dummy_nc)
-      print('print dummy nc TIME')
+      debugprint(params,'print dummy nc TIME')
       debugprint(params,dummy_nc['time'][:])
       
       debugprint(params,os.path.join(params.water_inputdir))
@@ -171,21 +171,21 @@ def make_time_indices(params, dummy_nc):
 #      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_BigTITS.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1970_2010.nc"), 'r')
       
-      print('Print waterbody id time vector')
-      print(waterbodyid['time'][:])
+      debugprint(params,'Print waterbody id time vector')
+      debugprint(params,waterbodyid['time'][:])
       
       
       modelrun_dummy_start = max(dummy_nc['time'][0],0)
-      print('modelrun_dummy_start')
-      print(modelrun_dummy_start)
+      debugprint(params,'modelrun_dummy_start')
+      debugprint(params,modelrun_dummy_start)
       
       
       modelrun_dummy_end = dummy_nc['time'][-1]
-      print('modelrun_dummy_end')
-      print(modelrun_dummy_end)
+      debugprint(params,'modelrun_dummy_end')
+      debugprint(params,modelrun_dummy_end)
       
-      print('TEST')
-      print(np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
+      debugprint(params,'TEST')
+      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
       all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
       all_dat_startindex=max(all_dat_startindex, 0)
       debugprint(params,'All data start index')
@@ -305,8 +305,8 @@ def all_inputs_to_dict(params,add_color=False):
       A=src_nc[source.get_val('name')]
       debugprint(params,'src_nc size pre modification')
       debugprint(params,A.shape)
-      print(all_dat_startindex)
-      print(all_dat_endindex)
+      debugprint(params, all_dat_startindex)
+      debugprint(params, all_dat_endindex)
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
       
       debugprint(params,'src_nc size post modification')
@@ -315,7 +315,7 @@ def all_inputs_to_dict(params,add_color=False):
       debugprint(params,mask_3d.shape)
       
       src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
-      print('FINISHED SOURCE MULTIPLICATION')
+      debugprint(params,'FINISHED SOURCE MULTIPLICATION')
 
 
       for attrib in source.get_attrib():
