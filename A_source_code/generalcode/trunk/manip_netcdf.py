@@ -1,6 +1,6 @@
 # ******************************************************
-## Revision "$LastChangedDate: 2018-06-01 15:05:44 +0200 (Fri, 01 Jun 2018) $"
-## Date "$LastChangedRevision: 1 $"
+## Revision "$LastChangedDate: 2019-12-20 14:40:31 +0100 (Fri, 20 Dec 2019) $"
+## Date "$LastChangedRevision: 29 $"
 ## Author "$LastChangedBy: arthurbeusen $"
 ## URL "$HeadURL: https://pbl.sliksvn.com/generalcode/trunk/manip_netcdf.py $"
 ## Copyright 2017, PBL Netherlands Environmental Assessment Agency and Utrecht University.
@@ -263,7 +263,7 @@ def get_netcdf_year(netcdf_filename,varname,year,mask=None,nodata_value=-9999.):
     return vardata_list
 
 
-def get_netcdf_year_grid(netcdf_filename,varname,year,params=None,mask=None,nodata_value=-9999.,idim=0):
+def get_netcdf_year_grid(netcdf_filename,varname,year,params=None,mask=None,nodata_value=-9999.,idim=0,time_eps=0.001):
     '''
     Returns the whole grid at a given time.
     If prescribed (ncols,nrows,xll,yll and cellsize in params) then that format
@@ -272,6 +272,9 @@ def get_netcdf_year_grid(netcdf_filename,varname,year,params=None,mask=None,noda
     Nodata_value is used as default nodata value of the output grid.
     idim is the number of the fourth dimension. Only when the number of dimensions is four,
     you must specify the last dimension. Normal {time,lat,lon,ndim} as dimensions for this.
+    time_eps gives the range of times in the netcdf which are close enough to the requested time.
+    For yearly value a time_eps of 0.01 is recommended, but for daily or monthly, this should be smaller (0.001).
+    The unit of time_eps is in years.
     '''
     # We have to open and close the filename
     if (not os.path.isfile(netcdf_filename)):
@@ -286,13 +289,14 @@ def get_netcdf_year_grid(netcdf_filename,varname,year,params=None,mask=None,noda
     istart,iend = find_within_range(years,year,year)
 
     # Check whether one of the boundaries is equal to the year specified.
-    # Range of 0.001 is used, because this is smaller than 0.5 day.
-    if (math.fabs(years[istart] - year) < 0.001):
+    # With a time_eps of 0.001 this is smaller than 0.5 day.
+    if (math.fabs(years[istart] - year) < time_eps):
         ifound = istart
-    elif (math.fabs(years[iend-1] - year) < 0.001):
+    elif (math.fabs(years[iend-1] - year) < time_eps):
         ifound = iend-1
     else:
         raise MyError("File: " + netcdf_filename + " does not have data for: " + str(year) +".",\
+                      "Time_eps ("+str(time_eps)+") is too small in call to get_netcdf_year_grid.",\
                       "Years found: " + ";".join(map(str,years)))
 
     # Assign the two dimension data for this parameter.
