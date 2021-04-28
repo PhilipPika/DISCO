@@ -1,9 +1,5 @@
 # ******************************************************
-## Revision "$LastChangedDate: 2018-07-08 18:08:17 +0200 (zo, 08 jul 2018) $"
-## Date "$LastChangedRevision: 1 $"
-## Author "$LastChangedBy: arthurbeusen $"
-## URL "$HeadURL: https://pbl.sliksvn.com/dgnm/core/general_startup.py $"
-## Copyright 2017, PBL Netherlands Environmental Assessment Agency and Utrecht University.
+## Copyright 2019, PBL Netherlands Environmental Assessment Agency and Utrecht University.
 ## Reuse permitted under Gnu Public License, GPL v3.
 # ******************************************************
 
