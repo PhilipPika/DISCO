@@ -107,7 +107,7 @@ def calc_carb_dat(conc_DIC, conc_ALK, T):
         pCO2 = -999999999
     return pCO2, pH
 
-def post_processing(params,dformat):
+def calc_ph_pco2(params,dformat):
   print('POST PROCESSING DATA IN '+params.outputdir+' AS '+dformat)  
   np.seterr(all='ignore')
   folder = os.path.join(params.outputdir, '..', "STATES", "subgrid")
