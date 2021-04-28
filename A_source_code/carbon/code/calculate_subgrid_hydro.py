@@ -158,8 +158,7 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
             if (item+1 < len(timeint)):
                 Qmid_next[0] = Q0[item+1] + 0.5 * Q[item+1][0]
                 for iorder in range(1,params.norder):
-                    Qmid_next[iorder] = (Q[item+1][iorder-1] + 0.5 * Q[item+1][iorder])
-          
+                    Qmid_next[iorder] = Q[item+1][iorder-1] + 0.5 * Q[item+1][iorder]
 
             for iorder in range(params.norder):
                 # Stream width and depth for each order [m] and volume in m3.
