@@ -31,6 +31,7 @@ try:
     import output_conversion
     import pointer_class
     import read_parameter
+    import time
 except:    
     # set the general path for the own python modules
     import general_path
@@ -108,7 +109,10 @@ def calc_carb_dat(conc_DIC, conc_ALK, T):
     return pCO2, pH
 
 def calc_ph_pco2(params,dformat):
-  print('POST PROCESSING DATA IN '+params.outputdir+' AS '+dformat)  
+  print('POST PROCESSING DATA IN '+params.outputdir+' AS '+dformat)
+  # start timer
+  starttime_main = time.time()
+
   np.seterr(all='ignore')
   folder = os.path.join(params.outputdir, '..', "STATES", "subgrid")
   if dformat=='NETCDF':
@@ -156,7 +160,11 @@ def calc_ph_pco2(params,dformat):
           pH.close()
 
       for fn in directory.get_files_with_str(folder, "*order6*"):
-          shutil.copyfile(fn, os.path.join(folder, '..', os.path.basename(fn).replace("_order6", ""))) 
+          shutil.copyfile(fn, os.path.join(folder, '..', os.path.basename(fn).replace("_order6", "")))
+  # end timer  
+  endtime_main = time.time()
+  print('post_processing.calc_ph_pco2 lasted (in s):  ' + str(endtime_main-starttime_main))
+
 
 if __name__ == "__main__":
     # Set the general path for the own python modules
