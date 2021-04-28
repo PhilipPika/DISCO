@@ -394,10 +394,7 @@ def convert_output(inputdir,outformat,norders=6):
 
         for filename,time in argumentfiles:
             pkl_to_ascraster_allorders(filename,outputdir,dummy,label='arguments_')
-
-
-
-
+            
     if ((outformat == 'NETCDF') or (outformat == 'ALL')):
         
         if (len(outputfiles) == 0) and (len(outputfiles_allorders) == 0)\

@@ -500,26 +500,31 @@ def procfunc(spec,params,species,proc,Q,arguments):
     if vol>0.:
       for iproc in range(len(proc)):
         name = proc[iproc].get_val("name")
+        ## PRIMARY PRODUCTION
         if (name == "prim_prod_C_PHYTO"):
-            out.append(prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature, globrad_cell))
+            out.append(prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature,globrad_cell))
         elif (name == "prim_prod_C_PERIPHYTON"):
-            out.append(prim_prod_C_PERIPHYTON(spec,params,species,vol,depth,temperature, globrad_cell, area))   
+            out.append(prim_prod_C_PERIPHYTON(spec,params,species,vol,depth,temperature, globrad_cell, area))
 
+        ## RESPIRATION
         elif (name == "respiration_PHYTO"):
             out.append(gen_respiration(params, species[params.iphyto],spec[params.iphyto],temperature, vol))
         elif (name == "respiration_PERIPHYTON"):
             out.append(gen_respiration(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))            
 
+        ## MORTALITY
         elif (name == "mortality_PHYTO"):
             out.append(gen_mortality(params, species[params.iphyto],spec[params.iphyto],temperature,vol,area))
         elif (name == "mortality_PERIPHYTON"):
             out.append(gen_mortality(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature,vol,area)) 
 
+	## EXCRETION
         elif (name == "excretion_DOC_PHYTO"):
             out.append(gen_excretion_doc(params,species[params.iphyto],spec[params.iphyto],temperature, vol))
         elif (name == "excretion_DOC_PERIPHYTON"):
             out.append(gen_excretion_doc(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))  
 
+        ## MINERALIZATION
         elif (name == "oxidation_POClowCN"):
             out.append(gen_mineralization(params, species[params.ipoclowcn], spec[params.ipoclowcn], temperature))
         elif (name == "oxidation_POClowCN_benth"):
@@ -530,6 +535,8 @@ def procfunc(spec,params,species,proc,Q,arguments):
             out.append(gen_mineralization(params, species[params.ipochighcn_benth], spec[params.ipochighcn_benth], temperature))
         elif (name == "oxidation_DOC"):
             out.append(gen_mineralization(params, species[params.idoc], spec[params.idoc], temperature))
+
+        ## PARTICLE DEPOSITION
         elif (name == "sedimentation_TSS"):
             out.append(sedimentation(species, spec, params.itss, proc, depth, vol, area))
         elif (name == "sedimentation_PIM"):
@@ -539,6 +546,7 @@ def procfunc(spec,params,species,proc,Q,arguments):
         elif (name == "sedimentation_POClowCN"):
             out.append(sedimentation(species,spec,params.ipoclowcn,proc,depth, vol, area))
 
+        ## PARTICLE RESUSPENSION
         elif (name == "erosion_TSS"):
             out.append(erosion(spec, params.itss_benth, params, species, proc, width, depth, area, vel, slope, area, vol, Q))
         elif (name == "erosion_PIM"):
@@ -548,6 +556,7 @@ def procfunc(spec,params,species,proc,Q,arguments):
         elif (name == "erosion_POClowCN"):
             out.append(erosion(spec,params.ipoclowcn_benth,params,species,proc,width,depth,area, vel, slope, area, vol, Q))
 
+        # BURIAL
         elif (name == "burial_PIM"):
             out.append(burial(spec, params.ipim_benth, params, species, depth, vol))
         elif (name == "burial_POChighCN"):
@@ -625,6 +634,14 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
                        load[item] - outflow)
         else:
               out.append(change_spec(spec, params, species, species[item].get_name(), funcs, proc))
+        #if params.debug and species[item].get_name()=='DETRITUShighCN_benth':
+        #        print(species[item].get_name())
+        #        print('amount=', spec[item])
+        #        print('proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), funcs, proc))
+        #        print('load=', load[item])
+        #        print('conc*dvoldt=', conc*dvoldt)
+        #        print('Q*conc=', Q*conc)
+        #        print('out=', out[-1])
       return out
 
     # if these conditions meet it is a stream with a floodplain
