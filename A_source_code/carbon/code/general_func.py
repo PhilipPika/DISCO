@@ -174,11 +174,11 @@ def find_within_range(list1,begin,end):
     '''
     #print(list1)
     ibegin = 0
-    iend = len(list1) 
+    iend = len(list1)-1
     for item in range(1,len(list1)):
         if (float(list1[item]) < begin):
             ibegin = item
-    for item in range(len(list1)-1,-1,-1):
+    for item in range(len(list1)-2,-1,-1):
         if (float(list1[item]) > end):
             iend = item
     return ibegin,iend

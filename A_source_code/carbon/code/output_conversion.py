@@ -594,11 +594,10 @@ if __name__ == "__main__":
     import optparse
     
     #print(sys.argv)
-    if (len(sys.argv) < 3):
+    if (len(sys.argv) < 2):
       print("Not enough arguments on command line!")
       raise MyError("Command line should be: python output_conversion.py inputdir outformat")
     inputdir = sys.argv[1]
-    #outputdir = sys.argv[2]
     outformat = sys.argv[2]
     
     print("OUTPUT CONVERSION OF " , inputdir, " TO ", outformat)
