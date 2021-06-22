@@ -15,8 +15,8 @@ import pandas as pd
 import os
 import sys
 
-import general_path 
-    
+import general_path
+
 import read_parameter
 
 import ascraster
@@ -49,7 +49,7 @@ def do(params):
     starttime_main = time.time()
     all_atm_exch_to_table(params)
     endtime_main = time.time()
-    print('all_atm_exch_to_table finished (in s):  ' + str(endtime_main-starttime_main)) 
+    print('all_atm_exch_to_table finished (in s):  ' + str(endtime_main-starttime_main))
     starttime_main = time.time()
     all_exports_to_table(params)
     endtime_main = time.time()
@@ -151,6 +151,46 @@ def geographical_reach_npmask(params):
 
 def debugprint(params, print_statement):
     if params.ldebug: print(print_statement)
+    
+    
+def make_3d_mask(params, species, folder, mask_kind):
+    # changes here: folder
+    proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
+    #invariant
+    dummy_nc = Dataset(proclist[-1], 'r')
+    dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
+    modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid = \
+    make_time_indices(params, dummy_nc)
+
+
+    dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
+    # chnages here
+    if mask_kind == 'climate.asc':
+        mask_fn = os.path.join(params.water_inputdir, 'climate.asc')
+        mask_2d_dum = make_mask.do(mask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
+
+        # invariant: mask
+        mask_2d_dum = make_mask.do(params.file_mask, params.maskid, dum_asc,logical=params.mask_bool_operator, mask_type='np_grid')
+        mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
+        mask_2d[:, :] = True
+        mask_2d[np.where(np.logical_and(mask_2d_dum[:, :] == False,mask_2d_dum[:, :] == False))] = False
+
+    elif mask_kind=='rivermouth.asc': # rivermouth
+        mask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
+        dum_mask = ascraster.create_mask(
+        mask_fn, params.maskid, logical=params.mask_bool_operator, numtype=int)
+        if len(dum_mask) > 0:
+            mask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
+        else:  # endoreic basin
+            mask_fn = os.path.join(params.water_inputdir,"rivermouths_exporting_to_endoreic_lakes.asc")
+        mask_2d = make_mask.do(mask_fn, params.maskid, dum_asc, logical=params.mask_bool_operator, mask_type='np_grid')
+    else:
+        print('Mask should be either rivermouth.asc OR climate.asc')
+
+    #invariant
+    mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
+    return mask_3d, dummy_name, dummy_nc, modeldat_startindex, modeldat_endindex
+      
 
 def make_time_indices(params, dummy_nc):
     if params.outputtime < 1:
@@ -164,15 +204,17 @@ def make_time_indices(params, dummy_nc):
       debugprint(params,dummy_nc['time'][:])
       
       debugprint(params,os.path.join(params.water_inputdir))
-      
+     #This parameter 'waterbodyid' needs to have the same hourly dt (time step) as the DISC model output.
+     # In my case hours/month, while chosing days/month, as with the new hydrology input, won't work.
+
 #     waterbodyid = Dataset(os.path.join(params.water_inputdir, "discharge_monthAvg_outputCorr.nc"), 'r')
 #     waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-#      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon70_00.nc"), 'r')
-#      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_BigTITS.nc"), 'r')
-      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1970_2010.nc"), 'r')
+      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1940_2010.nc"), 'r')
+
       
       debugprint(params,'Print waterbody id time vector')
       debugprint(params,waterbodyid['time'][:])
+#      debugprint(params,discharge['time'][:])
       
       
       modelrun_dummy_start = max(dummy_nc['time'][0],0)
@@ -190,11 +232,18 @@ def make_time_indices(params, dummy_nc):
       all_dat_startindex=max(all_dat_startindex, 0)
       debugprint(params,'All data start index')
       debugprint(params,all_dat_startindex)
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start))
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0])
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
-      
+      debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)")
+      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start))
+      debugprint(params,"all_dat_startindex from np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0]")
+      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0])
+      debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]")
+      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
+      debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][-1]+1")
+      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][-1]+1)
+
+      debugprint(params,"all_dat_endindex from np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]+1")
       all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]+1
+              
       debugprint(params,'All data end index')
       debugprint(params,all_dat_endindex)
 
@@ -202,7 +251,6 @@ def make_time_indices(params, dummy_nc):
       debugprint(params,waterbodyid['time'][-1])
       debugprint(params,waterbodyid['time'][0])
       debugprint(params,waterbodyid['time'][1])
-      #debugprint(params,waterbodyid['time'][1199])
 
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
       debugprint(params,'Overlap In-/output start index')
@@ -230,8 +278,6 @@ def make_time_indices(params, dummy_nc):
         all_dat_endindex +=1
     return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid
 
-def make_3d_mask(mask_2d, modeldat_startindex, modeldat_endindex, dummy_nc, dummy_name):
-    return np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape) 
 
 def dict_to_csv(filename, mydict):
     pd.DataFrame(mydict).T.reset_index().to_csv(filename, header=False, index=False)
@@ -303,13 +349,13 @@ def all_inputs_to_dict(params,add_color=False):
       
       debugprint(params,source.get_val('name'))
       A=src_nc[source.get_val('name')]
-      debugprint(params,'src_nc size pre modification')
+      debugprint(params,'src_nc shape pre modification')
       debugprint(params,A.shape)
       debugprint(params, all_dat_startindex)
       debugprint(params, all_dat_endindex)
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
       
-      debugprint(params,'src_nc size post modification')
+      debugprint(params,'src_nc shape post modification')
       debugprint(params,src_grid.shape)
       debugprint(params,'Mask size')
       debugprint(params,mask_3d.shape)
@@ -470,7 +516,8 @@ def all_exports_to_dict(params,add_color=False):
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
     folder = os.path.join(params.outputdir, '..', "BUDGET", "subgrid")
-    if(params.ldebug): print(folder)
+    debugprint(params,'print folder ')
+    debugprint(params,print(folder))
 
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
     dummy_nc = Dataset(proclist[0], 'r')
@@ -491,6 +538,7 @@ def all_exports_to_dict(params,add_color=False):
 
     mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid',logical=params.mask_bool_operator)
     mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
+
 
     export_series = dict()
     export_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units) 
@@ -569,10 +617,12 @@ def all_fluxes_to_dict(params):
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index_species.make_index_species(params,species,proc)
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    if(params.ldebug): print(folder)
+    debugprint(params,'print(folder)')
+    debugprint(params,print(folder))
 
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
-    if(params.ldebug): print(proclist)
+    debugprint(params,'print(proclist')
+    debugprint(params,print(proclist))
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
