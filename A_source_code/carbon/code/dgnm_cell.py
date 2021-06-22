@@ -46,12 +46,12 @@ def positive(x):
 def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_cell,\
               yearstart,yearend,timeperiod,runoff_in,load_src,temperature_in,globrad_in,\
               discharge_in,volume_in,water_area_in,depth_in,width_in,slope,volume_fp_in,depth_fp_in,vel_in,low_veg_fr,high_veg_fr,\
-              llake,llakeout,lendolake,args_strahler_cell=None): 
+              llake,llakeout,lendolake,args_strahler_cell=None):
     '''
     Calculates all processes in the subgrid in all stream orders
     '''
    # print("icell " + str(icell))
-    
+
     timeint = []
     if (lsteady):
         # Steady state calculation is perfomed on starttime
@@ -81,7 +81,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
     load_in  = []
 
     # initialize file pointer
-    fp_in = None 
+    fp_in = None
 
     # initialize arguments
     arguments = make_args.do()
@@ -102,9 +102,9 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
         for iorder in range(params.norder):
           data_prev_period.append(make_y0.make_y0(params,species))
           # for floodplain
-          if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False): 
+          if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
             data_prev_period[-1].extend(make_y0.make_y0(params,species))
-    else:    
+    else:
         data_prev_period = []
         fp_in = open(os.path.join(tmpdir,str(icell)+"_"+str(timeperiod-1)+".pkl"),"rb")
         for line in general_func.pickleLoader(fp_in):
@@ -115,7 +115,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
     # Initialize budgets
     if (params.lbudget):
         xbud = general_func.initialize_budget(params, species, proc)
-    # Output list of cell: [[time0,src0,  ..., srcn],[time1,src0,  ..., srcn],....,[time100,src0,  ..., srcn]]    
+    # Output list of cell: [[time0,src0,  ..., srcn],[time1,src0,  ..., srcn],....,[time100,src0,  ..., srcn]]
     load_src_cell = []
     temperature_cell = []
     globrad_cell = []
@@ -127,15 +127,15 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
         for isrc in range(1,len(sources)):
             val = interpolate_list.calculate(time,load_src[isrc],extrapol=1)
             load_src_cell[-1].append(val[1])
-            
+
         temperature_cell.append(interpolate_list.calculate(time,temperature_in,extrapol=1))
         globrad_cell.append(interpolate_list.calculate(time,globrad_in,extrapol=1))
         high_veg_fr_cell.append(interpolate_list.calculate(time,high_veg_fr,extrapol=1))
         low_veg_fr_cell.append(interpolate_list.calculate(time,low_veg_fr,extrapol=1))
-   
+
         # Correct air temperature above freezing as a proxy for water temperature
         temperature_cell[-1][1] = max(0.0,temperature_cell[-1][1])
-        
+
     # Read the load from other cells in Mmol/yr
     load_other_stream = []
     linput_other_stream = False
@@ -155,12 +155,12 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
     fp_bud = None
     if (params.lbudget == 1):
         fp_bud = open(os.path.join(tmpdir,"budget_"+str(icell)+"_"+str(timeperiod)+".pkl"),"wb")
-    
+
     # filepointer for the cell argument list pkl
-    fp_args = None 
+    fp_args = None
     if (params.largs == 1):
-        fp_args = open(os.path.join(tmpdir,"arguments_"+str(icell)+"_"+str(timeperiod)+".pkl"),"wb") 
-    
+        fp_args = open(os.path.join(tmpdir,"arguments_"+str(icell)+"_"+str(timeperiod)+".pkl"),"wb")
+
     # Solve the system for each Strahler order
     load_out = []
 
@@ -173,17 +173,17 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
         srcload = []
         upstrload = []
         # Take the local load from the cell (load_cell) and put the direct load
-        # to the streams of this iorder in load array. 
+        # to the streams of this iorder in load array.
         # Load: [[time0,spec0,  ..., specn],[time1,spec0,  ..., specn],....,[time100,spec0,  ..., specn]]
         dt = 0. #LV 19-11-2018
         for item in range(len(timeint)):
             if (item > 0):
                 dt = timeint[item] - timeint[item-1]
-                
+
             # Start with time.
-            load.append([load_src_cell[item][0]]) 
-            srcload.append([load_src_cell[item][0]]) 
-            upstrload.append([load_src_cell[item][0]]) 
+            load.append([load_src_cell[item][0]])
+            srcload.append([load_src_cell[item][0]])
+            upstrload.append([load_src_cell[item][0]])
             # Initialize loads of all species to zero - modif LV 22-07-2016
             for j in range(length_spec):
                 load[-1].append(0.0)
@@ -206,13 +206,13 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                                   minorder = sources[isrc].get_val('orders')
                             try:
                               dummy_bool = (iorder >= (minorder))
-                            except(TypeError):  
+                            except(TypeError):
                               dummy_bool = (minorder=='floodplain')
                             if dummy_bool:
 
                               # Apply fraction
                               load_spec = load_src_cell[item][isrc+1] * sources[isrc].get_val('fr_'+specname)
-                              
+
                               if load_spec is not np.ma.masked:
                                 # If cell isn't a lake, apply order distribution
                                 if (minorder == 0):
@@ -240,7 +240,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                                   minorder = sources[isrc].get_val('orders')
                             try:
                               dummy_bool = (iorder >= (minorder))
-                            except(TypeError):  
+                            except(TypeError):
                               dummy_bool = (minorder=='floodplain')
                             if dummy_bool:
                                 load_spec = load_src_cell[item][isrc+1] * sources[isrc].get_val('fr_'+specname)
@@ -285,14 +285,14 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
         # Take amounts for iorder out of data_prev_period to proceed.
         y0 = []
         for i in range(len(data_prev_period[iorder])):
-          
+
           try:
             y0.append(data_prev_period[iorder][i]/number_of_rivers[iorder])
           except(FloatingPointError):
             y0.append(0.)
         #y0 = np.divide(data_prev_period[iorder], number_of_rivers[iorder]).tolist()
         if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False) and (not len(y0)==2*len(species)):
-          for i in range(len(data_prev_period[iorder+1])):   
+          for i in range(len(data_prev_period[iorder+1])):
             try:
               y0.extend([data_prev_period[iorder+1][i]/number_of_rivers[iorder]])
             except(FloatingPointError):
@@ -312,7 +312,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
             load_out[-1] = [len(y0) * [0.0]]
             istart = 1
 
-            
+
         outdict = None # dictionnary with outputs from odeint
 
         for item in range(istart,len(timeint)):
@@ -320,7 +320,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
             # Make time range for this run
             timerange=[timeint[item-1],timeint[item]]
             dt = timeint[item] - timeint[item-1]
-                        
+
             # LV 28-11-2017 - Determine whether it's an endorheic water body
             # Other lake/reservoir cells are calculated as rivers
             if (iorder == params.norder-1):
@@ -339,7 +339,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                             for ispec in range(len(species)):
                                 general_func.add_budget_load(xbud, iorder, ispec, "loadIN", load[item][ispec+1] * dt)
                         continue
-                    
+
 
             if (depth[item][iorder]==0.0) or volume[item][iorder]<params.minimal_watervolume or Qmid[item][iorder]<1e-6:
                 # There is no water volume, so skip this calculation.
@@ -347,7 +347,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                 Y = [[]]
                 for item1 in range(len(y0)):
                     Y[-1].append(0.0)
-                Y = np.array(Y)  
+                Y = np.array(Y)
                 # Set y0 for the next small timestep
                 y0 = deepcopy(Y[-1])
 
@@ -362,15 +362,15 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
             arguments.set_val("windspeed", params.windspeed)
             arguments.set_val("globrad", globrad_cell[item][-1])
             arguments.set_val("dvoldt",dvoldt[item][iorder])
-            arguments.set_val("vol",volume[item][iorder])           
+            arguments.set_val("vol",volume[item][iorder])
             arguments.set_val("width",width[item][iorder])
             arguments.set_val("slope",slope*1e-5)
-            arguments.set_val("discharge",Qmid[item][iorder])         
+            arguments.set_val("discharge",Qmid[item][iorder])
             arguments.set_val("residence_time", arguments.get_val("vol")/Qmid[item][iorder])
             arguments.set_val("area", arguments.get_val("vol")/(depth[item][iorder]*1e-3))
             arguments.set_val("depth",depth[item][iorder])
             arguments.set_val("length", (arguments.get_val("area")*1e6)/width[item][iorder])
-            
+
             arguments.set_val("icell", icell)
             arguments.set_val("next_cell", next_cell)
             arguments.set_val("flow_velocity", vel[item][iorder])
@@ -381,7 +381,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
               arguments.set_val("globrad", globrad_cell[item][-1]*params.global_radiation_factor)
               arguments.set_val("slope",slope*1e-5*params.slope_factor)
               Qmid[item][iorder] = Qmid[item][iorder]*params.discharge_factor
-              arguments.set_val("discharge",Qmid[item][iorder])         
+              arguments.set_val("discharge",Qmid[item][iorder])
               arguments.set_val("residence_time", arguments.get_val("vol")/Qmid[item][iorder])
               arguments.set_val("flow_velocity", Qmid[item][iorder]/(arguments.get_val("width")*arguments.get_val("depth")*1e-6))
 
@@ -399,10 +399,10 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                 floodplain_arguments.set_val("discharge",(floodplain_arguments.get_val("depth")*floodplain_arguments.get_val("width")*1e-6)*floodplain_arguments.get_val('flow_velocity'))
                 floodplain_arguments.set_val("windspeed", params.windspeed*(params.fp_wind_reduc_factor*high_veg_fr_cell[item][-1]+(1-high_veg_fr_cell[item][-1])))
               else:
-                floodplain_arguments.set_val("area", 0) 
+                floodplain_arguments.set_val("area", 0)
                 floodplain_arguments.set_val("width", 0)
                 floodplain_arguments.set_val("length", 0)
-                floodplain_arguments.set_val("discharge",0) 
+                floodplain_arguments.set_val("discharge",0)
                 floodplain_arguments.set_val("flow_velocity",0)
               if params.lsensitivity==1:
                 floodplain_arguments.set_val("flow_velocity",arguments.get_val("flow_velocity")*params.fp_vel_fraction*params.fp_vel_factor)
@@ -411,7 +411,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                 floodplain_arguments.set_val("windspeed", params.windspeed*(params.fp_wind_reduc_factor*params.windspeed_reduction_factor*high_veg_fraction+(1-high_veg_fraction)))
 
             setattr(params, 'debug', False)
- 
+
             x_args = list() # wj201709
             for arg in sorted(arguments.get_attrib()): # wj201709
                 x_args.append(arguments.get_val(arg)) # wj201709
@@ -421,11 +421,11 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
 
                 timerange=[timeint[0],timeint[0]+params.outputtime]
                 dt = timerange[-1] - timerange[0]
-                load_reach = [] #LV 01-01-2017: loads only for one river reach (not total length of one order)     
+                load_reach = [] #LV 01-01-2017: loads only for one river reach (not total length of one order)
 
                 for ispec in range(len(species)):
                     load_reach.append(load[item][ispec+1]/number_of_rivers[iorder])
-                
+
                 if params.lfloodplains==1 and iorder==params.norder-1:
                     for ispec in range(len(species)):
                       load_reach.append(load[item][ispec+1+len(species)]/number_of_rivers[iorder])
@@ -433,7 +433,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                 for i_y in range(len(species)):
                     y0[i_y] = species[i_y].get_val('amount')*arguments.get_val('vol')
                     if ((params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False)):
-                      y0[i_y+len(species)] = species[i_y].get_val('amount')*arguments.get_val('vol') 
+                      y0[i_y+len(species)] = species[i_y].get_val('amount')*arguments.get_val('vol')
 
                 if params.lfloodplains==0 or iorder<params.norder-1 or llake==True:
                   Y1,outdict = itg.odeint(reactions.dy, y0,\
@@ -458,7 +458,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                   Y1,outdict = itg.odeint(reactions.dy, y0,\
                                        timerange,\
                                        args=(params,species,proc,load_reach,\
-                                             Qmid[item][iorder],arguments,floodplain_arguments), full_output=True,printmessg=False,mxstep=8760, rtol=1e-3, atol=1e-3) 
+                                             Qmid[item][iorder],arguments,floodplain_arguments), full_output=True,printmessg=False,mxstep=8760, rtol=1e-3, atol=1e-3)
                   Y = []
                   Y.append(list(map(positive,Y1[-1])))
                   # Make numpy array
@@ -482,7 +482,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                     for ispec in range(len(species)):
                       load_reach.append(load[item][ispec+1+len(species)]/number_of_rivers[iorder])
 
-                if params.lfloodplains==0 or iorder<params.norder-1 or llake==True: 
+                if params.lfloodplains==0 or iorder<params.norder-1 or llake==True:
                   Y,outdict = itg.odeint(reactions.dy, y0,\
                                        timerange,\
                                        args=(params,species,proc,load_reach,\
@@ -491,11 +491,11 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                   Y,outdict = itg.odeint(reactions.dy, y0,\
                                        timerange,\
                                        args=(params,species,proc,load_reach,\
-                                             Qmid[item][iorder],arguments,floodplain_arguments), full_output=True,printmessg=False,mxstep=8760, rtol=1e-3, atol=1e-3) 
-                  
+                                             Qmid[item][iorder],arguments,floodplain_arguments), full_output=True,printmessg=False,mxstep=8760, rtol=1e-3, atol=1e-3)
+
             setattr(params, 'debug', False)
             # Convert to load
-            # Convert amount (Mmol) Qmid(km3/yr) and volume (km3) into load (Mmol/yr)   
+            # Convert amount (Mmol) Qmid(km3/yr) and volume (km3) into load (Mmol/yr)
             # Y[-1][0:len(species)] to account for the transporting streams only  and exclude the floodplain transport in the extended Y (in the highest order only)
             load_out[-1].append([])
             for i in range(len(Y[-1][:len(species)])):
@@ -504,7 +504,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                 #load_out[-1][-1].append((Qmid[item][iorder]/arguments.get_val('vol')*Y[-1][:len(species)][i]*params.number_of_rivers[iorder])
               except(FloatingPointError):
                 load_out[-1][-1].append(0.)
-           
+
             #if iorder==5:
             #  print('load_out[-1]=', load_out[-1][0][0]) #load_out[-1].append(((Qmid[item][iorder]/volume[item][iorder])*Y[-1][:len(species)]*params.number_of_rivers[iorder]).tolist())
 
@@ -535,7 +535,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                     general_func.add_budget_load(xbud, iorder, ispec, "loadOUT", load_out_dt)
                     #general_func.add_budget_load(xbud, iorder, ispec, "dvoldt", arguments.dvoldt * Y[-1][ispec]/volume[item][iorder] * dt)
                     # to add: src_load for floodplains
-                    if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False) and volume_fp[item]>0: 
+                    if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False) and volume_fp[item]>0:
                       general_func.add_budget_load(xbud, iorder, ispec, "loadIN", load_reach[ispec+len(species)])
                       #if (Y[-1][ispec+len(species)]>0) and (llake==False) and ('benth' not in species[ispec].get_val('name')):
                       #  try:
@@ -549,14 +549,14 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                                                 Qmid[item][iorder],arguments) #LV 02-08-2017
                 general_func.add_budget_procs(species, xbud, iorder, number_of_rivers[iorder], dt, proc_rates)
 
-                if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False): 
+                if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
                     proc_rates_fp = reactions.procfunc(Y[-1][-len(species):],params,species,proc,\
                                                 0,floodplain_arguments) #LV 02-08-2017
                     general_func.add_budget_procs(species, xbud, iorder+1, 1, dt, proc_rates_fp)
                 else:
                     general_func.add_budget_procs(species, xbud, iorder, 1, dt, len(proc_rates)*[0])
 
-        # Save last state situation 
+        # Save last state situation
         # Y is a numpy array, so first make it a list.
         x = Y[-1][0:len(species)].tolist()
         xtot = []
@@ -564,9 +564,9 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
           try:
             xtot.append(number_of_rivers[iorder]*Y[-1][i])
           except(FloatingPointError):
-            xtot.append(0.) 
+            xtot.append(0.)
 
-        if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False): 
+        if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
           x_floodplains = Y[-1][-len(species):].tolist()
 
         # Calculate concentration for all species for last order.
@@ -579,7 +579,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
               xconc.append(1e-3 * x[ispec] * species[ispec].get_molarmass()/volume[item][iorder])
             except(FloatingPointError):
               xconc.append(0.)
-          else: 
+          else:
             xconc.append(0)
         if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
             xconc_floodplains=[]
@@ -603,7 +603,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
           x_floodplains = [0]*len(species)
           x_floodplains.insert(0,timerange[-1])
           pickle.dump(x_floodplains,fp_out,-1)
- 
+
         # Add time to the list
         xconc.insert(0,timerange[-1])
         pickle.dump(xconc,fp_conc,-1)
@@ -636,7 +636,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
               x_args.append(arguments.get_val(arg))
             # Add time to the list
             x_args.insert(0, timerange[-1])
-            # Write to file 
+            # Write to file
             pickle.dump(x_args, fp_args,-1)
             if (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
               x_floodplain_args=[]
@@ -655,9 +655,9 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
     fp_out.close()
     fp_conc.close()
     if (params.lbudget == 1):
-        fp_bud.close() 
-    if (params.largs == 1): 
-        fp_args.close() 
+        fp_bud.close()
+    if (params.largs == 1):
+        fp_args.close()
 
     # Remove the previous timeperiod file of this cell. It is not needed anymore.
     filename = os.path.join(tmpdir,str(icell)+"_"+str(timeperiod-1)+".pkl")
@@ -677,15 +677,15 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
         filename = os.path.join(tmpdir,"arguments_"+str(icell)+"_"+str(timeperiod-1)+".pkl") #wj201709
         if (os.path.isfile(filename)): #wj201709
             my_sys.my_removefile(filename) #wj201709
-     
+
     # Write load output of this cell to the output file.
     # Acquire the lock.
     if lock != None:
         lock.acquire()
-    
+
     # Open output file for the load of the next cell.
     filename = os.path.join(tmpdir,"load_"+str(next_cell)+"_"+str(timeperiod)+".pkl")
- 
+
     if (os.path.isfile(filename)):
         # Read the file and add this load to it.
         fp_out = open(os.path.join(tmpdir,"load_"+str(next_cell)+"_"+str(timeperiod)+".pkl"),"rb")
