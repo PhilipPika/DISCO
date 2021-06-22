@@ -269,6 +269,7 @@ def pkl2netcdf_allorders(filename,spec_data,netcdf_mask,basinid,fill_value=-9999
 
         
 def convert_output(inputdir,outformat,norders=6):
+    print("Entering output_conversion >> convert_output()")
     '''
     Read output of rive model and create output grids in wanted format (ASCII, NETCDF or both).
     By default norders is set to Strahler order = 6
@@ -402,6 +403,8 @@ def convert_output(inputdir,outformat,norders=6):
             raise MyError("There is nothing to do!")      
         
         ### Conversion of the species concentration ###
+        print("Conversion of the species concentration")
+
         if (len(outputfiles) > 0):
             filename = outputfiles[0][0]
             # Read header of one output file to get species names
@@ -432,6 +435,7 @@ def convert_output(inputdir,outformat,norders=6):
                 conc_spec_data[item].close()
 
         ### Conversion of the species concentration in subgrid orders ###
+        print("Conversion of the species concentration in subgrid orders")
         if (len(outputfiles_allorders) > 0):
             filename = outputfiles_allorders[0][0]
             # Read header of one output file to get species names
@@ -467,6 +471,7 @@ def convert_output(inputdir,outformat,norders=6):
                 shutil.copyfile(fn, os.path.join(subgrid_states_dir, '..', os.path.basename(fn).replace("_order6", "")))        
         
         ### Conversion of the environmental parameters and hydrology ###
+        if(params.ldebug): print("Conversion of the environmental parameters and hydrology")
         if (len(argumentfiles)>0):
             filename = argumentfiles[0][0]
             # Read header of one output file to get argument names
@@ -546,6 +551,7 @@ def convert_output(inputdir,outformat,norders=6):
                 shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
         
         ### Conversion of the species processes ###
+        print("Conversion of the species processes")
         if (len(budgetfiles)>0):
             filename = budgetfiles[0][0]
             # Read header of one output file to get argument names

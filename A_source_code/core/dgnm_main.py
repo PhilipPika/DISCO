@@ -187,8 +187,10 @@ def run_dgnm(args):
                 numbers.append(list_riverid[item])
 
         if (params.llocal):
+            print('GO LOCAL')
             # Define the process with riverid "num", return value p is process "handler"
             p=mp.Process(target= dgnm_river.calculate, args=(numbers,lock,params,species,proc,sources))
+            print('IN MP process')
             # Add the process handler to the jobs list.
             jobs.append(p)
             # Start the process

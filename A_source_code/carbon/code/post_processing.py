@@ -125,6 +125,7 @@ def calc_ph_pco2(params,dformat):
       mask_2d = make_mask.do(params.file_mask, params.maskid, dum_asc, logical=params.mask_bool_operator, mask_type='np_grid')
 
       for order in range(len(alklist)):
+          print("order", order)
           alk = Dataset(alklist[order], "a")
           dic = Dataset(diclist[order], "a")
           Tdat = Dataset(Tlist[order], "a")
@@ -179,7 +180,7 @@ if __name__ == "__main__":
     
     dformat = 'NETCDF'
     #post_processing(params, dformat)
-    post_processing_states(params, dformat)
+    #post_processing_states(params, dformat)
     #post_processing_budgets(params, dformat)	
     
 			
