@@ -8,10 +8,11 @@ import os
 import sys
 import traceback
 import pickle
-from scipy import *
+# from scipy import Scipy
 import time
 import make_args
 import reactions #LV 19-11-2018
+import math
 
 # Import own general modules
 try:
@@ -43,7 +44,7 @@ def start_process(p,jobs,max_number_of_processes):
     '''
     P: proces handler.
     Start the current process and continue only when the number of processes running is smaller than
-    the specified max_number_of_processes    
+    the specified max_number_of_processes
     '''
     # Start the process.
     p.start()
@@ -52,7 +53,7 @@ def start_process(p,jobs,max_number_of_processes):
     # When more than the defined number of cpu are active, it stops with starting new jobs until
     # there are cpu cores available.
     while (len(jobs) >= max_number_of_processes):
-        # This sleep is needed, otherwise this while loop consumes all cpu time. 
+        # This sleep is needed, otherwise this while loop consumes all cpu time.
         time.sleep(0.05)
         # Delete all jobs in the job list which are finished.
         for j in range(len(jobs)-1,-1,-1):
@@ -80,7 +81,7 @@ def stryear(year):
     '''
     In order to avoid too long names in the case of monthly simulations...
     '''
-    
+
     if (isinstance(year, float)):
         strtime = '%.3f' % round(year,3)
     else:
@@ -106,7 +107,7 @@ def path_conversion(path):
         outpath = path
     return outpath
 
-    
+
 def avg_within_range_2dim(domain,values,begin,end):
     '''
     Find all the values which are needed to cover the range begin to end.
@@ -182,7 +183,7 @@ def find_within_range(list1,begin,end):
         if (float(list1[item]) > end):
             iend = item
     return ibegin,iend
-        
+
 def pickleLoader(pklFile):
     try:
         while True:
@@ -222,7 +223,7 @@ def check_header(filename,species,year):
         #              "Year needed in file: "+str(year))
         print("WARNING: File " + filename + " does not have the year.",\
               "Year found in file: "+str(header[0]),\
-              "Year needed in file: "+str(year)) 
+              "Year needed in file: "+str(year))
     # Check whether the speciesnames and order are equal
     for item in range(len(species)):
         try:
@@ -259,7 +260,7 @@ def read_header(fp=None,filename=None):
     year = list[0]
     # Remove year from specienames list
     list.pop(0)
-  
+
     return year,list
 
 def make_header(filename,species,year):
@@ -291,7 +292,7 @@ def get_all_header_budget_names(species, proc,line=[]):
 
 def make_header_budget(filename,species,proc,year):
     '''
-    Make output file with process rates. 
+    Make output file with process rates.
     year, load, outflow, change in volume, particle exchanges, processes
     '''
     fp = open(filename, 'wb')
@@ -327,7 +328,7 @@ def add_budget_load(xbud, iorder, ispec, term, value):
         xbud[iorder][6*ispec+4] += value
     elif (term == "dvoldt"):
         xbud[iorder][6*ispec+5] += value
-        
+
 def add_budget_procs(species, xbud, iorder, nrivers, dt, proc_rates):
     '''
     Add process rates in budget for a specified order
@@ -337,7 +338,7 @@ def add_budget_procs(species, xbud, iorder, nrivers, dt, proc_rates):
           xbud[iorder][6*len(species)+iproc] += nrivers * proc_rates[iproc] * dt
         except(FloatingPointError):
           xbud[iorder][6*len(species)+iproc] += 0.
-    
+
 def make_header_arguments(filename, year): #wj201709
     arguments = make_args.do() #wj201709
     fp = open(filename, 'wb') #wj201709
@@ -354,7 +355,7 @@ def get_val_dict(dict,key):
         return None
 
 def find_spec(list,name,lfatal=0):
-    ''' 
+    '''
     Returns the index of the list where the name is found
     '''
     for i in range(len(list)):
@@ -364,9 +365,9 @@ def find_spec(list,name,lfatal=0):
         raise MyError("Species " + name + " is not found in the list.")
     else:
         print("Species " + name + " is not found in the list.")
-        
-def is_spec(list,name): 
-    ''' 
+
+def is_spec(list,name):
+    '''
     Returns 1 if the species is defined, 0 otherwise
     '''
     found = False
@@ -378,18 +379,18 @@ def is_spec(list,name):
     return found
 
 def find_func(list,name):
-    ''' 
+    '''
     Returns the index of the list where the name is found.
     '''
     for i in range(len(list)):
         lab = list[i].get_val("name")
         if (lab == name): return i
-    
+
     raise MyError("Process " + name + " is not found in the list.")
 
 def find_func_dict(list):
-    ''' 
-    Makes a dictionary for name of the functions and the index in the list. 
+    '''
+    Makes a dictionary for name of the functions and the index in the list.
     Dictionary returs the index of the list where the name is found.
     '''
     dict = {}
@@ -397,10 +398,10 @@ def find_func_dict(list):
         lab = list[i].get_val("name")
         dict[lab] = i
     return dict
-    
+
 #def get_conc(list):
 def get_amount(list):
-    ''' 
+    '''
     Returns a list with the concentration.
     List contains Spec items.
     '''
@@ -408,7 +409,7 @@ def get_amount(list):
     for i in range(len(list)):
         #out.append(list[i].get_conc())
         out.append(list[i].get_amount())
-    
+
     return out
 
 def MM(conc,half_sat):
@@ -428,7 +429,7 @@ def fT(topt, sigma, temperature):
 
 #def light_extinct(ss_conc, eta_ss, depth):
 #    '''
-#    Reduction factor of photosynthesis due to 
+#    Reduction factor of photosynthesis due to
 #    suspended sediments in the water column (light extinction)
 #    '''
 #    lext = 1.0
@@ -440,19 +441,19 @@ def fT(topt, sigma, temperature):
 
 def light_extinct(params, spec, species, I0, volume, depth):
     '''
-    Reduction factor of photosynthesis due to 
+    Reduction factor of photosynthesis due to
     species in the water column (light extinction)
-    
+
     lext = 1.0
     eta_tot=0.8 #attenuation of water only
     for s in species:
         ispec = getattr(params, "i"+s.get_name().lower())
         eta_tot += s.get_val('eta')*(spec[ispec]/volume)*1e3*s.get_val('molarmass')
-    
+
     if ((eta_tot * depth) > 0.0):
         lext = 1-math.exp((-1) * eta_tot * depth)
         lext /= eta_tot * depth
-    ''' 
+    '''
     ####################################################################################################
     ## function to analytically integrate light over depth
     #mindepth: most shallow depth to integrate to (often 0, which is water surface)
@@ -466,24 +467,24 @@ def light_extinct(params, spec, species, I0, volume, depth):
     for s in species:
         ispec = getattr(params, "i"+s.get_name().lower())
         k += s.get_val('eta')*((spec[ispec]*1e9)/(volume*1e12))*s.get_val('molarmass') #mg/l
-    
+
     k = max(k,1e-9)
 
     ## primitive of Lambert-Beer
-    def primitive(I0, k, z=0): 
+    def primitive(I0, k, z=0):
         try:
             return -I0/k *math.exp(-k*z)
         except:
             return -I0/k *math.exp(-10*z)
     # returns [W/m2]
     return (primitive(I0, k, z=maxdepth)-primitive(I0, k, z=mindepth))/((maxdepth-mindepth)*I0)
-  
-####################################################################################################   
+
+####################################################################################################
     return lext
 
 def light_extinct_benthic(params, spec, species, volume, depth):
     '''
-    Reduction factor of benthic photosynthesis due to 
+    Reduction factor of benthic photosynthesis due to
     species in the water column (light extinction)
     '''
     lext = 0
@@ -497,7 +498,7 @@ def light_extinct_benthic(params, spec, species, volume, depth):
         #print('eta_tot=',eta_tot)
         #print('depth=', depth)
         #print('lext=', lext)
-        
+
     return lext
 
 def calculate_vel(Q, width, depth):
@@ -527,7 +528,7 @@ def get_years(dirname,pre_text=None):
         else:
             # Not a year
             try:
-                if (pre_text == None): 
+                if (pre_text == None):
                     qq = float(years[item])
                 else:
                     if (years[item].startswith(pre_text)):
@@ -557,7 +558,7 @@ if __name__ == "__main__":
     import sys
     import traceback
     import pickle
- 
+
     # Import own general modules
     from error import *
 
@@ -602,5 +603,5 @@ if __name__ == "__main__":
          print("Error handling went okay.")
     except:
          print("Error handling of sum_within_range_2dim went wrong! ERROR")
-    
+
 

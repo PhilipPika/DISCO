@@ -41,11 +41,11 @@ class suppress_stdout_stderr(object):
         os.dup2 ( self.outnull_file.fileno(), self.old_stdout_fileno_undup )
         os.dup2 ( self.errnull_file.fileno(), self.old_stderr_fileno_undup )
 
-        sys.stdout = self.outnull_file        
+        sys.stdout = self.outnull_file
         sys.stderr = self.errnull_file
         return self
 
-    def __exit__(self, *_):        
+    def __exit__(self, *_):
         sys.stdout = self.old_stdout
         sys.stderr = self.old_stderr
 
@@ -66,37 +66,37 @@ def specie_dy(proc,speciesname):
     '''
     # Set all factors to zero.
     vals = len(proc)*[0.0]
-    
+
     # Find all the processess which influence this species.
     for item in range(len(proc)):
         try:
             vals[item] = proc[item].get_val("dy_"+speciesname)
-            
+
         except MyError:
             pass
     return vals
 
 ##############################################################################
 ######################################
-##### GENERAL REACTION FUNCTIONS #####    
-    
+##### GENERAL REACTION FUNCTIONS #####
+
 def gen_prim_prod(sp,amount,lim):
   if amount>0:
     np.seterr(all='raise')
-    try:  
+    try:
       return lim*sp.get_val('max_growth_r')*365*amount
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0.
   else:
     return 0.
-   
+
 def gen_respiration(params,sp,amount,temperature, vol):
   if amount>0 and vol>0:
     np.seterr(all='raise')
     try:
       fT = general_func.fT(sp.get_val("Topt"), sp.get_val("sigma"), temperature-params.tempcorrection)
       return fT*sp.get_val('max_resp_r')*365*amount
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0.
   else:
     return 0
@@ -109,7 +109,7 @@ def gen_mineralization(params, sp, amount, temperature):
         return sp.get_val('max_oxi_r')*365*amount
       else:
         return amount*sp.get_val('min_oxi_r')*math.pow(sp.get_val('q10'), (temperature-params.tempcorrection-15)/10)*365
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0.
   else:
     return 0
@@ -122,18 +122,18 @@ def gen_mortality(params,sp,amount,temperature,vol, area):
     try:
         phyconc = (amount/vol)*sp.get_val('molarmass')*1e-3 #mg/l
         factor = general_func.MM(phyconc, sp.get_val("paras_thres")*sp.get_val("spec_chl_ratio"))
-    except(OverflowError):
+    except OverflowError :
         factor = 1
-    except(FloatingPointError):
+    except FloatingPointError :
          factor = 0
     try:
       mort += mort + factor*mort*sp.get_val("vf")
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0.
-        
+
     try:
         return mort*365*amount
-    except(FloatingPointError):
+    except FloatingPointError :
         return 0.
   else:
     return 0
@@ -142,10 +142,10 @@ def gen_mortality(params,sp,amount,temperature,vol, area):
 def gen_excretion_doc(params,sp,amount,temperature, vol):
   if amount>0 and vol>0.:
     np.seterr(all='raise')
-    try:	
+    try:
       fT = general_func.fT(sp.get_val("Topt"), sp.get_val("sigma"), temperature-params.tempcorrection)
       return fT*sp.get_val('max_excr_r')*365*amount
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0.
   else:
     return 0.
@@ -160,18 +160,18 @@ def gen_excretion_doc(params,sp,amount,temperature, vol):
 
 # primary production of algae limited by C, light and temperature
 def prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature, glob_rad):
-    # DIC effect 
+    # DIC effect
     try:
       conc_DIC = spec[params.idic]/vol #mmol/m3 = um/L
       try:
         factor = 1/(1+math.exp(-10*conc_DIC))
-      except(OverflowError):
+      except OverflowError :
         if conc_DIC>0:
           factor = 1
         else:
           factor = 0
       DIC_lim = general_func.MM(conc_DIC, species[params.iphyto].get_kDIC())*factor
-    except(FloatingPointError):
+    except FloatingPointError :
       DIC_lim = 0
 
 
@@ -184,12 +184,12 @@ def prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature, glob_rad):
         if spec[ispec]>0:
           try:
             eta_dum += s.get_val('eta')*((spec[ispec])/(vol))*s.get_val('molarmass') #ug/l
-          except(FloatingPointError):
+          except FloatingPointError :
             if spec[ispec]>1:
               eta_dum += 20
             else:
               eta_dum += 0
-    eta_dum2 = max(eta_min, eta_dum) 
+    eta_dum2 = max(eta_min, eta_dum)
     eta = min(eta_max, eta_dum2)
 
     # Light attenuation in the water column (2 layers)
@@ -197,16 +197,16 @@ def prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature, glob_rad):
     for d in np.linspace(0, depth, 2):
         try:
           I_lim += general_func.MM(glob_rad*math.exp(-d*eta), species[params.iphyto].get_kI())*0.5
-        except(FloatingPointError):
+        except FloatingPointError :
           I_lim += 0
-     
+
     # Temperature effect
     fT = general_func.fT(species[params.iphyto].get_val("Topt"), species[params.iphyto].get_val("sigma"), temperature-params.tempcorrection)
 
     # limitation of primary production
     try:
       lim = I_lim*DIC_lim*fT
-    except(FloatingPointError):
+    except FloatingPointError :
       lim = 0
 
     try:
@@ -222,9 +222,9 @@ def prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature, glob_rad):
           amount_lim=1
       else:
         return 0.
-    except(OverflowError):
+    except OverflowError :
       amount_lim = 0
-    except(FloatingPointError):
+    except FloatingPointError :
       amount_lim = 1
 
     return gen_prim_prod(species[params.iphyto],spec[params.iphyto],lim)*amount_lim
@@ -232,19 +232,19 @@ def prim_prod_C_PHYTO(spec,params,species,vol,depth,temperature, glob_rad):
 
 # primary production of periphyton limited by C, light and temperature
 def prim_prod_C_PERIPHYTON(spec,params,species,vol,depth,temperature, glob_rad, area):
-    # DIC effect 
+    # DIC effect
     try:
       conc_DIC = spec[params.idic]/vol #mmol/m3 = um/L
       try:
         factor = 1/(1+math.exp(-10*conc_DIC))
-      except(OverflowError):
+      except OverflowError :
         if conc_DIC>0:
           factor = 1
         else:
           factor = 0
 
       DIC_lim = general_func.MM(conc_DIC, species[params.iperiphyton_benth].get_kDIC())*factor
-    except(FloatingPointError):
+    except FloatingPointError :
       DIC_lim = 0
 
     # Turbidity
@@ -256,34 +256,34 @@ def prim_prod_C_PERIPHYTON(spec,params,species,vol,depth,temperature, glob_rad, 
         if spec[ispec]>0:
           try:
             eta_dum += s.get_val('eta')*((spec[ispec])/(vol))*s.get_val('molarmass') #ug/l
-          except(FloatingPointError):
+          except FloatingPointError :
             if spec[ispec]>1:
               eta_dum += 20
             else:
               eta_dum += 0
-    eta_dum2 = max(eta_min, eta_dum) 
+    eta_dum2 = max(eta_min, eta_dum)
     eta = min(eta_max, eta_dum2)
 
     # Light attenuation at water bottom
     try:
       light = glob_rad*math.exp(-depth*eta)
       I_lim = general_func.MM(light, species[params.iperiphyton_benth].get_kI())
-    except(FloatingPointError):
+    except FloatingPointError :
         I_lim = 0
 
     # temperature effect
     fT = general_func.fT(species[params.iperiphyton_benth].get_val("Topt"), species[params.iperiphyton_benth].get_val("sigma"), temperature-params.tempcorrection)
-    
+
     # limitation of primary production
     try:
       lim = I_lim*DIC_lim*fT
-    except(FloatingPointError):
+    except FloatingPointError :
       lim = 0
-    
+
     try:
       if vol>0.:
-        
-        if spec[params.iperiphyton_benth]>0: 
+
+        if spec[params.iperiphyton_benth]>0:
           peri_vol_density = spec[params.iperiphyton_benth]/vol*species[params.iperiphyton_benth].get_val('molarmass') #ug/l
           amount_lim = 1-general_func.MM(peri_vol_density*1e-3, species[params.iperiphyton_benth].get_val("paras_thres")*species[params.iperiphyton_benth].get_val('spec_chl_ratio'))
           if amount_lim<0:
@@ -294,48 +294,48 @@ def prim_prod_C_PERIPHYTON(spec,params,species,vol,depth,temperature, glob_rad, 
           amount_lim=1
       else:
         return 0.
-    except(OverflowError):
+    except OverflowError :
       amount_lim = 0
-    except(FloatingPointError):
+    except FloatingPointError :
       amount_lim = 1
-    try:     
+    try:
       return gen_prim_prod(species[params.iperiphyton_benth],spec[params.iperiphyton_benth],lim)*amount_lim
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0
 
-# exchange of DIC with atmosphere    
+# exchange of DIC with atmosphere
 def atmospheric_exchange_DIC(spec,params,species,temperature,windspeed,Q, flow_velocity, vol,width,length):
     # [mol/m3]
-    try:    
+    try:
       conc_DIC = max(spec[params.idic]*1e-3/vol, 0)
-    except(FloatingPointError):
+    except FloatingPointError :
       conc_DIC = 0
     try:
       conc_ALK = max(spec[params.ialk]*1e-3/vol, 0)
-    except(FloatingPointError):
+    except FloatingPointError :
       conc_ALK = 0
 
     if conc_DIC<999 and conc_ALK<999 and conc_DIC>0:
       carb_dat = np.dstack(mocsy.mvars(temp=temperature-params.tempcorrection, sal=0, alk=conc_ALK, dic=conc_DIC, sil=0, phos=0, patm=1., depth=1, lat=0, optcon='mol/m3', optt='Tinsitu', optp='db', optb="u74", optk1k2='l', optkf="dg", optgas='Pinsitu'))[0][0]
-      # [micro atmosphere]    
+      # [micro atmosphere]
       pCO2 = operator.itemgetter(1)(carb_dat)
 
     elif conc_DIC<=0:
       pCO2 = 0
     else:
-      with suppress_stdout_stderr(): # suppressing printed output of mocsy module when concentrations of either ALK or DIC are more than 1M 
+      with suppress_stdout_stderr(): # suppressing printed output of mocsy module when concentrations of either ALK or DIC are more than 1M
         carb_dat = np.dstack(mocsy.mvars(temp=temperature-params.tempcorrection, sal=0, alk=conc_ALK, dic=conc_DIC, sil=0, phos=0, patm=1., depth=1, lat=0, optcon='mol/m3', optt='Tinsitu', optp='db', optb="u74", optk1k2='l', optkf="dg", optgas='Pinsitu'))[0][0]
-      # [micro atmosphere]    
+      # [micro atmosphere]
       pCO2 = operator.itemgetter(1)(carb_dat)
       if pCO2>1e6:
         pCO2=1e6
-   
+
     # [mol/m3]
     CO2_conc = pCO2*math.pow(10,-6)*species[params.idic].get_val("kH")*1000
-    
+
     # [cm s-1]
     v = (flow_velocity*1e5 / (365.*86400.))
-          
+
     # [km]
     length *= math.pow(10,-3)
     # [km]
@@ -345,13 +345,13 @@ def atmospheric_exchange_DIC(spec,params,species,temperature,windspeed,Q, flow_v
         # [cm h-1]
         k600 = (species[params.idic].get_val("exch_a1") + species[params.idic].get_val("exch_b1")*v)
     else:
-        # [cm h-1] 
+        # [cm h-1]
         k600 = (species[params.idic].get_val("exch_a2") + species[params.idic].get_val("exch_b2")*windspeed)
-      
+
     sc = 1911.1-118.11*(temperature-params.tempcorrection)+3.4527*(temperature-params.tempcorrection)**2-0.04132*(temperature-params.tempcorrection)**3
     try:
       k = k600/((600/sc)**(-0.5))
-    except(FloatingPointError):
+    except FloatingPointError :
       k = 1e-9
 
     # [cm d-1]
@@ -362,35 +362,35 @@ def atmospheric_exchange_DIC(spec,params,species,temperature,windspeed,Q, flow_v
     k*=0.01
 
 
-              
+
     #[mol/m3]
-    dCO2 = CO2_conc-params.CO2_eq 
+    dCO2 = CO2_conc-params.CO2_eq
 
     if params.lsensitivity==1:
       #[mol/m3]
       dCO2 = CO2_conc-params.CO2_eq*params.co2_eq_factor
-                 
+
     # [km y-1]
     k*=math.pow(10,-3)
     #[mol/km3]
     dCO2*=math.pow(10,9)
     #[Mmol/km3]
     dCO2*=math.pow(10,-6)
-       
+
     #exchange in Mmol/year
     ex = dCO2*k*length*width
 
     return ex
-   
+
 
 def sedimentation(species, spec, ispec, proc, depth, vol, area):
     '''
     Returns sedimentation rate in Mmol.yr-1, tons.yr-1 or kg.yr-1
-    '''   
+    '''
     # Scheffer 2004, Ecology of shallow lakes
     try:
       return species[ispec].get_val("vsed") * spec[ispec] / (depth*1e-3) #(km/yr * tons / km = tons/yr)
-    except(FloatingPointError):
+    except FloatingPointError :
       return 0.
 
 def erosion(spec, ispec_benth, params, species, proc, width, depth, bedarea, vel, slope, area, vol, Q):
@@ -403,17 +403,17 @@ def erosion(spec, ispec_benth, params, species, proc, width, depth, bedarea, vel
     if bedarea>0. and vol>0. and vel>0. and spec_benth_amount>0.:
       try:
         bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24+spec[params.ipoclowcn_benth]*24) / bedarea #sediment stock per bed surface area
-      except(AttributeError):
+      except AttributeError :
         try:
-          bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24) / bedarea #sediment stock per bed surface area          
-        except(AttributeError):
+          bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24) / bedarea #sediment stock per bed surface area
+        except AttributeError :
           bsed = spec[params.ipim_benth] / bedarea #sediment stock per bed surface area
     else:
       return 0.
 
-    try: 
+    try:
       factor = 1/(1+math.exp(-1*(bsed-species[params.itss_benth].get_val("k_sed"))))
-    except(OverflowError):
+    except OverflowError :
       if bsed > 0:
         factor = 1
       else:
@@ -424,17 +424,17 @@ def erosion(spec, ispec_benth, params, species, proc, width, depth, bedarea, vel
 
     try:
       ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24+spec[params.ipoclowcn_benth]*24)
-    except(AttributeError):
+    except AttributeError :
       try:
         ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24)
-      except(AttributeError):
+      except AttributeError :
         try:
           ero = ero_tss * spec_benth_amount/(spec[params.ipim_benth])
-        except(FloatingPointError):
+        except FloatingPointError :
           return 0.
-      except(FloatingPointError):
+      except FloatingPointError :
           return 0.
-    except(FloatingPointError):
+    except FloatingPointError :
           return 0.
 
     return ero
@@ -448,14 +448,14 @@ def burial(spec, ispec, params, species, depth, vol):
 
         try:
           bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24+spec[params.ipoclowcn_benth]*24) / bedarea #sediment stock per bed surface area
-        except(AttributeError):
+        except AttributeError :
             try:
               bsed = (spec[params.ipim_benth]+spec[params.ipochighcn_benth]*24) / bedarea #sediment stock per bed surface area
-            except(AttributeError):
+            except AttributeError :
               bsed = (spec[params.ipim_benth]) / bedarea #sediment stock per bed surface area
         try:
             factor = 1/(1+math.exp(-1*(math.log(bsed)-math.log(species[params.itss_benth].get_val("bsedlim")))))
-        except(OverflowError):
+        except OverflowError :
             if bsed > 0:
               factor = 1
             else:
@@ -471,12 +471,12 @@ def burial(spec, ispec, params, species, depth, vol):
         bur *= factor
         try:
           bur *= spec[ispec]
-        except(FloatingPointError):
+        except FloatingPointError :
           bur = 0.
     return bur
 
 
-      
+
 ##### SPECIE SPECIFIC FUNCTIONS ######
 ######################################
 
@@ -510,19 +510,19 @@ def procfunc(spec,params,species,proc,Q,arguments):
         elif (name == "respiration_PHYTO"):
             out.append(gen_respiration(params, species[params.iphyto],spec[params.iphyto],temperature, vol))
         elif (name == "respiration_PERIPHYTON"):
-            out.append(gen_respiration(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))            
+            out.append(gen_respiration(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))
 
         ## MORTALITY
         elif (name == "mortality_PHYTO"):
             out.append(gen_mortality(params, species[params.iphyto],spec[params.iphyto],temperature,vol,area))
         elif (name == "mortality_PERIPHYTON"):
-            out.append(gen_mortality(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature,vol,area)) 
+            out.append(gen_mortality(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature,vol,area))
 
-	## EXCRETION
+    ## EXCRETION
         elif (name == "excretion_DOC_PHYTO"):
             out.append(gen_excretion_doc(params,species[params.iphyto],spec[params.iphyto],temperature, vol))
         elif (name == "excretion_DOC_PERIPHYTON"):
-            out.append(gen_excretion_doc(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))  
+            out.append(gen_excretion_doc(params,species[params.iperiphyton_benth],spec[params.iperiphyton_benth],temperature, vol))
 
         ## MINERALIZATION
         elif (name == "oxidation_POClowCN"):
@@ -576,21 +576,21 @@ def procfunc(spec,params,species,proc,Q,arguments):
             MyError.write("Function %s has not been defined." % name)
     else:
       return [0.]*len(proc)
-     
+
     return out
 
 
-# Total change rate due to biogeochemical processes 
+# Total change rate due to biogeochemical processes
 def change_spec(spec, params, species, name, funcs, proc):
     '''
-    Calculates the total change rate due to biogeochemical processes 
+    Calculates the total change rate due to biogeochemical processes
     for one species
     '''
 
     # Get the stoichiometry for the processes.
     vals = specie_dy(proc,name)
 
-    # Calculate the product of the two lists and sum them.   
+    # Calculate the product of the two lists and sum them.
     total = 0.0
 
     for item in range(len(vals)):
@@ -599,34 +599,34 @@ def change_spec(spec, params, species, name, funcs, proc):
         except(TypeError):
           total='error'
 
-    return total 
+    return total
 
 
 def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
     '''
     This function returns a list of changing_rate function for each specie.
     '''
-  
+
     # if these conditions meet it is a stream without floodplains
     if (params.lfloodplains == 0) or (fp_arguments==None) or len(spec)==len(species):
       out = []
 
       dvoldt = arguments.get_val("dvoldt")
       vol = arguments.get_val("vol")
- 
+
       # Calculation of the change rates due to biogeochemical processing
-      funcs = procfunc(spec,params,species,proc,Q,arguments)         
-    
+      funcs = procfunc(spec,params,species,proc,Q,arguments)
+
       # Calculation of total change rates of species in the water column
       for item in range(len(species)):
-        try:      
+        try:
           conc = max(0, spec[item] / vol)
-        except(FloatingPointError):
+        except FloatingPointError :
           conc = 0.
 
         try:
           outflow = Q*conc
-        except(FloatingPointError):
+        except FloatingPointError :
           outflow = 0.
 
         if not (species[item].get_name().endswith("_benth")):
@@ -664,19 +664,19 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
         for item in range(len(species)):
           try:
             conc = max(0, spec[item] / vol)
-          except(FloatingPointError):
+          except FloatingPointError :
             conc = 0.
           try:
             fp_conc = max(0, spec[item+len(species)] / fp_vol)
-          except(FloatingPointError):
+          except FloatingPointError :
             fp_conc = 0.
-    
+
           # all dissolved and suspended contents are calculated within this condition
           if not (species[item].get_name().endswith("_benth")):
             if fp_dvoldt>0. and fp_depth>0.:
               try:
                 to_fp_dvoldt_amount = conc*fp_dvoldt
-              except(FloatingPointError):
+              except FloatingPointError :
                 to_fp_dvoldt_amount = 0.
               try:
                 through_fp_volIN_amount = conc*fp_arguments.get_val('discharge')
@@ -684,14 +684,14 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
                 if through_fp_volIN_amount<0:
                   through_fp_volIN_amount = 0
                 if through_fp_volOUT_amount<0:
-                  through_fp_volOUT_amount= 0 
-              except(FloatingPointError):
+                  through_fp_volOUT_amount= 0
+              except FloatingPointError :
                 through_fp_volIN_amount = 0.
                 through_fp_volOUT_amount = 0.
 
               try:
                 outflow = Q*conc
-              except(FloatingPointError):
+              except FloatingPointError :
                 outflow = 0.
 
               # in stream dY
@@ -705,7 +705,7 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
             else:
               try:
                 from_fp_dvoldt_amount = fp_conc*fp_dvoldt
-              except(FloatingPointError):
+              except FloatingPointError :
                 from_fp_dvoldt_amount = 0.
               try:
                 through_fp_volIN_amount = conc*fp_arguments.get_val('discharge')
@@ -713,14 +713,14 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
                 if through_fp_volIN_amount<0:
                   through_fp_volIN_amount = 0
                 if through_fp_volOUT_amount<0:
-                  through_fp_volOUT_amount= 0 
-              except(FloatingPointError):
+                  through_fp_volOUT_amount= 0
+              except FloatingPointError :
                 through_fp_volIN_amount = 0.
                 through_fp_volOUT_amount = 0.
 
               try:
                 outflow = Q*conc
-              except(FloatingPointError):
+              except FloatingPointError :
                 outflow = 0.
 
               # in stream dY
@@ -743,20 +743,20 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
         out = [0.]*len(spec)
         # Calculation of total change rates of species in the water column
         for item in range(len(species)):
-          try:      
+          try:
             conc = max(0., spec[item] / vol)
-          except(FloatingPointError):
+          except FloatingPointError :
             conc = 0.
 
           try:
                 outflow = Q*conc
-          except(FloatingPointError):
+          except FloatingPointError :
                 outflow = 0.
           if not (species[item].get_name().endswith("_benth")):
               out[getattr(params, 'i'+species[item].get_name().lower())] = change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc) + load[item] - outflow
           else:
               out[getattr(params, 'i'+species[item].get_name().lower())] = change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc)
-       
+
         return out
 
 
@@ -768,7 +768,7 @@ def dy_steady(y,params,species,proc,load,Q,arguments,fp_arguments=None):
     '''
     return dy_list(y,params,species,proc,load,Q,arguments,fp_arguments)
 
-    
+
 def dy(y,t,params,species,proc,load,Q,arguments,fp_arguments=None):
     '''
     This function is used in the solver, depending on y (list of species) and t (time).

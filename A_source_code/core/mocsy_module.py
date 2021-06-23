@@ -9,21 +9,21 @@
 '''
 imports mocsy module
 '''
-#try: 
+#try:
 #  import mocsy
 #except ImportError:
 import os
 import sys
 root = os.getenv("DGNM_ROOT")
-if (root == None):
-  print("***** ERROR *****")
-  print("Environment parameter DGNM_ROOT is not set.")
-  sys.exit(1)
-if (not os.path.isdir(root)):
-  print("***** ERROR ******")
-  print("Environment parameter DGNM_ROOT is not set correctly.")
-  print("Environment parameter DGNM_ROOT found: ",root)
-  sys.exit(1)
+if  root is None :
+    print("***** ERROR *****")
+    print("Environment parameter DGNM_ROOT is not set.")
+    sys.exit(1)
+if not os.path.isdir(root):
+    print("***** ERROR ******")
+    print("Environment parameter DGNM_ROOT is not set correctly.")
+    print("Environment parameter DGNM_ROOT found: ",root)
+    sys.exit(1)
 # put mocsy directory in the sys.path.
 if "/User" in root:
     print('Working in Mac OS')
@@ -35,5 +35,6 @@ elif "/theia" in root:
 elif "/" in root:
     print('Working in linux OS - original statement')
     path = os.path.join(root,"libs","mocsy","linux")
-if (os.path.exists(path)):
+if os.path.exists(path):
     sys.path.insert(3, path)
+    

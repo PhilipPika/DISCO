@@ -31,36 +31,36 @@ def get_files_with_str(searchdir, searchstr, exclude=[]):
     file_list = list()
     searchdir=searchdir+'/'
     for filename in glob.iglob(os.path.join(searchdir,searchstr), recursive=True):
-      file_list.append(filename)
+        file_list.append(filename)
     exclude_list = []
     for str in exclude:
-      for file in file_list:
-        if str in file:
-          exclude_list.append(file)
+        for file in file_list:
+            if str in file:
+                exclude_list.append(file)
     for item in exclude_list:
-      try:
-        file_list.remove(item)
-      except(ValueError):
-        pass
-      
+        try:
+            file_list.remove(item)
+        except ValueError:
+            pass
+
     return file_list
-  
+
 def get_dirs(searchdir, full=False):
     '''
     returns all directory names in directory "searchdir"
 
     full = False returns only the name of the directory
     full = True returns the entire path of directory
-    '''  
+    '''
     if full==True:
-      dirs = list()  
-      dirs_dum = [x[1] for x in os.walk(searchdir)][0]
-      for d in dirs_dum:
-          dirs.append(os.path.join(searchdir, d))
+        dirs = list()
+        dirs_dum = [x[1] for x in os.walk(searchdir)][0]
+        for d in dirs_dum:
+            dirs.append(os.path.join(searchdir, d))
     else:
-      dirs = [x[1] for x in os.walk(searchdir)][0]  
+        dirs = [x[1] for x in os.walk(searchdir)][0]
     return dirs
-  
+
 def ensure(d, returnB=True):
     '''
     function to make sure directory "d" exists
@@ -71,7 +71,7 @@ def ensure(d, returnB=True):
     if not os.path.exists(d):
         os.makedirs(d)
     if returnB:
-        return d   
+        return d
 
 def up(d):
     '''
@@ -90,3 +90,4 @@ def get_parent(d, full=False):
         return up(d)
     else:
         return os.path.basename(os.path.normpath(d))
+    

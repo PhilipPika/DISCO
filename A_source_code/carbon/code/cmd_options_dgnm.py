@@ -17,16 +17,16 @@ import directory
 class Input_dgnm(cmd_options_general.Input,object):
     '''
     Parse arguments and store them using the optparse module.
-    
+
      Pass sys.argv into class: Input(sys.argv).
      Options will be included in 'options' object of instance of Input_dgnm().
      Call options using:
-     
+
      <instance>.options.<option>
-     
+
      All other commandline arguments will be stored in <instance>.args
     '''
-    
+
     def __init__(self,list_args, parse_parameter=True):
         # Extract scriptname to set working directory
         scriptname = list_args.pop(0)
@@ -35,17 +35,17 @@ class Input_dgnm(cmd_options_general.Input,object):
             # Insert inifile arguments before other commandline arguments.
             # This way commandline options prevail over inifile options
             print("Inifile option found in the command line.")
-            list_args = self._parse_inifile(list_args) + list_args    
+            list_args = self._parse_inifile(list_args) + list_args
 
         usage = "usage: python %prog [options]"
         self._dbg("Argument list: %s" % list_args)
-        
+
         # Debug print of current working directory
         self._dbg("Current workdir: %s" % os.getcwd())
 
         # Initialisation of the OptionParser
-        parser = optparse.OptionParser(prog=scriptname,usage=usage)      
-              
+        parser = optparse.OptionParser(prog=scriptname,usage=usage)
+
         # Set defaults for test mode
         parser.set_defaults(root = os.getenv("DGNM_ROOT"),
                             parameter_ini = os.path.join(os.getcwd(), "parameters.ini"),
@@ -83,12 +83,12 @@ class Input_dgnm(cmd_options_general.Input,object):
                           type = "string",
                           dest = "parameter_ini",
                           action="store",
-                          help="Full path to file with all 'constant' parameter values like filenames etc..")                            
+                          help="Full path to file with all 'constant' parameter values like filenames etc..")
         parser.add_option("-s", "--species_ini",
                           type = "string",
                           dest = "species_ini",
                           action="store",
-                          help="Full path to file with all definition of the species.")                            
+                          help="Full path to file with all definition of the species.")
         parser.add_option("--starttime",
                           type = "float",
                           dest = "starttime",
@@ -163,26 +163,26 @@ class Input_dgnm(cmd_options_general.Input,object):
                           dest = "lslope",
                           action="store",
                           help="Include slope information in calculations. 1: yes, 0: no")
-        parser.add_option("--allorders", 
+        parser.add_option("--allorders",
                           type = "int",
                           dest = "allorders",
                           action="store",
                           help="Print outputs for lower orders. 1: yes, 0: no.")
-        parser.add_option("--lbudget", 
+        parser.add_option("--lbudget",
                           type = "int",
                           dest = "lbudget",
                           action="store",
-                          help="Print budget variables for all orders. 1: yes, 0: no.") 
+                          help="Print budget variables for all orders. 1: yes, 0: no.")
         parser.add_option("--largs",
                           type = "int",
                           dest = "largs",
                           action="store",
-                          help="Print arguments used for reactions at all timesteps. 1: yes, 0: no.") 
+                          help="Print arguments used for reactions at all timesteps. 1: yes, 0: no.")
         parser.add_option("--llocal",
                           type = "int",
                           dest = "llocal",
                           action="store",
-                          help="Perform the run on a local computer or on the cluster. 1: yes, 0: no.")                          
+                          help="Perform the run on a local computer or on the cluster. 1: yes, 0: no.")
         parser.add_option("--inifile",
                           type = "string",
                           dest = "inifile",
@@ -198,18 +198,18 @@ class Input_dgnm(cmd_options_general.Input,object):
         (self.options_var, self.args1) = parser.parse_args(args=list_args)
 
 
-               
+
         # Set ldebug and lss_grw as int parameters:
         self.options.ldebug = int(self.options.ldebug)
 
         # Override the root parameter with the value of the environment parameter
         self.options.root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..', os.path.dirname(self.options.inifile)))
-	
+
         # Expand all file names to an absolute reference
         self.options.species_ini = os.path.join(self.options.root, self.options.species_ini)
         self.options.parameter_ini = os.path.join(self.options.root, self.options.parameter_ini)
         self.options.outputdir = os.path.join(self.options.root, self.options.outputdir)
-        
+
         self.options.water_inputdir = os.path.join(self.options.root, self.options.water_inputdir)
         self.options.load_inputdir = os.path.join(self.options.root, self.options.load_inputdir)
 
@@ -220,28 +220,28 @@ class Input_dgnm(cmd_options_general.Input,object):
             for item in range(len(filenames)):
                 setattr(self.options,"aggregationgrid"+str(self.options.aggregationgrid_number),\
                           os.path.join(self.options.root, filenames[item]))
-                self.options.aggregationgrid_number += 1                
-            
+                self.options.aggregationgrid_number += 1
+
         # Read all the default parameter settings out of the parameter.ini
         # Here all the other semi constant parameters for the model are set!
         self.options.parameter_ini = os.path.join(self.options.root, self.options.parameter_ini)
         self._parse_parameter_inifile(self.options,self.options.parameter_ini)
-    
+
         # Set temp output directory for this river basin.
         # First check the temp directory
-        self.options.tmp_dir = directory.ensure(os.path.join(self.options.outputdir, str(int(random.random()*1000))))     
-    
+        self.options.tmp_dir = directory.ensure(os.path.join(self.options.outputdir, str(int(random.random()*1000))))
+
         # This is to use all the directory information, which is given by the user
         if self.options.file_mask == None:
             self.options.lmask = False
-        else:   
+        else:
             self.options.lmask = True
 
         #if (self.options.lmask):
-            #self.options.scenariodir = self.options.root 
+            #self.options.scenariodir = self.options.root
             #self.options.file_mask = os.path.join(self.options.scenariodir,self.options.file_mask)
 
-        self.options.file_mask         = os.path.join(self.options.root,self.options.file_mask)  
+        self.options.file_mask         = os.path.join(self.options.root,self.options.file_mask)
 
         # Add all the directories to the filenames
         try:
@@ -252,15 +252,15 @@ class Input_dgnm(cmd_options_general.Input,object):
         self.options.basin         = os.path.join(self.options.water_inputdir,self.options.basin)
         self.options.channel_depth   = os.path.join(self.options.water_inputdir,self.options.channel_depth)
         self.options.channel_width   = os.path.join(self.options.water_inputdir,self.options.channel_width)
-        self.options.slope = os.path.join(self.options.water_inputdir,self.options.slope)      
-                
+        self.options.slope = os.path.join(self.options.water_inputdir,self.options.slope)
+
         # Switch debugging on/off
         self.set_debug(self.options.ldebug)
         # If no arguments are provided, print usage
         if len(list_args) == 0:
             print(parser.print_help())
             raise parser.error("No arguments provided.")
-                       
+
         # Display all options in case of debug.
         self._dbg("Start checking the command line arguments")
         # Write all settings to screen
@@ -269,36 +269,36 @@ class Input_dgnm(cmd_options_general.Input,object):
 
         # Check given input parameters
         self.run_checks()
-       
+
 
     def run_checks(self):
         '''
         Check options
-        
+
         '''
         self.validate_directory(self.options.root, bool_write=False)
-       
+
         # Create new output directory if necessary
         if not os.path.exists(self.options.outputdir):
             os.makedirs(self.options.outputdir)
-            
+
         self.validate_directory(self.options.outputdir, bool_write=True)
         #self.validate_directory(self.options.scenariodir, bool_write=False)
         self.validate_directory(self.options.water_inputdir, bool_write=False)
         self.validate_directory(self.options.load_inputdir, bool_write=False)
-               
-        # Check the existence of all given input files                      
+
+        # Check the existence of all given input files
         if (self.options.lmask):
             self.validate_file(self.options.file_mask)
-            
+
         self.validate_file(self.options.ldd)
 
         self.validate_file(self.options.basin)
         self.validate_file(self.options.channel_depth)
         self.validate_file(self.options.channel_width)
-        
+
         # Stop checking
         return
-        
+
 
 

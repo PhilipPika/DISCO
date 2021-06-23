@@ -23,7 +23,7 @@ except ImportError:
 
     # Put core directory in the sys.path.
     path = os.path.join(root,"core")
-    if (os.path.exists(path)): 
+    if (os.path.exists(path)):
         sys.path.insert(0, path)
 
     # Try it again to load the general_path module.
@@ -91,7 +91,7 @@ def calculate(iriv,lock,params,species,proc,sources):
     jobid = rivlist[0]
     print("Reading mask for riverids with jobid",jobid)
 
-    # Read ldd map 
+    # Read ldd map
     lddmap = ascraster.Asciigrid(ascii_file=params.ldd,mask = rivmask,numtype=int)
     print("Reading ldd for riverid ",jobid)
 
@@ -115,16 +115,15 @@ def calculate(iriv,lock,params,species,proc,sources):
     print(tmpdir)
 
     # Create photosynthese files for each species which needs photosynthese.
-    if (len(params.totalphotindex) > 0):  
+    if (len(params.totalphotindex) > 0):
         photo_list = []
         for ispec in params.totalphotindex:
             specname = species[ispec].get_name()
-            fp = open(os.path.join(params.outputdir,\
+            with open(os.path.join(params.outputdir,\
                             os.path.splitext(os.path.basename(params.photosyn_file))[0]\
-                             + "_" + specname + ".pkl"),"rb")
+                             + "_" + specname + ".pkl"),"rb") as fp:
+                photo_list.append(list(general_func.pickleLoader(fp)))
 
-            photo_list.append(list(general_func.pickleLoader(fp)))
-            fp.close()
             
         for item in range(len(pointer1)):
             icell = pointer1[item].get_index()
@@ -139,7 +138,7 @@ def calculate(iriv,lock,params,species,proc,sources):
     # Read the constant channel_width of PCRGLOBWB. # added in volume_depth.... calculations
     channel_width_grid = ascraster.Asciigrid(ascii_file=params.channel_width,\
                                              mask=rivmask,numtype=float)
-            
+
     # Read the slopes of the cells
     slopemap = ascraster.Asciigrid(ascii_file=params.slope,\
                                    mask=rivmask,numtype=float)
@@ -150,7 +149,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         norders = params.norder
 
     #outlakes_dict = make_outlakes_dict.calculate(params,pointer1)
-            
+
     # Get all data from the input files with multiprocessing.
     if (params.ncpu_read_files > 1):
 
@@ -396,7 +395,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         for i in rivlist:
             lfound[i] = False
 
-        # Read the startup file of all the riverbasins.  
+        # Read the startup file of all the riverbasins.
         with open(params.startup_file, 'rb') as fp:
             # Read header and skip this
             header_skip = pickle.load(fp)
@@ -884,7 +883,7 @@ def calculate(iriv,lock,params,species,proc,sources):
 
     endtime_calculate = time.time()
     print('Total time (in s) to calculate dynamic processes in riverbasin ' + str(iriv) + ':  ' + str(endtime_calculate-starttime_calculate))
-                                                                                                     
+
 if __name__ == '__main__':
 
     try:
