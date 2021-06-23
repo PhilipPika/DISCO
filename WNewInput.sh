@@ -17,13 +17,13 @@ cd $TOCODE/core; echo "MESS: Switching to Core Directory"
 echo "MESS: Removing current results"
 #rm -r $DIR/OUT
 Spinstart=1970
-SpinUpEnd=1972
-SimuEnd=1972 #Remember to also change the file name in params.ini
+SpinUpEnd=1971
+SimuEnd=1971 #Remember to also change the file name in params.ini
 ########################################################################################
 INI_file=species_bio_101_oldNames.ini
 INI_file=species_bio_101.ini
 echo "MESS: $INI_file"
-#nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini
+nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini
 #nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=$SpinUpEnd --species_ini=$INI_file --parameter_ini=Params_m_united_CUT.ini
 #nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=$SpinUpEnd --species_ini=$INI_file
 #cp $DIR/OUT/bio/pkl/start$SpinUpEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
@@ -32,8 +32,8 @@ echo "MESS: $INI_file"
 ##nice -n 19 python dgnm_main.py  --lspinup=0 --inifile ../ini/cmd_m_def.ini --species_ini=$INI_file
 ##nice -n 19 python dgnm_main.py  --lspinup=0 --inifile ../ini/cmd_m_def.ini
 #echo "MESS: START output conversion"
-#cd $TOCODE/carbon/code/
-#python output_conversion.py $DIR/OUT/bio/pkl/ NETCDF
+cd $TOCODE/carbon/code/
+python output_conversion.py $DIR/OUT/bio/pkl/ NETCDF
 echo "MESS: START aggragate TS"
 cd $TOCODE/core
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=$INI_file
