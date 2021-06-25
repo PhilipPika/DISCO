@@ -42,11 +42,11 @@ def calculate_yearly_load(load_cell, year_start, year_end):
 
     # The value attributed to the first year is the first available value
     #load_yearly.append(load_cell[0])
-    
+
     for year in range(year_start, year_end+1):
         val = interpolate_list.calculate(year, load_cell, extrapol=1)
         load_yearly.append([year, val[1]])
-        
+
     return load_yearly
 
 
@@ -72,20 +72,20 @@ def calculate_disaggregated_load(params, load_yearly, ipointer, temp_distrib):
         varname = params.discharge_varname
     elif (temp_distrib == 'flooding_volume'):
         pattern_file = os.path.join(params.water_inputdir,params.flooding_volume)
-        varname = params.flooding_volume_varname  
+        varname = params.flooding_volume_varname
     elif (temp_distrib == 'runoff'):
         pattern_file = os.path.join(params.water_inputdir,params.pnet)
-        varname = params.pnet_varname      
+        varname = params.pnet_varname
     elif (temp_distrib == 'surface_runoff'):
         pattern_file = os.path.join(params.water_inputdir,params.surface_runoff)
-        varname = params.surface_runoff_varname       
+        varname = params.surface_runoff_varname
     elif (temp_distrib == 'land_runoff'):
         pattern_file = os.path.join(params.water_inputdir,params.land_runoff)
-        varname = params.land_runoff_varname        
+        varname = params.land_runoff_varname
     #elif (temp_distrib == 'square_sro'):
     #    pattern_file = os.path.join(params.water_inputdir,params.surface_runoff)
     #    varname = params.surface_runoff_varname
-    #    square = True     
+    #    square = True
     elif (temp_distrib == 'square_precip'):
         pattern_file = os.path.join(params.water_inputdir,params.precipitation)
         varname = params.precipitation_varname
@@ -93,10 +93,10 @@ def calculate_disaggregated_load(params, load_yearly, ipointer, temp_distrib):
     else:
         print("Unknown temporal pattern provided in calculate_disaggregated_load: " + temp_distrib)
         raise MyError("Only discharge, flooding_volume, surface_runoff and square_precip are available!")
-        
+
     try:
         pattern = MFDataset(pattern_file, 'r')
-        #print('pattern file ' + pattern_file + ' is open!')
+        print('pattern file ' + pattern_file + ' is open!')
         # Convert dates of the pattern NETCDF data to decimal years
         ncyears = manip_netcdf.convert_numdate2year(pattern.variables['time'][:], pattern.variables['time'].units)
         #print('Dates in pattern file:')
@@ -110,7 +110,7 @@ def calculate_disaggregated_load(params, load_yearly, ipointer, temp_distrib):
         #print('load  ' + str(load))
         year_dates = []              #time steps available for the current year
         year_vals = []               #pattern variable values for the current year
-    
+
         for idate in range(ibegin, iend):
             year_dec = ncyears[idate]
             #print('year_dec  ' + str(year_dec) + '  ' + str(int(year_dec)))
@@ -168,7 +168,7 @@ def calculate_disaggregated_load(params, load_yearly, ipointer, temp_distrib):
             load_dis.append([year_dates[item], val])
 
         pattern.close()
-    
+
         return load_dis
 
     except:
@@ -178,12 +178,12 @@ def calculate_disaggregated_load(params, load_yearly, ipointer, temp_distrib):
         print("Yearly time series is returned.")
         return load_yearly
 
-    
+
 def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outputfile=None):
     '''
     Reads one variable (varname) for the whole simulation period and puts its values in a time dependent object.
     Reads from a NETCDF file, extracts the right time steps and applies a temporal pattern (to describe seasonnality) if asked for.
-    Returned is dict object with cell number as key and a list of [time, value]. 
+    Returned is dict object with cell number as key and a list of [time, value].
     '''
 
     obj_out = {}
@@ -209,7 +209,7 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
           ncdata = MFDataset(filename)
           searchstr = copy.deepcopy(os.path.basename(filename)).replace('.zip', '.nc')
           nc_list = directory.get_files_with_str(os.path.dirname(filename), searchstr, exclude=['*.zip*'])
-         
+
           print(nc_list)
           for nc_file in nc_list:
             os.remove(nc_file)
@@ -217,14 +217,14 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
         nctimes = ncdata.variables['time']
         years = manip_netcdf.convert_numdate2year(nctimes[:], nctimes.units)
         #print('years  ' + str(years))
-    
+
         # Find begin and end point for this time period
         istart,iend = general_func.find_within_range(years,params.starttime,params.endtime)
         general_func.debugprint(params,['VarName = ', varname])
         general_func.debugprint(params,["istart,iend = ", istart,',',iend])
         general_func.debugprint(params,[min(iend+1,len(nctimes[:]))])
         all_dat_period = ncdata.variables[varname][istart:min(iend+1,len(nctimes[:])),:,:] #wj
-        
+
         # For each cell, create temp time series
         for item in range(len(pointer1)):
             icell = pointer1[item].get_local_index() # LV 12-07-2017
@@ -247,7 +247,7 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
                 out_cell_yearly = calculate_yearly_load(out_cell, int(params.starttime), int(params.endtime))
                 out_cell_pattern = calculate_disaggregated_load(params, out_cell_yearly, pointer1[item], temp_distrib)
                 obj_out[icell] = out_cell_pattern
-        
+
     # If does not work, return the object with time_start en time_end with the value 0.0
     else:
         for item in range(len(pointer1)):
@@ -255,8 +255,8 @@ def get_dynamic_gridinfo(params,pointer1,filename,varname,temp_distrib=None,outp
             obj_out[icell].append([params.starttime,0.0]) #add default value to function's arguments?
             obj_out[icell].append([params.endtime,0.0])
         print("No grid information is used for filename " + filename)
-        print("Default value for the whole simulation period: 0.0")          
-        
+        print("Default value for the whole simulation period: 0.0")
+
     if (outputfile == None):
         # Return the values
         #print('\nReturned object:')
@@ -282,7 +282,7 @@ if __name__ == "__main__":
         print("years_test  " + str(years_test))
         print("Test find_within_range in years test from 1900 to 1905:")
         print((general_func.find_within_range(years_test, 1900, 1905)))
-        
+
         # Create a list of pointer objects
         pointer1_tmp = []
         npointers = 8
@@ -291,7 +291,7 @@ if __name__ == "__main__":
             ilat = int(item/nlon)
             ilon = item - (ilat*nlon)
             pointer1_tmp.append(pointer_class.Pointer(index_cell=item,local_index=item,ilat=ilat,ilon=ilon,iorder=item))
-            
+
         pointer1 = sorted(pointer1_tmp, key=lambda pointer_obj: pointer_obj.iorder)
 
         # Create test parameters

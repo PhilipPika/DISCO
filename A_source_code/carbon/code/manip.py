@@ -37,9 +37,9 @@ def read_parameters_ncinifile(inifile):
     general_params = general_class.General() #dictionary
     src_params = []                          #list of dictionaries
     #var_params = []                         #list of dictionaries
-    
+
     check_file(inifile)
-  
+
     # Open file with all parameters
     fp = open(inifile,'r')
 
@@ -50,8 +50,8 @@ def read_parameters_ncinifile(inifile):
         if (len(option[0]) < 1):
             # Empty line
             continue
-        
-        # Check whether the first element is start of a new class 
+
+        # Check whether the first element is start of a new class
         # (first character is a '[' )
         if option[0].startswith('['):
             # Start of a new class
@@ -99,7 +99,7 @@ def add_variable(rootgrp, ncparams, varparams):
     Add a new variable in NETCDF dataset
     Fill in variable metadata
     '''
-    varname = varparams.get_val('name')    
+    varname = varparams.get_val('name')
     var = rootgrp.createVariable(varname,'f4',('time','lat','lon',) ,fill_value=ncparams.get_val('fill'),zlib=ncparams.get_val('zlib'))
     var.standard_name = varname
     if ('units' in varparams.get_attrib()):
@@ -107,23 +107,23 @@ def add_variable(rootgrp, ncparams, varparams):
     if ('description' in varparams.get_attrib()):
         var.description = varparams.get_val('description')
 
-    
+
 def initialize_lat(nlat, yllcorner, cellsize):
     '''
     Calculates latitudes from yllcorner value and cellsize
     '''
     latlist = np.arange(yllcorner+nlat*cellsize-cellsize/2, yllcorner, -cellsize)
     return latlist
-    
-    
+
+
 def initialize_lon(nlon, xllcorner, cellsize):
     '''
     Calculates longitudes from xllcorner value and cellsize
     '''
     lonlist = np.arange(xllcorner+cellsize/2., xllcorner+nlon*cellsize, cellsize)
     return lonlist
-    
-    
+
+
 def create_time_lat_lon(rootgrp, lat, lon, time_units, time_calendar='standard'):
     '''
     Create time, latitude and longitude dimensions and variables in new NETCDF datset
@@ -131,29 +131,29 @@ def create_time_lat_lon(rootgrp, lat, lon, time_units, time_calendar='standard')
 
     nlat = len(lat)
     nlon = len(lon)
-    
-    # Create dimensions: time is unlimited, others are fixed   
+
+    # Create dimensions: time is unlimited, others are fixed
     rootgrp.createDimension('time', None)
     rootgrp.createDimension('lat', nlat)
     rootgrp.createDimension('lon', nlon)
 
-    # Create variables 
+    # Create variables
     date_time = rootgrp.createVariable('time','f4',('time',))
     date_time.standard_name = 'time'
     date_time.units = time_units
     date_time.calendar = time_calendar
-    
+
     latitude = rootgrp.createVariable('lat','f4',('lat',))
     latitude.standard_name = 'latitude'
     latitude.units = 'degrees north'
     latitude[:] = lat
-    
+
     longitude = rootgrp.createVariable('lon','f4',('lon',))
     longitude.standard_name = 'longitude'
     longitude.units = 'degrees east'
     longitude[:] = lon
 
-    
+
 #def create_ncfile(ncfile, ncparams, varparams, nlat, nlon, iorder):
 #    '''
 #    Create NETCDF file for one species, with time, latitude and longitude dimensions
@@ -165,28 +165,28 @@ def create_time_lat_lon(rootgrp, lat, lon, time_units, time_calendar='standard')
 #    rootgrp.description = ncparams.get_val('description') + ' for streams of order ' + str(iorder)
 #    rootgrp.history = 'Created on ' + time.ctime(time.time())
 #    rootgrp.source = ncparams.get_val('source')
-#    
-#    # Create dimensions: time is unlimited, others are fixed   
+#
+#    # Create dimensions: time is unlimited, others are fixed
 #    rootgrp.createDimension('time', None)
 #    rootgrp.createDimension('lat', nlat)
 #    rootgrp.createDimension('lon', nlon)
 #
-#    # Create variables 
+#    # Create variables
 #    date_time = rootgrp.createVariable('time','f4',('time',))
 #    date_time.standard_name = 'time'
 #    date_time.units = ncparams.get_val('time_units')
 #    date_time.calendar = 'standard'
-#    
+#
 #    lat = rootgrp.createVariable('lat','f4',('lat',))
 #    lat.standard_name = 'latitude'
 #    lat.units = 'degrees north'
-#    
+#
 #    lon = rootgrp.createVariable('lon','f4',('lon',))
 #    lon.standard_name = 'longitude'
 #    lon.units = 'degrees east'
 #
 #    add_variable(rootgrp, ncparams, varparams)
-#    
+#
 #    rootgrp.sync()
 #    print rootgrp
 #    rootgrp.close()
@@ -203,7 +203,7 @@ def create_time_lat_lon(rootgrp, lat, lon, time_units, time_calendar='standard')
 #
 #    for ivar in range(len(var_params)):
 #        filenames[ivar] = []
-#        
+#
 #    # Make new output directory when it does not exist
 #    create_dir(general_params.get_val('path'))
 #
@@ -249,7 +249,7 @@ def get_value_at_date(rootgrp, varname, t0, ilat, ilon, no_data_value=None):
             str(ilat) + ', ' + str(ilon) + ').')
         print('Value set to ' + str(no_data_value))
         val = no_data_value
-        
+
     # If not, extraction of the value t time t0
     else:
         #2DO: add check for None values
@@ -313,7 +313,7 @@ def check_variable_in_ncfile(rootgrp, varname, ncfile):
 ###################
 ### Conversions ###
 ###################
-    
+
 def create_ncmask_from_ascii_file(asciifile):
     '''
     Returns a mask (numpy array of booleans) corresponding to ASCII file
@@ -365,7 +365,7 @@ def calc_lat_lon_from_mask(mask, nlat, nlon):
         ilon = icell - ilat*nlon
         lat.append(ilat)
         lon.append(ilon)
-        
+
     return lat,lon
 
 def calc_row_col_from_index(ind, ncols):
@@ -384,7 +384,7 @@ def calc_index_from_row_col(irow, icol, nrows, ncols):
     ind = irow * int(ncols) + icol
     grid_length = nrows * ncols
     #print 'ind  ' + str(ind)
-    if (ind >= grid_length) or (ind < 0): 
+    if (ind >= grid_length) or (ind < 0):
         raise MyError("calc_index_from_row_col: Row,Col position (%s,%s) falls outside bounds." % (irow,icol))
     return ind
 
@@ -396,14 +396,14 @@ def calc_index_from_coordin(x, y, nrows, ncols, xllcorner, yllcorner, cellsize):
     #print 'irow  ' + str(irow)
     icol = int((float(x)-float(xllcorner))/float(cellsize))
     #print 'icol  ' + str(icol)
-    
+
     if (icol >= ncols or icol < 0):
         raise MyError("calc_index_from_coordin: Y position (%s,%s) falls outside bounds." % (x,y))
     if (irow >= nrows or irow < 0):
         raise MyError("calc_index_from_coordin: X position (%s,%s) falls outside bounds." % (x,y))
-    
+
     return calc_index_from_row_col(irow, icol, nrows, ncols)
-    
+
 
 def calc_row_col_from_coordin(x, y, nrows, ncols, xllcorner, yllcorner, cellsize):
     '''
@@ -412,7 +412,7 @@ def calc_row_col_from_coordin(x, y, nrows, ncols, xllcorner, yllcorner, cellsize
     ind = calc_index_from_coordin(x, y, nrows, ncols, xllcorner, yllcorner, cellsize)
     return calc_row_col_from_index(ind, ncols)
 
-    
+
 def convert_year2numdate(year0, units):
     '''
     Converts a date in years (decimal) to number used in NETCDF file
@@ -447,7 +447,7 @@ def convert_datetime2year(dtdates):
     # and a numpy array of datetime objects if more than one need conversion
     if (type(dtdates) == dt.datetime):
         dtdates = [dtdates]
-    
+
     for idate in range(len(dtdates)):
         year = float(dtdates[idate].year)
         ndays = 365
@@ -462,7 +462,7 @@ def convert_datetime2year(dtdates):
         return years[0]
     else:
         return years
-    
+
 
 def convert_numdate2year(numdates, units):
     '''
@@ -476,7 +476,7 @@ def convert_numdate2year(numdates, units):
 ### Test ###
 ############
 if __name__ == "__main__":
-    
+
     try:
         if (len(sys.argv) < 2):
             raise MyError("Not enough arguments on command line.\n" +\

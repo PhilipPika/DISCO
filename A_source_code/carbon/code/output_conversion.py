@@ -551,7 +551,7 @@ def convert_output(inputdir,outformat,norders=6):
                 shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
 
         ### Conversion of the species processes ###
-        print("Conversion of the species processes")
+        print("Conversion of the species processes/budget")
         if (len(budgetfiles)>0):
             filename = budgetfiles[0][0]
             # Read header of one output file to get argument names
@@ -564,6 +564,7 @@ def convert_output(inputdir,outformat,norders=6):
             budget_data = []
 
             for iorder in range(norders):
+                print('Budget Order: ', iorder)
                 budget_data.append([])
                 orderlabel = '_order'+str(iorder+1)
 

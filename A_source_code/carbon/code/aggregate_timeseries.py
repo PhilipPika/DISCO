@@ -71,55 +71,55 @@ def do(params):
     #all_stream_env_conditions_to_table(params)
 
 def get_river_name(params):
-  if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
-    if params.maskid==1:
-      rivername = 'Amazon'
-    elif params.maskid==2:
-      rivername = 'Congo'
-    elif params.maskid==3:
-      rivername = 'Caspian Sea'
-    elif params.maskid==4:
-      rivername = 'Mississippi'
-    elif params.maskid==5:
-      rivername = 'Nile'
-    elif params.maskid==7:
-      rivername = 'Yenisei'
-    elif params.maskid==8:
-      rivername = 'Ob'
-    elif params.maskid==9:
-      rivername = 'Lena'
-    elif params.maskid==10:
-      rivername = 'Yangtze'
-    elif params.maskid==11:
-      rivername = 'Amur'
-    elif params.maskid==13:
-      rivername = 'Mackenzie'
-    elif params.maskid==28:
-      rivername = 'Yukon'
-    elif params.maskid==38:
-      rivername = 'Kolyma'
-    elif params.maskid==55:
-      rivername = 'Indigirka'
-    elif params.maskid==99:
-      rivername = "Rhine"
-    elif params.maskid==220:
-      rivername = 'Peel'
-    elif params.maskid==231:
-      rivername = 'Seine'
-    elif params.maskid==433:
-      rivername = 'Meuse'
-    elif params.maskid==4634:
-      rivername = 'Shanghai'
+    if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
+        if params.maskid==1:
+            rivername = 'Amazon'
+        elif params.maskid==2:
+            rivername = 'Congo'
+        elif params.maskid==3:
+            rivername = 'Caspian Sea'
+        elif params.maskid==4:
+            rivername = 'Mississippi'
+        elif params.maskid==5:
+            rivername = 'Nile'
+        elif params.maskid==7:
+            rivername = 'Yenisei'
+        elif params.maskid==8:
+            rivername = 'Ob'
+        elif params.maskid==9:
+            rivername = 'Lena'
+        elif params.maskid==10:
+            rivername = 'Yangtze'
+        elif params.maskid==11:
+            rivername = 'Amur'
+        elif params.maskid==13:
+            rivername = 'Mackenzie'
+        elif params.maskid==28:
+            rivername = 'Yukon'
+        elif params.maskid==38:
+            rivername = 'Kolyma'
+        elif params.maskid==55:
+            rivername = 'Indigirka'
+        elif params.maskid==99:
+            rivername = "Rhine"
+        elif params.maskid==220:
+            rivername = 'Peel'
+        elif params.maskid==231:
+            rivername = 'Seine'
+        elif params.maskid==433:
+            rivername = 'Meuse'
+        elif params.maskid==4634:
+            rivername = 'Shanghai'
+        else:
+          rivername = str(params.maskid)
+    elif params.maskid==0 and params.mask_bool_operator=='GT':
+        rivername = 'Global'
+    elif 'country' in params.file_mask:
+        if params.maskid==752:
+            rivername = "Sweden"
     else:
-      rivername = str(params.maskid)
-  elif params.maskid==0 and params.mask_bool_operator=='GT':
-      rivername = 'Global'
-  elif 'country' in params.file_mask:
-    if params.maskid==752:
-      rivername = "Sweden"
-  else:
-    rivername = 'other'
-  return rivername
+        rivername = 'other'
+    return rivername
 
 def geographical_reach_npmask(params):
     mincol = 1e6
@@ -130,16 +130,16 @@ def geographical_reach_npmask(params):
     mask = make_mask.do(params.file_mask, params.maskid, dum_asc, logical=params.mask_bool_operator, mask_type='np_grid')
 
     for row in range(dum_asc.nrows):
-      for col in range(dum_asc.ncols):
-         if mask[row,col]==False:
-           if col > maxcol:
-             maxcol = col
-           if col < mincol:
-             mincol = col
-           if row > maxrow:
-             maxrow = row
-           if row < minrow:
-             minrow = row
+        for col in range(dum_asc.ncols):
+            if mask[row,col]==False:
+                if col > maxcol:
+                    maxcol = col
+                if col < mincol:
+                    mincol = col
+                if row > maxrow:
+                    maxrow = row
+                if row < minrow:
+                    minrow = row
     minlon, maxlat = dum_asc.get_coordin_from_row_col(minrow,mincol)
     maxlon, minlat = dum_asc.get_coordin_from_row_col(maxrow,maxcol)
 
@@ -195,88 +195,85 @@ def make_3d_mask(params, species, folder, mask_kind):
 
 def make_time_indices(params, dummy_nc):
     if params.outputtime < 1:
-      debugprint(params,'Time step')
-      debugprint(params,params.outputtime)
-      debugprint(params,"find index for outputtime ")
-      debugprint(params,'size dummy nc')
-      debugprint(params,'print dummy nc')
-      debugprint(params,dummy_nc)
-      debugprint(params,'print dummy nc TIME')
-      debugprint(params,dummy_nc['time'][:])
+        debugprint(params,'Time step')
+        debugprint(params,params.outputtime)
+        debugprint(params,"find index for outputtime ")
+        debugprint(params,'size dummy nc')
+        debugprint(params,'print dummy nc')
+        debugprint(params,dummy_nc)
+        debugprint(params,'print dummy nc TIME')
+        debugprint(params,dummy_nc['time'][:])
 
-      debugprint(params,os.path.join(params.water_inputdir))
-     #This parameter 'waterbodyid' needs to have the same hourly dt (time step) as the DISC model output.
-     # In my case hours/month, while chosing days/month, as with the new hydrology input, won't work.
+        debugprint(params,os.path.join(params.water_inputdir))
+       #This parameter 'waterbodyid' needs to have the same hourly dt (time step) as the DISC model output.
+       # In my case hours/month, while chosing days/month, as with the new hydrology input, won't work.
 
-#     waterbodyid = Dataset(os.path.join(params.water_inputdir, "discharge_monthAvg_outputCorr.nc"), 'r')
-#     waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1940_2010.nc"), 'r')
+        waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1970_2010.nc"), 'r')
 
-
-      debugprint(params,'Print waterbody id time vector')
-      debugprint(params,waterbodyid['time'][:])
-#      debugprint(params,discharge['time'][:])
+        debugprint(params,'Print waterbody id time vector')
+        debugprint(params,waterbodyid['time'][:])
 
 
-      modelrun_dummy_start = max(dummy_nc['time'][0],0)
-      debugprint(params,'modelrun_dummy_start')
-      debugprint(params,modelrun_dummy_start)
+        modelrun_dummy_start = max(dummy_nc['time'][0],0)
+        debugprint(params,'modelrun_dummy_start')
+        debugprint(params,modelrun_dummy_start)
 
 
-      modelrun_dummy_end = dummy_nc['time'][-1]
-      debugprint(params,'modelrun_dummy_end')
-      debugprint(params,modelrun_dummy_end)
+        modelrun_dummy_end = dummy_nc['time'][-1]
+        debugprint(params,'modelrun_dummy_end')
+        debugprint(params,modelrun_dummy_end)
 
-      debugprint(params,'TEST')
-      debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
-      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
-      all_dat_startindex=max(all_dat_startindex, 0)
-      debugprint(params,'All data start index')
-      debugprint(params,all_dat_startindex)
-      debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)")
-      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start))
-      debugprint(params,"all_dat_startindex from np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0]")
-      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0])
-      debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]")
-      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
-      debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][-1]+1")
-      debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][-1]+1)
+        debugprint(params,'TESTing the time step overlap')
+        debugprint(params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
+        all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
+        all_dat_startindex=max(all_dat_startindex, 0)
+        debugprint(params,'All data start index')
+        debugprint(params,all_dat_startindex)
+        debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)")
+        debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start))
+         # One [0] shows the array in position 1 aka (:,:)
+        debugprint(params,"all_dat_startindex from np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0]")
+        debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0])
+         # two [0] show the first nr of first dim = [1,1]
+        debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]")
+        debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0])
+        debugprint(params,"all_dat_startindex from params,np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][-1]+1")
+        debugprint(params, np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][-1]+1)
 
-      debugprint(params,"all_dat_endindex from np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]+1")
-      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]+1
+        all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]+1
 
-      debugprint(params,'All data end index')
-      debugprint(params,all_dat_endindex)
+        debugprint(params,'All data end index')
+        debugprint(params,all_dat_endindex)
 
-      debugprint(params,'waterbodyid time steps: -1, 0, 1')
-      debugprint(params,waterbodyid['time'][-1])
-      debugprint(params,waterbodyid['time'][0])
-      debugprint(params,waterbodyid['time'][1])
+        debugprint(params,'waterbodyid time steps: -1, 0, 1')
+        debugprint(params,waterbodyid['time'][-1])
+        debugprint(params,waterbodyid['time'][0])
+        debugprint(params,waterbodyid['time'][1])
 
-      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
-      debugprint(params,'Overlap In-/output start index')
-      debugprint(params,modeldat_startindex)
+        modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
+        debugprint(params,'Overlap In-/output start index')
+        debugprint(params,modeldat_startindex)
 
 
 
-      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+2
-      debugprint(params,'Overlap In-/output end index')
-      debugprint(params,modeldat_endindex)
+        modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+2
+        debugprint(params,'Overlap In-/output end index')
+        debugprint(params,modeldat_endindex)
 
-      if modeldat_endindex==len(dummy_nc['time'][:]):
-        all_dat_endindex +=1
+        if modeldat_endindex==len(dummy_nc['time'][:]):
+          all_dat_endindex +=1
     else:
-      print("ALTERNATE 101 DATA")
-      waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
-      modelrun_dummy_start = max(dummy_nc['time'][0],0)
-      modelrun_dummy_end = dummy_nc['time'][-1]
-      all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
-      all_dat_startindex=max(all_dat_startindex, 0)
-      all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]
-      modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
-      modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+1
-      if modeldat_endindex==len(dummy_nc['time'][:]):
-        all_dat_endindex +=1
+        print("ALTERNATE 101 DATA")
+        waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
+        modelrun_dummy_start = max(dummy_nc['time'][0],0)
+        modelrun_dummy_end = dummy_nc['time'][-1]
+        all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]
+        all_dat_startindex=max(all_dat_startindex, 0)
+        all_dat_endindex = np.where(waterbodyid['time'][:] <= modelrun_dummy_end)[0][-1]
+        modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyid['time'][all_dat_startindex])[0][0]
+        modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyid['time'][all_dat_endindex])[0][-1]+1
+        if modeldat_endindex==len(dummy_nc['time'][:]):
+            all_dat_endindex +=1
     return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex, waterbodyid
 
 
@@ -336,14 +333,14 @@ def all_inputs_to_dict(params,add_color=False):
       A=src_nc[source.get_val('name')]
       debugprint(params,'src_nc shape pre modification')
       debugprint(params,A.shape)
-      # debugprint(params, all_dat_startindex)
-      # debugprint(params, all_dat_endindex)
+      debugprint(params, all_dat_startindex)
+      debugprint(params, all_dat_endindex)
       src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
 
       debugprint(params,'src_nc shape post modification')
-      # debugprint(params,src_grid.shape)
+      debugprint(params,src_grid.shape)
       debugprint(params,'Mask size')
-      # debugprint(params,mask_3d.shape)
+      debugprint(params,mask_3d.shape)
 
       # src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
       debugprint(params,'FINISHED SOURCE MULTIPLICATION')

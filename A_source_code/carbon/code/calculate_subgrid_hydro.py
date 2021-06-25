@@ -37,13 +37,13 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
             timeint.append(time)
             time += params.timestep
         timeint.append(yearend)
-        
+
     runoff_cell = []
     discharge_cell = []
     water_area_cell = []
     volume_cell = []
     depth_cell = []
-    dvoldt_cell = [] 
+    dvoldt_cell = []
     vel_cell = []
     volume_fp_cell = []
     depth_fp_cell = []
@@ -64,7 +64,7 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
         runoff_cell.append(interpolate_list.calculate(time,runoff_in,extrapol=1))
         discharge_cell.append(interpolate_list.calculate(time,discharge_in,extrapol=1))
         water_area_cell.append(interpolate_list.calculate(time,water_area_in,extrapol=1))
-        volume_cell.append(interpolate_list.calculate(time,volume_in,extrapol=1)) 
+        volume_cell.append(interpolate_list.calculate(time,volume_in,extrapol=1))
         depth_cell.append(interpolate_list.calculate(time,depth_in,extrapol=1))
         vel_cell.append(interpolate_list.calculate(time,vel_in,extrapol=1)) #LV 14-02-2018
         volume_fp_cell.append(interpolate_list.calculate(time,volume_fp_in,extrapol=1))
@@ -111,7 +111,7 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
     depth = []
     dvoldt = []
     width = []
-    vel = [] 
+    vel = []
     volume = []
     volume_fp = []
     depth_fp = []
@@ -144,7 +144,7 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
                 vel[-1].append(0.) #LV 14-02-2018
                 Qmid[-1].append(0.)
                 volume[-1].append(0.)
-                
+
         else:
             if (item == 0): #Qmid at 1st time step
                 Qmid[-1].append(Q0[item] + 0.5 * Q[item][0])
@@ -200,7 +200,7 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
                         dvoldt_i = (vol_next[iorder] - vol_t[iorder]) / params.timestep
                     else:
                         dvoldt_i = (vol_t[iorder] - vol_prev[iorder]) / params.timestep
-                    dvoldt[-1].append(dvoldt_i) 
+                    dvoldt[-1].append(dvoldt_i)
                     vol_prev[iorder] = vol_t[iorder]
                     vol_t[iorder] = vol_next[iorder]
 
@@ -211,14 +211,14 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
                 dvoldt[-1][iorder] *= 1.0e-9
                 # from m/s to km/yr
                 vel[-1][iorder] *= year2second*1.0e-3
-                
+
 
 
         # floodplains are only available for main stream
         volume_fp[item] = volume_fp_cell[item][-1]
         depth_fp[item] = depth_fp_cell[item][-1]
         dvoldt_fp[item] = dvoldt_fp_cell[item][-1]
-                
+
     for iorder in range(params.norder):
         # Replace properties of sixth order streams by information of PCRGLOBWB
         if (iorder == params.norder-1):
@@ -231,6 +231,6 @@ def calculate_subgrid_hydro(lsteady,params,species,timeint,yearstart,yearend,run
                 volume[item][iorder] = volume_cell[item][-1]
                 depth[item][iorder]  = depth_cell[item][-1]
                 dvoldt[item][iorder]  = dvoldt_cell[item][-1]
-                vel[item][iorder]  = vel_cell[item][-1] 
+                vel[item][iorder]  = vel_cell[item][-1]
 
     return Qmid, volume, depth, width, vel, dvoldt, volume_fp, depth_fp, dvoldt_fp

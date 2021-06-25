@@ -13,7 +13,8 @@ def do(icell, dum_asc, type="icell"):
         for col in range(icol-1, icol+2):
             if not (col==icol and row==irow):
                 if type=="icell":
-                  nbs.append(dum_asc.get_index_from_row_col(row, col))
+                    nbs.append(dum_asc.get_index_from_row_col(row, col))
                 elif type=="irow_icol":
-                  nbs.append([row, col])
+                    nbs.append([row, col])
     return nbs
+  
