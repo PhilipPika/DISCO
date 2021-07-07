@@ -126,7 +126,7 @@ def get_river_name(params):
       rivername = 'Global'
   elif 'country' in params.file_mask:
     if params.maskid==752:
-      rivername = "Sweden"    
+      rivername = "Sweden"
   else:
     rivername = 'other'
   return rivername

@@ -25,7 +25,7 @@ import general_func
 #import analysis
 import post_processing
 
-import time
+import time as ts
 
 def pkl_to_ascraster_allorders(filename,outputdir,unmask_raster,new_raster=None,label='',norders=6):
     # Convert output file in pkl format from rive_framework to ascraster format for each specie.
@@ -370,31 +370,31 @@ def convert_output(inputdir,outformat,norders=6):
         # Use output dates to create subdirectories in output directory
         for item in range(len(outputfiles)):
             strtime = str(round(outputfiles[item][-1], 3))
-            if (not os.path.isdir(os.path.join(outputdir,strtime))):
-                os.makedirs(os.path.join(outputdir,strtime))
+            if (not os.path.isdir(os.path.join(params.outputdir,strtime))):
+                os.makedirs(os.path.join(params.outputdir,strtime))
 
         # Conversion of pkl file to ascraster file for each output date and each species
         for filename,time in outputfiles:
-            pkl_to_ascraster_allorders(filename,outputdir,dummy,norders=1)
+            pkl_to_ascraster_allorders(filename,params.outputdir,dummy,norders=1)
 
         # Conversion of pkl file to ascreaster of concentration files
         for filename,time in conc_outputfiles:
-            pkl_to_ascraster_allorders(filename,outputdir,dummy,label='conc_',norders=1)
+            pkl_to_ascraster_allorders(filename,params.outputdir,dummy,label='conc_',norders=1)
 
         # LV 12-07-2017
         for item in range(len(outputfiles_allorders)):
             strtime = str(round(outputfiles_allorders[item][-1], 3))
-            if (not os.path.isdir(os.path.join(outputdir,strtime))):
-                os.makedirs(os.path.join(outputdir,strtime))
+            if (not os.path.isdir(os.path.join(params.outputdir,strtime))):
+                os.makedirs(os.path.join(params.outputdir,strtime))
 
         for filename,time in outputfiles_allorders:
-            pkl_to_ascraster_allorders(filename,outputdir,dummy)
+            pkl_to_ascraster_allorders(filename,params.outputdir,dummy)
 
         for filename,time in conc_outputfiles_allorders:
-            pkl_to_ascraster_allorders(filename,outputdir,dummy,label='conc_')
+            pkl_to_ascraster_allorders(filename,params.outputdir,dummy,label='conc_')
 
         for filename,time in argumentfiles:
-            pkl_to_ascraster_allorders(filename,outputdir,dummy,label='arguments_')
+            pkl_to_ascraster_allorders(filename,params.outputdir,dummy,label='arguments_')
 
     if ((outformat == 'NETCDF') or (outformat == 'ALL')):
 
@@ -551,7 +551,7 @@ def convert_output(inputdir,outformat,norders=6):
                 shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
 
         ### Conversion of the species processes ###
-        print("Conversion of the species processes/budget")
+        print("### Conversion of the species processes/budget ###")
         if (len(budgetfiles)>0):
             filename = budgetfiles[0][0]
             # Read header of one output file to get argument names
@@ -579,6 +579,7 @@ def convert_output(inputdir,outformat,norders=6):
 
             # LV 12-07-2017
             for filename,time in budgetfiles:
+                print('Budgetfile Name: ', filename)
                 pkl2netcdf_allorders(filename,budget_data,netcdf_mask,basinid,label="budget_", norders=norders)
 
             for iorder in range(norders):
@@ -587,10 +588,14 @@ def convert_output(inputdir,outformat,norders=6):
                     budget_data[iorder][item].close()
 
             for fn in directory.get_files_with_str(budget_dir, "*order6*"):
+                print('copy file: ', fn)
                 shutil.copyfile(fn, os.path.join(budget_dir, '..', os.path.basename(fn).replace("_order6", "")))
 
     #post_processing.post_processing_states(params,dformat='NETCDF')
+    starttime_main1 = ts.time()
     post_processing.calc_ph_pco2(params, outformat) # PP This script converts pH and pCO2 for the given data
+    endtime_main1 = ts.time()
+    print('OUTPUT CONVERSION: calc_ph_pco2 lasted (in s):  ' + str(endtime_main1-starttime_main1))
     #post_processing.post_processing_budgets(params, outformat)
     #analysis.do(params)
 
@@ -609,12 +614,12 @@ if __name__ == "__main__":
 
     print("OUTPUT CONVERSION OF " , inputdir, " TO ", outformat)
 
-    starttime_main = time.time()
+    starttime_main = ts.time()
 
     convert_output(inputdir,outformat)
 
-    endtime_main = time.time()
-    print('OUTPUT CONVERSION lasted (in s):  ' + str(endtime_main-starttime_main))
+    endtime_main = ts.time()
+    print('Toal OUTPUT CONVERSION lasted (in s):  ' + str(endtime_main-starttime_main))
 
     #except MyError, val:
     #    val.write()
