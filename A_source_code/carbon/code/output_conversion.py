@@ -90,7 +90,6 @@ def create_mask_from_pkl_file(filename, basinid):
     '''
     # Open pickle file
     fp = open(filename,'rb')
-    print(filename)
     time,names = general_func.read_header(fp=fp)
 
     # Create mask
@@ -125,12 +124,12 @@ def init_ncdata(inputdir, ncdata, varname, basinid, unit='Mmol', long_name='None
     ncdata.institution = institution
     ncdata.description = description
 
-    # Create dimensions: time is unlimited, others are fixed
+    #### Create dimensions: time is unlimited, others are fixed
     ncdata.createDimension('time', None)
     ncdata.createDimension('lat', basinid.nrows)
     ncdata.createDimension('lon', basinid.ncols)
 
-    # Create variables
+    #### Create variables
     date_time = ncdata.createVariable('time','f4',('time',))
     date_time.standard_name = 'time'
     date_time.units = 'hours since 1900-01-01 00:00:00'
@@ -321,12 +320,12 @@ def convert_output(inputdir,outformat,norders=6):
             #    shutil.copy(fullname,os.path.join()
 
             # Select all the files which have the extension ".pkl"
-            if (extension.upper() == '.PKL'):
+            if extension.upper() == '.PKL':
                 # Try whether the basename is a float (time) or starts by "conc_"
                 try:
                     # addition LV 12-07-2017: option to print outputs for all orders
-                    if (basename.endswith("_allorders")):
-                        if (basename.startswith("conc_")):
+                    if basename.endswith("_allorders"):
+                        if basename.startswith("conc_"):
                             time = float(basename[5:-10])
                             conc_outputfiles_allorders.append([fullname,time])
                         else:
@@ -379,7 +378,8 @@ def convert_output(inputdir,outformat,norders=6):
 
         # Conversion of pkl file to ascreaster of concentration files
         for filename,time in conc_outputfiles:
-            pkl_to_ascraster_allorders(filename,params.outputdir,dummy,label='conc_',norders=1)
+            pkl_to_ascraster_allorders(filename,params.outputdir,dummy,\
+                                       label='conc_',norders=1)
 
         # LV 12-07-2017
         for item in range(len(outputfiles_allorders)):
@@ -402,10 +402,9 @@ def convert_output(inputdir,outformat,norders=6):
             and (len(argumentfiles) ==0) and (len(budgetfiles) == 0):
             raise MyError("There is nothing to do!")
 
-        ### Conversion of the species concentration ###
-        print("Conversion of the species concentration")
-
-        if (len(outputfiles) > 0):
+        #### Conversion of the species concentration ###
+        print("Conversion of the species concentration...")
+        if len(outputfiles) > 0:
             filename = outputfiles[0][0]
             # Read header of one output file to get species names
             time,names = general_func.read_header(filename=filename)
@@ -434,9 +433,9 @@ def convert_output(inputdir,outformat,norders=6):
                 conc_spec_data[item].sync()
                 conc_spec_data[item].close()
 
-        ### Conversion of the species concentration in subgrid orders ###
-        print("Conversion of the species concentration in subgrid orders")
-        if (len(outputfiles_allorders) > 0):
+        #### Conversion of the species concentration in subgrid orders
+        print("Conversion of the species concentration in subgrid orders...")
+        if len(outputfiles_allorders) > 0:
             filename = outputfiles_allorders[0][0]
             # Read header of one output file to get species names
             time,names = general_func.read_header(filename=filename)
@@ -470,7 +469,7 @@ def convert_output(inputdir,outformat,norders=6):
             for fn in directory.get_files_with_str(subgrid_states_dir, "*order6*"):
                 shutil.copyfile(fn, os.path.join(subgrid_states_dir, '..', os.path.basename(fn).replace("_order6", "")))
 
-        ### Conversion of the environmental parameters and hydrology ###
+        #### Conversion of the environmental parameters and hydrology
         if(params.ldebug): print("Conversion of the environmental parameters and hydrology")
         if (len(argumentfiles)>0):
             filename = argumentfiles[0][0]
@@ -488,7 +487,8 @@ def convert_output(inputdir,outformat,norders=6):
                 orderlabel = '_order'+str(iorder+1)
                 for name in names:
                     # Create NETCDF output files
-                    subgrid_arg_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STREAM_ENV_CONDITIONS', 'subgrid'))
+                    subgrid_arg_dir = directory.ensure(\
+                      os.path.join(params.outputdir, '..', 'STREAM_ENV_CONDITIONS', 'subgrid'))
                     ncfile = os.path.join(subgrid_arg_dir,name+orderlabel+'.nc')
                     argument_data[-1].append(Dataset(ncfile,'w'))
                     # Initialize each of the NETCDF files (metadata, dimensions...)
@@ -550,7 +550,7 @@ def convert_output(inputdir,outformat,norders=6):
             for fn in directory.get_files_with_str(subgrid_arg_dir, "*order6*"):
                 shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
 
-        ### Conversion of the species processes ###
+        #### Conversion of the species processes
         print("### Conversion of the species processes/budget ###")
         if (len(budgetfiles)>0):
             filename = budgetfiles[0][0]
@@ -564,7 +564,7 @@ def convert_output(inputdir,outformat,norders=6):
             budget_data = []
 
             for iorder in range(norders):
-                print('Budget Order: ', iorder)
+#                print('Budget Order: ', iorder)
                 budget_data.append([])
                 orderlabel = '_order'+str(iorder+1)
 
@@ -579,7 +579,7 @@ def convert_output(inputdir,outformat,norders=6):
 
             # LV 12-07-2017
             for filename,time in budgetfiles:
-                print('Budgetfile Name: ', filename)
+#                print('Budgetfile Name: ', filename)
                 pkl2netcdf_allorders(filename,budget_data,netcdf_mask,basinid,label="budget_", norders=norders)
 
             for iorder in range(norders):
@@ -588,7 +588,7 @@ def convert_output(inputdir,outformat,norders=6):
                     budget_data[iorder][item].close()
 
             for fn in directory.get_files_with_str(budget_dir, "*order6*"):
-                print('copy file: ', fn)
+#                print('copy file: ', fn)
                 shutil.copyfile(fn, os.path.join(budget_dir, '..', os.path.basename(fn).replace("_order6", "")))
 
     #post_processing.post_processing_states(params,dformat='NETCDF')
