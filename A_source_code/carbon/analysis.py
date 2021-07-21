@@ -10,8 +10,8 @@ import pandas as pd
 import os
 import sys
 
-import general_path 
-    
+import general_path
+
 import read_parameter
 
 import ascraster
@@ -56,7 +56,7 @@ def do(params):
       #all_inputs_per_latitude(params)
       #all_atm_exch_per_latitude(params)
       #all_fluxes_per_latitude(params)
-   
+
     #all_fluxes_to_multiplots(params)
     #all_speciefluxes_to_multiplots(params)
 
@@ -95,7 +95,7 @@ def do(params):
     #all_atm_exch_to_stackserieplots(params)
 
     #all_exports_to_stackserieplots(params)
-	    
+
 def get_river_name(params):
   if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
     if params.maskid==99:
@@ -144,12 +144,12 @@ def make_colors(params):
 
 def geographical_reach_npmask(params):
     mincol = 1e6
-    maxcol = 0 
+    maxcol = 0
     minrow = 1e6
     maxrow = 0
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
     mask = make_mask.do(params.file_mask, params.maskid, dum_asc, logical=params.mask_bool_operator, mask_type='np_grid')
-    
+
     for row in range(dum_asc.nrows):
       for col in range(dum_asc.ncols):
          if mask[row,col]==False:
@@ -172,10 +172,10 @@ def geographical_reach_npmask(params):
     return d
 
 def make_time_indices(params):
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -184,7 +184,7 @@ def make_time_indices(params):
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
-        all_dat_endindex +=1  
+        all_dat_endindex +=1
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -197,11 +197,11 @@ def make_time_indices(params):
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
-        all_dat_endindex +=1       
+        all_dat_endindex +=1
     return modeldat_startindex, modeldat_endindex, all_dat_startindex, all_dat_endindex
 
 def make_3d_mask(mask_2d, modeldat_startindex, modeldat_endindex, dummy_nc, dummy_name):
-    return np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape) 
+    return np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
 def dict_to_csv(filename, mydict):
     pd.DataFrame(mydict).T.reset_index().to_csv(filename, header=False, index=False)
@@ -237,21 +237,21 @@ def all_inputs_to_dict(params,add_color=False):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    #mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
-    mask_2d[np.where(mask_2d_dum[:,:]==False)] = False     
+    #mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
+    mask_2d[np.where(mask_2d_dum[:,:]==False)] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
     src_folder = params.load_inputdir
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
-    
+
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -261,7 +261,7 @@ def all_inputs_to_dict(params,add_color=False):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -275,7 +275,7 @@ def all_inputs_to_dict(params,add_color=False):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)   
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     #print("all_dat_startindex ",all_dat_startindex)
     #print(" ",)
@@ -283,12 +283,12 @@ def all_inputs_to_dict(params,add_color=False):
     #print(" ",)
 
     src_series = dict()
-    src_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units) 
+    src_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units)
 
     tot_in = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
 
     for specie in species:
-      src_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))    
+      src_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))
 
     ## this is still a bit too specific for carbon; to be formulated more generic
     for source in sources:
@@ -308,7 +308,7 @@ def all_inputs_to_dict(params,add_color=False):
       for attrib in source.get_attrib():
         if 'fr_' in attrib:
           src_grid = src_nc[source.get_val('name')][all_dat_startindex:all_dat_endindex,:,:]*params.outputtime*fraction
-          
+
           if (not 'TSS' in attrib) and (not 'PIM' in attrib) :
             source_string = attrib.replace('fr_', '')+'_srcloadIN'
           elif 'tss' in source.get_val('name').lower():
@@ -339,7 +339,7 @@ def all_inputs_to_pieplots(params):
     for key in src_series_dum:
       if not 'srcloadIN' in key:
         del src_series[key]
- 
+
     src_values = np.array([])
     src_labels = np.array([])
     for key,value_list in src_series.items():
@@ -351,7 +351,7 @@ def all_inputs_to_pieplots(params):
     outname = os.path.join(params.outputdir, '..', 'ANALYSIS', "plots", get_river_name(params)+'_PIECHART_sources.png')
     make_plots.piechart(src_values, src_labels, outfilename=outname, title='Carbon inputs to the '+get_river_name(params), annotations=annotations, colors='Blues')
 
-def all_inputs_to_stackserieplots(params):      
+def all_inputs_to_stackserieplots(params):
     filename = os.path.join(params.outputdir, '..', 'ANALYSIS', "tables", 'sources_'+get_river_name(params)+'.csv')
     src_series = csv_to_dict(filename)
     directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "plots"))
@@ -372,11 +372,11 @@ def all_inputs_to_stackserieplots(params):
     y_min, y_max = 0, 1.1*max(budget_series['input'])*conv
     color_dict = make_colors(params)
 
-    outname = os.path.join(params.outputdir, '..', 'ANALYSIS', "plots", get_river_name(params)+'_TIMESERIES_sources.png')	
+    outname = os.path.join(params.outputdir, '..', 'ANALYSIS', "plots", get_river_name(params)+'_TIMESERIES_sources.png')
     make_plots.stacked_linechart(time, src_series, \
                                            xlab='time [years]', ylab='flux [Tg/yr]', \
                                            outfilename=outname, \
-                                           title='Delivery of carbon forms to '+get_river_name(params), 
+                                           title='Delivery of carbon forms to '+get_river_name(params),
                                            color='mixed', color_dict=color_dict, ylim=(0, y_max), xlim=(budget_series['time'][0]-3,budget_series['time'][-1]+3))
 
 def all_inputs_per_latitude(params):
@@ -389,22 +389,22 @@ def all_inputs_per_latitude(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
     src_folder = params.load_inputdir
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
-    
+
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
 
     conv = 12*1e-6*(1/params.outputtime)
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -414,7 +414,7 @@ def all_inputs_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -428,14 +428,14 @@ def all_inputs_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)   
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     for specie in species:
-      src_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))    
+      src_files = sorted(directory.get_files_with_str(folder, "atmospheric_exchange_"+specie.get_name().upper()+'*.nc'))
 
     lat_array = np.linspace(89.75,-89.75, 360)
     folder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "plots"))
-    
+
 
     ## this is still a bit too specific for carbon; to be formulated more generic
     for source in sources:
@@ -470,19 +470,19 @@ def all_burial_to_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
 
     dummy_nc = Dataset(proclist[0], 'r')
-    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
+    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -492,7 +492,7 @@ def all_burial_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -506,7 +506,7 @@ def all_burial_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
@@ -538,9 +538,9 @@ def all_burial_to_dict(params):
         if (ifn < len(burial_files)-mainstream_id) or (ifn > len(burial_files)-mainstream_id):
           burial_series["burial_"+specie.get_name().upper()+'_order'+str(fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
         else: # mask the non-outlet lake/reservoirs gridcells in main stream order
-          grid_3d_dum = copy.deepcopy(grid_3d)  
-          grid_3d_lakes = copy.deepcopy(grid_3d) 
-          grid_3d_reservoirs = copy.deepcopy(grid_3d) 
+          grid_3d_dum = copy.deepcopy(grid_3d)
+          grid_3d_lakes = copy.deepcopy(grid_3d)
+          grid_3d_reservoirs = copy.deepcopy(grid_3d)
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
           # store main stream without lakes and reservoirs
           burial_series["burial_"+specie.get_name().upper()+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
@@ -568,7 +568,7 @@ def all_burial_to_dict(params):
           mask_major_streams_3d[np.where(np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False))] = False
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
           burial_series["burial_"+specie.get_name().upper()+'_smallstreams'] = (np.add(np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1),np.array(burial_series["burial_"+specie.get_name().upper()+'_subgrid']))).tolist()
-          burial_series["burial_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+          burial_series["burial_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
         # store sum of cell
@@ -578,7 +578,7 @@ def all_burial_to_dict(params):
         if (ifn==len(burial_files)-mainstream_id):
           lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
           lakesmask_3d[:,:,:] = True
-          lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+          lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
           burial_series["burial_"+specie.get_name().upper()+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d_lakes, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
         # store reservoirs
@@ -588,8 +588,8 @@ def all_burial_to_dict(params):
           reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
           reservoirsmask_3d_dum[:,:,:] = True
 
-          reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-          reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False    
+          reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+          reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
           burial_series["burial_"+specie.get_name().upper()+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d_reservoirs, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
     if len(burial_files)>0:
@@ -612,19 +612,19 @@ def burial_to_climate_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
 
     dummy_nc = Dataset(proclist[0], 'r')
-    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
+    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -634,7 +634,7 @@ def burial_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -648,7 +648,7 @@ def burial_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
@@ -670,7 +670,7 @@ def burial_to_climate_dict(params):
     continental_mask_3d = np.broadcast_to(continental_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
     polar_mask_2d = make_mask.do(climatemask_fn, 5, dum_asc, mask_type='np_grid', logical='EQ')
     polar_mask_3d = np.broadcast_to(polar_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
- 
+
     name_list = ['tropical', 'arid', 'temperate', 'continental', 'polar']
     climate_mask_list = [tropics_mask_3d, arid_mask_3d, temperate_mask_3d, continental_mask_3d, polar_mask_3d]
     burial_series_list = []
@@ -698,9 +698,9 @@ def burial_to_climate_dict(params):
           if (ifn < len(burial_files)-mainstream_id) or (ifn > len(burial_files)-mainstream_id):
             burial_series["burial_"+specie.get_name().upper()+'_order'+str(fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
           else: # mask the non-outlet lake/reservoirs gridcells in main stream order
-            grid_3d_dum = copy.deepcopy(grid_3d)  
-            grid_3d_lakes = copy.deepcopy(grid_3d) 
-            grid_3d_reservoirs = copy.deepcopy(grid_3d) 
+            grid_3d_dum = copy.deepcopy(grid_3d)
+            grid_3d_lakes = copy.deepcopy(grid_3d)
+            grid_3d_reservoirs = copy.deepcopy(grid_3d)
             grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
             # store main stream without lakes and reservoirs
             burial_series["burial_"+specie.get_name().upper()+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
@@ -728,7 +728,7 @@ def burial_to_climate_dict(params):
             mask_major_streams_3d[np.where(np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False))] = False
             grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
             burial_series["burial_"+specie.get_name().upper()+'_smallstreams'] = (np.add(np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1),np.array(burial_series["burial_"+specie.get_name().upper()+'_subgrid']))).tolist()
-            burial_series["burial_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+            burial_series["burial_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
             grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
           # store sum of cell
@@ -738,7 +738,7 @@ def burial_to_climate_dict(params):
           if (ifn==len(burial_files)-mainstream_id):
             lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
             lakesmask_3d[:,:,:] = True
-            lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+            lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
             burial_series["burial_"+specie.get_name().upper()+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d_lakes, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
           # store reservoirs
@@ -748,8 +748,8 @@ def burial_to_climate_dict(params):
             reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
             reservoirsmask_3d_dum[:,:,:] = True
 
-            reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-            reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False    
+            reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+            reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
             burial_series["burial_"+specie.get_name().upper()+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d_reservoirs, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
         if len(burial_files)>0:
@@ -790,19 +790,19 @@ def all_atm_exch_to_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
 
     dummy_nc = Dataset(proclist[0], 'r')
-    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
+    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -812,7 +812,7 @@ def all_atm_exch_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -826,7 +826,7 @@ def all_atm_exch_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
@@ -855,9 +855,9 @@ def all_atm_exch_to_dict(params):
         if (ifn < len(atm_exch_files)-mainstream_id) or (ifn > len(atm_exch_files)-mainstream_id):
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_order'+str(fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
         else: # mask the non-outlet lake/reservoirs gridcells in main stream order
-          grid_3d_dum = copy.deepcopy(grid_3d)  
-          grid_3d_lakes = copy.deepcopy(grid_3d) 
-          grid_3d_reservoirs = copy.deepcopy(grid_3d) 
+          grid_3d_dum = copy.deepcopy(grid_3d)
+          grid_3d_lakes = copy.deepcopy(grid_3d)
+          grid_3d_reservoirs = copy.deepcopy(grid_3d)
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
           # store main stream without lakes and reservoirs
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
@@ -885,7 +885,7 @@ def all_atm_exch_to_dict(params):
           mask_major_streams_3d[np.where(np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False))] = False
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_smallstreams'] = (np.add(np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1),np.array(atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_subgrid']))).tolist()
-          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+          atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
           grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
         # store sum of cell
@@ -895,7 +895,7 @@ def all_atm_exch_to_dict(params):
         if (ifn==len(atm_exch_files)-mainstream_id):
           lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
           lakesmask_3d[:,:,:] = True
-          lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+          lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d_lakes, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
         # store reservoirs
@@ -905,8 +905,8 @@ def all_atm_exch_to_dict(params):
           reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
           reservoirsmask_3d_dum[:,:,:] = True
 
-          reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-          reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False    
+          reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+          reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
           atm_exch_series["atmospheric_exchange_"+specie.get_name().upper()+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d_reservoirs, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
       if len(atm_exch_files)>0:
@@ -929,19 +929,19 @@ def atm_exch_to_climate_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
 
     dummy_nc = Dataset(proclist[0], 'r')
-    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
+    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -951,7 +951,7 @@ def atm_exch_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -965,7 +965,7 @@ def atm_exch_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
@@ -987,7 +987,7 @@ def atm_exch_to_climate_dict(params):
     continental_mask_3d = np.broadcast_to(continental_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
     polar_mask_2d = make_mask.do(climatemask_fn, 5, dum_asc, mask_type='np_grid', logical='EQ')
     polar_mask_3d = np.broadcast_to(polar_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
- 
+
     name_list = ['tropical', 'arid', 'temperate', 'continental', 'polar']
     climate_mask_list = [tropics_mask_3d, arid_mask_3d, temperate_mask_3d, continental_mask_3d, polar_mask_3d]
     atm_exch_series_list = []
@@ -1012,9 +1012,9 @@ def atm_exch_to_climate_dict(params):
           if (ifn < len(atm_exch_files)-mainstream_id) or (ifn > len(atm_exch_files)-mainstream_id):
             atm_exch_series["atm_exch_"+specie.get_name().upper()+'_order'+str(fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
           else: # mask the non-outlet lake/reservoirs gridcells in main stream order
-            grid_3d_dum = copy.deepcopy(grid_3d)  
-            grid_3d_lakes = copy.deepcopy(grid_3d) 
-            grid_3d_reservoirs = copy.deepcopy(grid_3d) 
+            grid_3d_dum = copy.deepcopy(grid_3d)
+            grid_3d_lakes = copy.deepcopy(grid_3d)
+            grid_3d_reservoirs = copy.deepcopy(grid_3d)
             grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
             # store main stream without lakes and reservoirs
             atm_exch_series["atm_exch_"+specie.get_name().upper()+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
@@ -1042,7 +1042,7 @@ def atm_exch_to_climate_dict(params):
             mask_major_streams_3d[np.where(np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False))] = False
             grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
             atm_exch_series["atm_exch_"+specie.get_name().upper()+'_smallstreams'] = (np.add(np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1),np.array(atm_exch_series["atm_exch_"+specie.get_name().upper()+'_subgrid']))).tolist()
-            atm_exch_series["atm_exch_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+            atm_exch_series["atm_exch_"+specie.get_name().upper()+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
             grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
           # store sum of cell
@@ -1052,7 +1052,7 @@ def atm_exch_to_climate_dict(params):
           if (ifn==len(atm_exch_files)-mainstream_id):
             lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
             lakesmask_3d[:,:,:] = True
-            lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+            lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
             atm_exch_series["atm_exch_"+specie.get_name().upper()+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d_lakes, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
           # store reservoirs
@@ -1062,8 +1062,8 @@ def atm_exch_to_climate_dict(params):
             reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
             reservoirsmask_3d_dum[:,:,:] = True
 
-            reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-            reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False    
+            reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+            reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
             atm_exch_series["atm_exch_"+specie.get_name().upper()+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d_reservoirs, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
         if len(atm_exch_files)>0:
@@ -1124,11 +1124,11 @@ def all_atm_exch_to_pieplots(params):
     try:
       annotations = ['Results from: \n'+os.path.join(params.outputdir, '..')]
       outname = os.path.join(params.outputdir, '..', 'ANALYSIS', "plots", get_river_name(params)+'_PIECHART_uptake.png')
-      make_plots.piechart(uptake_exch_values, uptake_exch_labels, outfilename=outname, title='Carbon uptake from the '+get_river_name(params), annotations=annotations)    
+      make_plots.piechart(uptake_exch_values, uptake_exch_labels, outfilename=outname, title='Carbon uptake from the '+get_river_name(params), annotations=annotations)
     except:
       print('no uptake to plot')
 
-def all_atm_exch_to_stackserieplots(params):      
+def all_atm_exch_to_stackserieplots(params):
     filename = os.path.join(params.outputdir, '..', 'ANALYSIS', "tables", 'atm_exch_'+get_river_name(params)+'.csv')
     atm_exch_series = csv_to_dict(filename)
     directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "plots"))
@@ -1151,7 +1151,7 @@ def all_atm_exch_to_stackserieplots(params):
     budget_series = csv_to_dict(filename)
     y_min, y_max = 0, 1.1*max(budget_series['input'])*conv
 
-    outname = os.path.join(params.outputdir, '..', 'ANALYSIS', "plots", get_river_name(params)+'_TIMESERIES_atm_exch_TgYear.png')	
+    outname = os.path.join(params.outputdir, '..', 'ANALYSIS', "plots", get_river_name(params)+'_TIMESERIES_atm_exch_TgYear.png')
 
     make_plots.stacked_linechart(time, atm_exch_series, \
                                            xlab='time [years]', ylab='flux [Tg/year]', \
@@ -1174,19 +1174,19 @@ def all_atm_exch_per_latitude(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
-    
+
     proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
 
     dummy_nc = Dataset(proclist[0], 'r')
-    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]   
+    dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -1196,7 +1196,7 @@ def all_atm_exch_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -1210,7 +1210,7 @@ def all_atm_exch_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
@@ -1246,9 +1246,9 @@ def all_atm_exch_per_latitude(params):
           if ifn==6:
             atm_fld_lat_array  = np.nansum(np.ma.array(grid_3d, mask=mask_2d),axis=1).tolist()
         else: # mask the non-outlet lake/reservoirs gridcells in main stream order
-          grid_3d_dum = copy.deepcopy(grid_3d)  
-          grid_3d_lakes = copy.deepcopy(grid_3d) 
-          grid_3d_reservoirs = copy.deepcopy(grid_3d) 
+          grid_3d_dum = copy.deepcopy(grid_3d)
+          grid_3d_lakes = copy.deepcopy(grid_3d)
+          grid_3d_reservoirs = copy.deepcopy(grid_3d)
           grid_3d[np.where(waterbodyid_grid[-1,:,:]>1)]=0
           # store main stream without lakes and reservoirs
           atm_rvr_lat_array = np.nansum(np.ma.array(grid_3d, mask=mask_2d),axis=1).tolist()
@@ -1268,7 +1268,7 @@ def all_atm_exch_per_latitude(params):
         if (ifn==len(atm_exch_files)-mainstream_id):
           lakesmask_2d = np.zeros(grid_3d.shape, dtype=bool)
           lakesmask_2d[:,:] = True
-          lakesmask_2d[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>=10000, mask_2d[:,:]==False))] = False     
+          lakesmask_2d[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>=10000, mask_2d[:,:]==False))] = False
           atm_lakes_lat_array = np.nansum(np.ma.array(grid_3d_lakes, mask=lakesmask_2d),axis=1).tolist()
           filename = os.path.join(ANfolder, 'lat_'+'atm_exch_'+specie.get_val('name')+'_lakes'+'.png')
           make_plots.single_2d(filename, atm_lakes_lat_array, lat_array, title="None", ylabel="None", xlabel="None")
@@ -1280,14 +1280,14 @@ def all_atm_exch_per_latitude(params):
           reservoirsmask_2d_dum = np.zeros(grid_3d.shape, dtype=bool)
           reservoirsmask_2d_dum[:,:] = True
 
-          reservoirsmask_2d_dum[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>1, waterbodyid_grid[-1,:,:]<10000))] = False   
-          reservoirsmask_2d[np.where(np.logical_and(reservoirsmask_2d_dum[:,:]==False, mask_2d[:,:]==False))] = False    
-          atm_resrvr_lat_array = np.nansum(np.ma.array(grid_3d_reservoirs, mask=reservoirsmask_2d),axis=1).tolist()    
+          reservoirsmask_2d_dum[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>1, waterbodyid_grid[-1,:,:]<10000))] = False
+          reservoirsmask_2d[np.where(np.logical_and(reservoirsmask_2d_dum[:,:]==False, mask_2d[:,:]==False))] = False
+          atm_resrvr_lat_array = np.nansum(np.ma.array(grid_3d_reservoirs, mask=reservoirsmask_2d),axis=1).tolist()
           filename = os.path.join(ANfolder, 'lat_'+'atm_exch_'+specie.get_val('name')+'_rsrvrs'+'.png')
           make_plots.single_2d(filename, atm_resrvr_lat_array, lat_array, title="None", ylabel="None", xlabel="None")
 
       if specie.get_val('name')=='DIC':
-        atm_tot_lat_array = np.nansum(np.ma.array(tot_spec_atm_exch, mask=mask_2d),axis=1).tolist()    
+        atm_tot_lat_array = np.nansum(np.ma.array(tot_spec_atm_exch, mask=mask_2d),axis=1).tolist()
         filename = os.path.join(ANfolder, 'lat_'+'atm_exch_'+specie.get_val('name')+'_tot'+'.png')
         make_plots.single_2d(filename, atm_tot_lat_array, lat_array, title="None", ylabel="None", xlabel="None")
         filename = os.path.join(ANfolder, 'lat_'+'atm_exch_'+specie.get_val('name')+'_combined'+'.png')
@@ -1303,17 +1303,17 @@ def all_exports_to_dict(params,add_color=False):
     dummy_nc = Dataset(proclist[0], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
-    if params.outputtime < 1.: 
+    if params.outputtime < 1.:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]-1
       all_dat_endindex = np.where(waterbodyoutlet['time'][:] <= modelrun_end)[0][-1]
       modeldat_startindex = np.where(dummy_nc['time'][:] >= waterbodyoutlet['time'][all_dat_startindex])[0][0]+1
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
-   
+
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -1335,13 +1335,13 @@ def all_exports_to_dict(params,add_color=False):
     if len(dum_mask)>0:
       mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
     else: #endoreic basin
-      mouthmask_fn = os.path.join(params.water_inputdir, "rivermouths_exporting_to_endoreic_lakes.asc")    
+      mouthmask_fn = os.path.join(params.water_inputdir, "rivermouths_exporting_to_endoreic_lakes.asc")
 
     mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid',logical=params.mask_bool_operator)
     mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
 
     export_series = dict()
-    export_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units) 
+    export_series["time"] = manip.convert_numdate2year(dummy_nc['time'][modeldat_startindex:modeldat_endindex], dummy_nc['time'].units)
 
     tot_export = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:]))
 
@@ -1374,7 +1374,7 @@ def all_exports_to_table(params):
 def all_exports_to_pieplots(params):
     export_series = all_exports_to_dict(params)
     folder = directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "plots"))
- 
+
     exp_values = np.array([])
     exp_labels = np.array([])
     for key,value_list in export_series.items():
@@ -1386,8 +1386,8 @@ def all_exports_to_pieplots(params):
     outname = os.path.join(folder, get_river_name(params)+'_PIECHART_export.png')
     make_plots.piechart(exp_values, exp_labels, outfilename=outname, title='Carbon exports from '+get_river_name(params), annotations=annotations, colors='Oranges')
 
-def all_exports_to_stackserieplots(params):   
-    folder = directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "tables"))   
+def all_exports_to_stackserieplots(params):
+    folder = directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "tables"))
     filename = os.path.join(folder, 'exports_'+get_river_name(params)+'.csv')
     export_series = csv_to_dict(filename)
     directory.ensure(os.path.join(folder, '..', "plots"))
@@ -1411,7 +1411,7 @@ def all_exports_to_stackserieplots(params):
     for key in export_series:
       name = key.replace('_loadOUT')
       color_dict[key] = general_colors[name]
-    outname = os.path.join(folder, '..', "plots", get_river_name(params)+'_TIMESERIES_exports.png')	
+    outname = os.path.join(folder, '..', "plots", get_river_name(params)+'_TIMESERIES_exports.png')
     make_plots.stacked_linechart(time, export_series, \
                                            xlab='time [years]', ylab='flux [Tg/year]', \
                                            outfilename=outname, \
@@ -1428,7 +1428,7 @@ def all_budget_to_dict(params):
     atm_series = csv_to_dict(atm_filename)
     exp_series = csv_to_dict(exp_filename)
 
-    
+
     time = src_series['time'][:]
 
     dellist = list()
@@ -1436,7 +1436,7 @@ def all_budget_to_dict(params):
         if not ('total' in key):
             dellist.append(key)
     for key in dellist:
-            del atm_series[key] 
+            del atm_series[key]
 
     budget_series = dict()
     budget_series['time'] = time
@@ -1464,13 +1464,13 @@ def all_budget_to_stackserieplots_Tg_year(params):
     for key in budget_series:
       budget_series[key]=(np.array(budget_series[key])*12*1e-6*(1/params.outputtime)).tolist()
     y_min, y_max = -1.1*max(budget_series['input']), 1.1*max(budget_series['input'])
-    outname = os.path.join(params.outputdir, "..", "ANALYSIS", "plots", get_river_name(params)+'_TIMESERIES_budget.png')	
+    outname = os.path.join(params.outputdir, "..", "ANALYSIS", "plots", get_river_name(params)+'_TIMESERIES_budget.png')
 
     make_plots.stacked_linechart_linecombi(time, budget_series, line_series,\
                                            xlab='time [years]', ylab='flux [Tg/yr]', \
                                            outfilename=outname, \
                                            title='Budget of total carbon in '+get_river_name(params) +' basin', \
-                                           annotations=[outname], 
+                                           annotations=[outname],
                                            color='blue_orange', ylim=(y_min, y_max), xlim=(params.starttime,params.endtime))
 
 def all_fluxes_to_dict(params):
@@ -1483,7 +1483,7 @@ def all_fluxes_to_dict(params):
 
     if params.lfloodplains:
       mainstream_id = 2
-    else: 
+    else:
       mainstream_id = 1
 
     folder = os.path.join(params.outputdir, "..", "BUDGET", "subgrid")
@@ -1498,12 +1498,12 @@ def all_fluxes_to_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -1513,7 +1513,7 @@ def all_fluxes_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -1527,8 +1527,8 @@ def all_fluxes_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
-    
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
+
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
@@ -1538,7 +1538,7 @@ def all_fluxes_to_dict(params):
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
     mouthmask_2d = make_mask.do(mouthmask_fn, params.maskid, dum_asc, mask_type='np_grid', logical=params.mask_bool_operator)
     mouthmask_3d = np.broadcast_to(mouthmask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
-    
+
     flux_series = dict()
     for specie in species:
       flux_series[specie.get_val('name')] = dict()
@@ -1559,11 +1559,11 @@ def all_fluxes_to_dict(params):
             if (ifn < len(proc_fns)-mainstream_id) or (ifn > len(proc_fns)-mainstream_id):
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_order'+str(proc_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
             elif (ifn == len(proc_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
-              grid_3d_dum = copy.deepcopy(grid_3d) 
+              grid_3d_dum = copy.deepcopy(grid_3d)
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
 			  # store main stream without lakes and reservoirs
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
-			  
+
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_order'+str(proc_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
@@ -1587,8 +1587,8 @@ def all_fluxes_to_dict(params):
               mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_subgrid'])).tolist()
-              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
-              grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]     
+              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
+              grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
 
             # store sum of cell
             tot_spec_flux = np.add(grid_3d, tot_spec_flux)
@@ -1597,7 +1597,7 @@ def all_fluxes_to_dict(params):
             if (ifn==len(proc_fns)-mainstream_id):
               lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
               lakesmask_3d[:,:,:] = True
-              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
             # store reservoirs
@@ -1607,15 +1607,15 @@ def all_fluxes_to_dict(params):
               reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
               reservoirsmask_3d_dum[:,:,:] = True
 
-              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False   
+              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
               flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
             # store floodplains
             if 'order7' in proc_fns[ifn]:
-              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_floodplains/wetlands']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()              
+              flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_floodplains/wetlands']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
-  
+
           flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_totflux'] = np.nansum(np.nansum(np.ma.array(tot_spec_flux, mask=mask_3d),axis=2),axis=1).tolist()
 
         src_dict = csv_to_dict(os.path.join(params.outputdir, '..', 'ANALYSIS',  "tables", "sources_"+get_river_name(params)+'.csv'))
@@ -1635,7 +1635,7 @@ def all_fluxes_to_dict(params):
             grid_3d = exp_nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]*-1
             exp_nc.close()
             tot_exp = np.add(grid_3d, tot_exp)
-        flux_series[specie.get_val('name')][specie.get_name()+'_expflux'] = np.nansum(np.nansum(np.ma.array(tot_exp, mask=mouthmask_3d),axis=2),axis=1)  
+        flux_series[specie.get_val('name')][specie.get_name()+'_expflux'] = np.nansum(np.nansum(np.ma.array(tot_exp, mask=mouthmask_3d),axis=2),axis=1)
       flux_series[specie.get_val('name')]['budget'] = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,0,0]))
       for flux in flux_series[specie.get_val('name')]:
         if 'flux' in flux:
@@ -1669,11 +1669,11 @@ def all_fluxes_per_latitude(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
-    if params.outputtime < 1: 
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -1683,7 +1683,7 @@ def all_fluxes_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-    
+
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -1700,7 +1700,7 @@ def all_fluxes_per_latitude(params):
 
     lat_array = np.linspace(89.75,-89.75, 360)
     conv = 12*1e-6*(1/params.outputtime)
-    ANfolder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "plots"))    
+    ANfolder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "plots"))
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
@@ -1708,7 +1708,7 @@ def all_fluxes_per_latitude(params):
 
     mouthmask_fn = os.path.join(params.water_inputdir, "rivermouth.asc")
     dum_asc = ascraster.Asciigrid(ascii_file=params.file_mask)
-    
+
     for specie in species:
       stoich = reactions.specie_dy(proc,specie.get_name())
       for iproc in range(len(proc)):
@@ -1728,7 +1728,7 @@ def all_fluxes_per_latitude(params):
               filename = os.path.join(ANfolder, 'lat_'+specie.get_val('name')+'_'+proc[iproc].get_val('name')+'_'+str(ifn)+'.png')
               make_plots.single_2d(filename, order_array, lat_array, title="None", ylabel="None", xlabel="None")
             elif (ifn == len(proc_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
-              grid_3d_dum = copy.deepcopy(grid_3d) 
+              grid_3d_dum = copy.deepcopy(grid_3d)
               grid_3d_dum[np.where(waterbodyid_grid[-1,:,:]>1)]=0
 			  # store main stream without lakes and reservoirs
               river_array = np.nansum(np.ma.array(grid_3d_dum, mask=mask_2d),axis=1).tolist()
@@ -1742,7 +1742,7 @@ def all_fluxes_per_latitude(params):
                sbgrd_array = np.nansum(np.ma.array(sub_spec_flux, mask=mask_2d),axis=1).tolist()
                filename = os.path.join(ANfolder, 'lat_'+specie.get_val('name')+'_'+proc[iproc].get_val('name')+'_sbgrd'+'.png')
                make_plots.single_2d(filename, sbgrd_array, lat_array, title="None", ylabel="None", xlabel="None")
-    
+
             # store sum of cell
             tot_spec_flux = np.add(grid_3d, tot_spec_flux)
 
@@ -1750,7 +1750,7 @@ def all_fluxes_per_latitude(params):
             if (ifn==len(proc_fns)-mainstream_id):
               lakesmask_2d = np.zeros(grid_3d.shape, dtype=bool)
               lakesmask_2d[:,:] = True
-              lakesmask_2d[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>=10000, mask_2d[:,:]==False))] = False     
+              lakesmask_2d[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>=10000, mask_2d[:,:]==False))] = False
               lakes_array = np.nansum(np.ma.array(grid_3d, mask=lakesmask_2d),axis=1).tolist()
               filename = os.path.join(ANfolder, 'lat_'+specie.get_val('name')+'_'+proc[iproc].get_val('name')+'_lakes'+'.png')
               make_plots.single_2d(filename, lakes_array, lat_array, title="None", ylabel="None", xlabel="None")
@@ -1762,19 +1762,19 @@ def all_fluxes_per_latitude(params):
               reservoirsmask_2d_dum = np.zeros(grid_3d.shape, dtype=bool)
               reservoirsmask_2d_dum[:,:] = True
 
-              reservoirsmask_2d_dum[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>1, waterbodyid_grid[-1,:,:]<10000))] = False   
-              reservoirsmask_2d[np.where(np.logical_and(reservoirsmask_2d_dum[:,:]==False, mask_2d[:,:]==False))] = False   
+              reservoirsmask_2d_dum[np.where(np.logical_and(waterbodyid_grid[-1,:,:]>1, waterbodyid_grid[-1,:,:]<10000))] = False
+              reservoirsmask_2d[np.where(np.logical_and(reservoirsmask_2d_dum[:,:]==False, mask_2d[:,:]==False))] = False
               reservoir_array = np.nansum(np.ma.array(grid_3d, mask=mask_2d),axis=1).tolist()
               filename = os.path.join(ANfolder, 'lat_'+specie.get_val('name')+'_'+proc[iproc].get_val('name')+'_rsrvrs'+'.png')
               make_plots.single_2d(filename, reservoir_array, lat_array, title="None", ylabel="None", xlabel="None")
 
             # store floodplains
             if 'order7' in proc_fns[ifn]:
-              fldpln_array = np.nansum(np.ma.array(grid_3d, mask=mask_2d),axis=1).tolist()     
+              fldpln_array = np.nansum(np.ma.array(grid_3d, mask=mask_2d),axis=1).tolist()
               filename = os.path.join(ANfolder, 'lat_'+specie.get_val('name')+'_'+proc[iproc].get_val('name')+'_fldpln'+'.png')
               make_plots.single_2d(filename, fldpln_array, lat_array, title="None", ylabel="None", xlabel="None")
-  
-          tot_array = np.nansum(np.ma.array(tot_spec_flux, mask=mask_2d),axis=1).tolist() 
+
+          tot_array = np.nansum(np.ma.array(tot_spec_flux, mask=mask_2d),axis=1).tolist()
           filename = os.path.join(ANfolder, 'lat_'+specie.get_val('name')+'_'+proc[iproc].get_val('name')+'_tot'+'.png')
           make_plots.single_2d(filename, tot_array, lat_array, title="None", ylabel="None", xlabel="None")
 
@@ -1808,11 +1808,11 @@ def all_fluxes_to_climate_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
-    if params.outputtime < 1: 
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -1822,7 +1822,7 @@ def all_fluxes_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -1836,8 +1836,8 @@ def all_fluxes_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
-    
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
+
     print('modeldat_startindex=', modeldat_startindex)
     print('modeldat_endindex=', modeldat_endindex)
     print('all_dat_startindex=', all_dat_startindex)
@@ -1863,7 +1863,7 @@ def all_fluxes_to_climate_dict(params):
     continental_mask_3d = np.broadcast_to(continental_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
     polar_mask_2d = make_mask.do(climatemask_fn, 5, dum_asc, mask_type='np_grid', logical='EQ')
     polar_mask_3d = np.broadcast_to(polar_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
- 
+
     name_list = ['tropical', 'arid', 'temperate', 'continental', 'polar']
     climate_mask_list = [tropics_mask_3d, arid_mask_3d, temperate_mask_3d, continental_mask_3d, polar_mask_3d]
     flux_series_list = []
@@ -1892,11 +1892,11 @@ def all_fluxes_to_climate_dict(params):
               if (ifn < len(proc_fns)-mainstream_id) or (ifn > len(proc_fns)-mainstream_id):
                 flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_order'+str(proc_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
               elif (ifn == len(proc_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
-                grid_3d_dum = copy.deepcopy(grid_3d) 
+                grid_3d_dum = copy.deepcopy(grid_3d)
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
 		  	    # store main stream without lakes and reservoirs
                 flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
-			  
+
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
                 flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_order'+str(proc_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
@@ -1920,9 +1920,9 @@ def all_fluxes_to_climate_dict(params):
                 mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
                 flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_subgrid'])).tolist()
-                flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+                flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
-     
+
               # store sum of cell
               tot_spec_flux = np.add(grid_3d, tot_spec_flux)
 
@@ -1930,7 +1930,7 @@ def all_fluxes_to_climate_dict(params):
               if (ifn==len(proc_fns)-mainstream_id):
                 lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
                 lakesmask_3d[:,:,:] = True
-                lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+                lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
                 flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
               # store reservoirs
@@ -1940,11 +1940,11 @@ def all_fluxes_to_climate_dict(params):
                 reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
                 reservoirsmask_3d_dum[:,:,:] = True
 
-                reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-                reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False   
+                reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+                reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
                 flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
-  
+
             flux_series[specie.get_val('name')][proc[iproc].get_val("name")+'_totflux'] = np.nansum(np.nansum(np.ma.array(tot_spec_flux, mask=mask_3d),axis=2),axis=1).tolist()
 
           src_dict = csv_to_dict(os.path.join(params.outputdir, '..', 'ANALYSIS',  "tables", "sources_"+get_river_name(params)+'.csv'))
@@ -1964,7 +1964,7 @@ def all_fluxes_to_climate_dict(params):
             grid_3d = exp_nc[specie.get_name()+"loadOUT"][modeldat_startindex:modeldat_endindex,:,:]*-1
             exp_nc.close()
             tot_exp = np.add(grid_3d, tot_exp)
-          flux_series[specie.get_val('name')][specie.get_name()+'_expflux'] = np.nansum(np.nansum(np.ma.array(tot_exp, mask=mouthmask_3d),axis=2),axis=1)  
+          flux_series[specie.get_val('name')][specie.get_name()+'_expflux'] = np.nansum(np.nansum(np.ma.array(tot_exp, mask=mouthmask_3d),axis=2),axis=1)
         flux_series[specie.get_val('name')]['budget'] = np.zeros(np.shape(dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,0,0]))
         #for flux in flux_series[specie.get_val('name')]:
         #  if 'flux' in flux:
@@ -1999,7 +1999,7 @@ def all_sec_to_dict(params):
     for filename in filename_list:
       if (('vol' in filename) or ('area' in filename)) and (not 'dvoldt' in filename):
         arguments.append(os.path.splitext(os.path.basename(filename))[0])
- 
+
     if params.lfloodplains:
       mainstream_id = 2
     else:
@@ -2020,11 +2020,11 @@ def all_sec_to_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
-    if params.outputtime < 1: 
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -2034,7 +2034,7 @@ def all_sec_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -2048,11 +2048,11 @@ def all_sec_to_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]    
+    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     sec_series = dict()
     for arg in arguments:
@@ -2069,15 +2069,15 @@ def all_sec_to_dict(params):
             if (ifn < len(arg_fns)-mainstream_id) or (ifn > len(arg_fns)-mainstream_id):
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
             elif (ifn == len(arg_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
-              grid_3d_dum = copy.deepcopy(grid_3d) 
+              grid_3d_dum = copy.deepcopy(grid_3d)
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
 			  # store main stream without lakes and reservoirs
               sec_series[arg][arg+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
-			  
+
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
-            
+
             # store sum of subgrid orders
             if (ifn < len(arg_fns)-mainstream_id):
               sub_arg = np.add(sub_arg, np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1)*params.number_of_rivers[ifn])
@@ -2098,9 +2098,9 @@ def all_sec_to_dict(params):
                 mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
                 sec_series[arg][arg+'_smallstreams'] = (np.add(np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1),np.array(sec_series[arg][arg+'_subgrid']))).tolist()
-                sec_series[arg][arg+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+                sec_series[arg][arg+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
-     
+
             # store sum of cell
             grid_3d[np.where(np.isnan(grid_3d))] = 0
             tot_arg = np.add(grid_3d,tot_arg)
@@ -2109,7 +2109,7 @@ def all_sec_to_dict(params):
             if (ifn==len(arg_fns)-mainstream_id):
               lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
               lakesmask_3d[:,:,:] = True
-              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
               sec_series[arg][arg+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
             # store reservoirs
@@ -2119,16 +2119,16 @@ def all_sec_to_dict(params):
               reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
               reservoirsmask_3d_dum[:,:,:] = True
 
-              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False   
+              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
               sec_series[arg][arg+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
             # store floodplains
             if 'order7' in arg_fns[ifn]:
-              sec_series[arg][arg+'_floodplains/wetlands']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist() 
-              sec_series[arg].pop(arg+'_order7', None)             
+              sec_series[arg][arg+'_floodplains/wetlands']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
+              sec_series[arg].pop(arg+'_order7', None)
 
-      
+
       sec_series[arg][arg+'_tot'] = np.nansum(np.nansum(np.ma.array(tot_arg, mask=mask_3d),axis=2),axis=1).tolist()
     dummy_nc.close()
     waterbodyoutlet.close()
@@ -2141,7 +2141,7 @@ def all_sec_to_climate_dict(params):
     for filename in filename_list:
       if (('vol' in filename) or ('area' in filename)) and (not 'dvoldt' in filename):
         arguments.append(os.path.splitext(os.path.basename(filename))[0])
- 
+
     if params.lfloodplains:
       mainstream_id = 2
     else:
@@ -2162,11 +2162,11 @@ def all_sec_to_climate_dict(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
-    if params.outputtime < 1: 
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -2176,7 +2176,7 @@ def all_sec_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -2190,11 +2190,11 @@ def all_sec_to_climate_dict(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d_dum = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]   
+    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
     climatemask_fn = os.path.join(params.water_inputdir, 'climate.asc')
     tropics_mask_2d = make_mask.do(climatemask_fn, 1, dum_asc, mask_type='np_grid', logical='EQ')
     tropics_mask_3d = np.broadcast_to(tropics_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
@@ -2206,7 +2206,7 @@ def all_sec_to_climate_dict(params):
     continental_mask_3d = np.broadcast_to(continental_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
     polar_mask_2d = make_mask.do(climatemask_fn, 5, dum_asc, mask_type='np_grid', logical='EQ')
     polar_mask_3d = np.broadcast_to(polar_mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape).copy()
- 
+
     name_list = ['tropical', 'arid', 'temperate', 'continental', 'polar']
     climate_mask_list = [tropics_mask_3d, arid_mask_3d, temperate_mask_3d, continental_mask_3d, polar_mask_3d]
     sec_series_list = []
@@ -2229,15 +2229,15 @@ def all_sec_to_climate_dict(params):
             if (ifn < len(arg_fns)-mainstream_id) or (ifn > len(arg_fns)-mainstream_id):
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
             elif (ifn == len(arg_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
-              grid_3d_dum = copy.deepcopy(grid_3d) 
+              grid_3d_dum = copy.deepcopy(grid_3d)
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
 			  # store main stream without lakes and reservoirs
               sec_series[arg][arg+'_river'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
-			  
+
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
 
-            
+
             # store sum of subgrid orders
             if (ifn < len(arg_fns)-mainstream_id):
               sub_arg = np.add(sub_arg, np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1)*params.number_of_rivers[ifn])
@@ -2258,9 +2258,9 @@ def all_sec_to_climate_dict(params):
                 mask_major_streams_3d[np.logical_and(mask_3d==False, mask_major_streams_3d_dum[:,:,:]==False)] = False
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
                 sec_series[arg][arg+'_smallstreams'] = (np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_small_streams_3d),axis=2),axis=1)+np.array(sec_series[arg][arg+'_subgrid'])).tolist()
-                sec_series[arg][arg+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist() 
+                sec_series[arg][arg+'_majorstreams'] = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_major_streams_3d),axis=2),axis=1).tolist()
                 grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
-     
+
             # store sum of cell
             tot_arg = np.add(grid_3d, tot_arg)
 
@@ -2268,7 +2268,7 @@ def all_sec_to_climate_dict(params):
             if (ifn==len(arg_fns)-mainstream_id):
               lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
               lakesmask_3d[:,:,:] = True
-              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
               sec_series[arg][arg+'_lakes']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=lakesmask_3d),axis=2),axis=1).tolist()
 
             # store reservoirs
@@ -2278,16 +2278,16 @@ def all_sec_to_climate_dict(params):
               reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
               reservoirsmask_3d_dum[:,:,:] = True
 
-              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False   
+              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
               sec_series[arg][arg+'_reservoirs']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=reservoirsmask_3d),axis=2),axis=1).tolist()
 
             # store floodplains
             if 'order7' in arg_fns[ifn]:
-              sec_series[arg][arg+'_floodplains/wetlands']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist() 
-              sec_series[arg].pop(arg+'_order7', None)             
+              sec_series[arg][arg+'_floodplains/wetlands']  = np.nansum(np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2),axis=1).tolist()
+              sec_series[arg].pop(arg+'_order7', None)
 
-  
+
       sec_series[arg][arg+'_tot'] = np.nansum(np.nansum(np.ma.array(tot_arg, mask=mask_3d),axis=2),axis=1).tolist()
       sec_series_list.append(sec_series)
     return sec_series_list
@@ -2299,7 +2299,7 @@ def all_sec_per_latitude(params):
     for filename in filename_list:
       if (('vol' in filename) or ('area' in filename)) and (not 'dvoldt' in filename):
         arguments.append(os.path.splitext(os.path.basename(filename))[0])
- 
+
     if params.lfloodplains:
       mainstream_id = 2
     else:
@@ -2320,12 +2320,12 @@ def all_sec_per_latitude(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
 
-    if params.outputtime < 1: 
+    if params.outputtime < 1:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101_mon.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101_mon.nc"), 'r')
-      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')  
+      endo_waterbodyid = Dataset(os.path.join(params.water_inputdir, "endo_waterbodyid_101_mon.nc"), 'r')
       modelrun_start = max(dummy_nc['time'][0],0)
       modelrun_end = dummy_nc['time'][-1]
       all_dat_startindex = np.where(waterbodyoutlet['time'][:] >= modelrun_start)[0][0]
@@ -2335,7 +2335,7 @@ def all_sec_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)     
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
     else:
       waterbodyoutlet  = Dataset(os.path.join(params.water_inputdir, "waterbodyoutlet_101.nc"), 'r')
       waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
@@ -2349,11 +2349,11 @@ def all_sec_per_latitude(params):
       modeldat_endindex = np.where(dummy_nc['time'][:] <= waterbodyoutlet['time'][all_dat_endindex])[0][-1]+1
       if modeldat_endindex==len(dummy_nc['time'][:]):
         all_dat_endindex +=1
-      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)  
+      mask_3d = np.broadcast_to(mask_2d, dummy_nc[dummy_name][modeldat_startindex:modeldat_endindex,:,:].shape)
 
     waterbodyoutlet_grid = waterbodyoutlet['waterbodyoutlet'][all_dat_startindex:all_dat_endindex,:,:]
     waterbodyid_grid = waterbodyid['waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
-    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]    
+    endo_waterbodyid_grid = endo_waterbodyid['endo_waterbodyid'][all_dat_startindex:all_dat_endindex,:,:]
 
     sec_series = dict()
     for arg in arguments:
@@ -2370,21 +2370,21 @@ def all_sec_per_latitude(params):
             if (ifn < len(arg_fns)-mainstream_id) or (ifn > len(arg_fns)-mainstream_id):
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2).tolist()
             elif (ifn == len(arg_fns)-mainstream_id): # mask the non-outlet lake/reservoirs gridcells in main stream order
-              grid_3d_dum = copy.deepcopy(grid_3d) 
+              grid_3d_dum = copy.deepcopy(grid_3d)
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]=0
 			  # store main stream without lakes and reservoirs
               sec_series[arg][arg+'_river'] = np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2).tolist()
-			  
+
               grid_3d[np.where(waterbodyid_grid[:,:,:]>1)]+=grid_3d_dum[np.where(waterbodyid_grid[:,:,:]>1)]
               sec_series[arg][arg+'_order'+str(arg_fn[-4])] = np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2).tolist()
 
-            
+
             # store sum of subgrid orders
             if (ifn < len(arg_fns)-mainstream_id):
               sub_arg = np.add(sub_arg, np.ma.array(grid_3d, mask=mask_3d)*params.number_of_rivers[ifn])
             elif (ifn == len(arg_fns)-mainstream_id):
               sec_series[arg][arg+'_subgrid'] = np.nansum(np.ma.array(sub_arg, mask=mask_3d),axis=2).tolist()
-     
+
             # store sum of cell
             tot_arg = np.add(grid_3d, tot_arg)
 
@@ -2392,7 +2392,7 @@ def all_sec_per_latitude(params):
             if (ifn==len(arg_fns)-mainstream_id):
               lakesmask_3d = np.zeros(grid_3d.shape, dtype=bool)
               lakesmask_3d[:,:,:] = True
-              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False     
+              lakesmask_3d[np.where(np.logical_and(waterbodyid_grid[:,:,:]>=10000, mask_3d[:,:,:]==False))] = False
               sec_series[arg][arg+'_lakes']  = np.nansum(np.ma.array(grid_3d, mask=lakesmask_3d),axis=2).tolist()
 
             # store reservoirs
@@ -2402,22 +2402,22 @@ def all_sec_per_latitude(params):
               reservoirsmask_3d_dum = np.zeros(grid_3d.shape, dtype=bool)
               reservoirsmask_3d_dum[:,:,:] = True
 
-              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False   
-              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False   
+              reservoirsmask_3d_dum[np.where(np.logical_and(waterbodyid_grid[:,:,:]>1, waterbodyid_grid[:,:,:]<10000))] = False
+              reservoirsmask_3d[np.where(np.logical_and(reservoirsmask_3d_dum[:,:,:]==False, mask_3d[:,:,:]==False))] = False
               sec_series[arg][arg+'_reservoirs']  = np.nansum(np.ma.array(grid_3d, mask=reservoirsmask_3d),axis=2).tolist()
 
             # store floodplains
             if 'order7' in arg_fns[ifn]:
-              sec_series[arg][arg+'_floodplains/wetlands']  = np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2).tolist() 
-              sec_series[arg].pop(arg+'_order7', None)             
+              sec_series[arg][arg+'_floodplains/wetlands']  = np.nansum(np.ma.array(grid_3d, mask=mask_3d),axis=2).tolist()
+              sec_series[arg].pop(arg+'_order7', None)
 
-  
+
       sec_series[arg][arg+'_tot'] = np.nansum(np.ma.array(tot_arg, mask=mask_3d),axis=2).tolist()
     dummy_nc.close()
     waterbodyoutlet.close()
 
     lat_array = np.linspace(89.75,-89.75, 360)
-    ANfolder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "plots"))    
+    ANfolder = directory.ensure(os.path.join(params.outputdir, "..", "ANALYSIS", "plots"))
 
 
     for arg in sec_series.keys():
@@ -2438,7 +2438,7 @@ def all_sec_per_latitude(params):
         make_plots.multiple_2d_1frame(filename, [sbgrd_array, river_array, lakes_array, reservoir_array, fldpln_array], [lat_array]*5,\
                            llabel=['small streams', 'large streams', 'lakes', 'reservoirs', 'floodplains/wetlands'], legend=True, xlim=xlim, ylim="None", title=arg+" of freshwaters per latitude", xlabel=unit, ylabel="latitude [degree]", resolution='low')
 
-      outfilename = os.path.join(ANfolder, 'lat_'+arg+'_combined'+'.gif') 
+      outfilename = os.path.join(ANfolder, 'lat_'+arg+'_combined'+'.gif')
       images=list()
       filenames = sorted(directory.get_files_with_str(ANfolder, 'lat_'+arg+"*.png"))
       for filename in filenames:
@@ -2538,7 +2538,7 @@ def all_fluxes_to_pieplots(params):
       pos_list = []
       neg_list = []
       pos_labels = []
-      neg_labels = [] 
+      neg_labels = []
       for key, values in speciedict.items():
         if ('flux' in key):
           if np.mean(values)>0:
@@ -2547,11 +2547,11 @@ def all_fluxes_to_pieplots(params):
           elif np.mean(values)<0:
             neg_list.append(abs(np.mean(values)))
             neg_labels.append(key.replace('flux', ''))
-			
+
       data_list = [pos_list, neg_list]
       labels = [pos_labels, neg_labels]
       if len(data_list[1])>0 or len(data_list[0])>0:
-        outname = os.path.join(folder, get_river_name(params)+'_PIECHARTS_'+speciekey+'_origins_fates.png')		
+        outname = os.path.join(folder, get_river_name(params)+'_PIECHARTS_'+speciekey+'_origins_fates.png')
         make_plots.multi_piechart(data_list, labels, title_list, outfilename=outname, title=speciekey + ' in ' + get_river_name(params) + ' freshwaters ', annotations=["no comments"])
 
 def all_fluxes_per_wbtype_to_pieplots(params):
@@ -2568,7 +2568,7 @@ def all_fluxes_per_wbtype_to_pieplots(params):
     folder = directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "plots"))
 
     for speciekey, speciedict in flux_series.items():
-        pie_dict = {}    
+        pie_dict = {}
         for key, values in speciedict.items():
 
           if ('lakes' in key) or ('reservoirs' in key) or ('subgrid' in key) or ('river' in key) or ('order7' in key):
@@ -2588,8 +2588,8 @@ def all_fluxes_per_wbtype_to_pieplots(params):
                 print("len(values)=", len(values))
         for procname in pie_dict.keys():
           outname = os.path.join(folder, get_river_name(params)+'_PIECHARTS_perwaterbody_'+procname+'.png')
-          try:		
-            make_plots.piechart(pie_dict[procname]['data'], pie_dict[procname]['labels'], outfilename=outname, title=procname+'per waterbody type', annotations=["no comments"], colors='Oranges')   
+          try:
+            make_plots.piechart(pie_dict[procname]['data'], pie_dict[procname]['labels'], outfilename=outname, title=procname+'per waterbody type', annotations=["no comments"], colors='Oranges')
           except(ValueError):
             pass
 
@@ -2602,7 +2602,7 @@ def all_fluxes_per_climate_to_pieplots(params):
 def all_fluxes_to_stackserieplots(params):
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     flux_series = dict()
-    folder = directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "tables"))    
+    folder = directory.ensure(os.path.join(params.outputdir, '..', 'ANALYSIS', "tables"))
     for specie in species:
         filename = os.path.join(folder, specie.get_val('name')+'_biogeochemistry_'+get_river_name(params)+'.csv')
         flux_series[specie.get_val('name')] = csv_to_dict(filename)
@@ -2612,7 +2612,7 @@ def all_fluxes_to_stackserieplots(params):
     filename = os.path.join(folder, 'total_budget_'+get_river_name(params)+'.csv')
     budget_series = csv_to_dict(filename)
     y_min, y_max = -1.1*max(budget_series['srcflux']), 1.1*max(budget_series['srcflux'])
-    
+
     for speciekey, speciedict in flux_series.items():
         if len(speciedict.keys())>0:
           time = speciedict['time']
@@ -2623,12 +2623,12 @@ def all_fluxes_to_stackserieplots(params):
           for key in dellist:
             del speciedict[key]
 
-          outname = os.path.join(folder, '..', "plots", get_river_name(params)+'_Mmol_TIMESERIES_'+speciekey+'_origins_fates.png')	
+          outname = os.path.join(folder, '..', "plots", get_river_name(params)+'_Mmol_TIMESERIES_'+speciekey+'_origins_fates.png')
           make_plots.stacked_linechart(time, speciedict, \
                                            xlab='time [years]', ylab='flux [Mmol/month]', \
                                            outfilename=outname, \
                                            title='Biogeochemical and lateral fluxes of '+speciekey+' in the '+ get_river_name(params), \
-                                           annotations=[outname], 
+                                           annotations=[outname],
                                            color='blue_orange', ylim=(y_min, y_max), xlim=(params.starttime,params.endtime))
 
 def all_fluxes_to_stackserieplots_TgPerYear(params):
@@ -2661,24 +2661,24 @@ def all_fluxes_to_stackserieplots_TgPerYear(params):
           line_series['budget'] = (np.array(speciedict2['budget'])).tolist()
           del speciedict2['budget']
 
-          outname = os.path.join(folder, get_river_name(params)+'_Tg_TIMESERIES_'+speciekey+'_origins_fates.png')	
+          outname = os.path.join(folder, get_river_name(params)+'_Tg_TIMESERIES_'+speciekey+'_origins_fates.png')
           make_plots.stacked_linechart_linecombi(time, speciedict2, line_series,\
                                            xlab='time [years]', ylab='flux [Tg/yr]', \
                                            outfilename=outname, \
                                            title='Budget of '+ speciekey + ' in the '+get_river_name(params) +' basin', \
-                                           annotations=[outname], 
+                                           annotations=[outname],
                                            color='blue_orange', ylim=(y_min, y_max), xlim=(params.starttime, params.endtime))
 
 def piechart_export(params, loc=[None]):
     print('piechart_export start')
     species,sources,proc,params_local = read_parameter.readfile(params.species_ini)
     make_index.species(params,species,proc)
-    
+
     basin = ascraster.Asciigrid(ascii_file=params.basin,numtype=int)
     icell = manip.calc_index_from_coordin(loc[0], loc[1], basin.nrows, basin.ncols, basin.xllcorner, basin.yllcorner, basin.cellsize)
     ilat, ilon = manip.calc_row_col_from_index(icell, basin.ncols)
     discharge = Dataset(os.path.join(params.water_inputdir,params.discharge), 'r')[params.discharge_varname][0,ilat,ilon]
-    
+
     labels = list()
     carbon_array = np.array([])
     mass_transport = np.array([])
@@ -2702,10 +2702,10 @@ def piechart_export(params, loc=[None]):
 
     for i in range(len(carbon_array)): #for every specie
         labels[i]=labels[i]+' '+'{0:.4f}'.format(mass_transport[i])+' Tg/yr  ('+str(int(carbon_array[i]*100/carbon_array.sum()))+'%)'
-        
+
     annotations = ['Results from: \n'+os.path.join(params.outputdir, '..')]
     outname = os.path.join(params.outputdir, '..', 'ANALYSIS',  str(params.maskid)+'_export.png')
-    make_plots.piechart(mass_transport, labels, outfilename=outname, title='Carbon export of the '+str(params.maskid), annotations=annotations, colors=colors, xlim=(params.starttime,params.endtime))   
+    make_plots.piechart(mass_transport, labels, outfilename=outname, title='Carbon export of the '+str(params.maskid), annotations=annotations, colors=colors, xlim=(params.starttime,params.endtime))
     print('piechart_export finish')
 
 def map_net_budget(params):
@@ -2719,14 +2719,14 @@ def map_net_budget(params):
     climate_mask_2d_dum = make_mask.do(climatemask_fn, 0, dum_asc, logical='GT', mask_type='np_grid')
     mask_2d = np.zeros(mask_2d_dum.shape, dtype=bool)
     mask_2d[:,:] = True
-    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False     
+    mask_2d[np.where(np.logical_and(mask_2d_dum[:,:]==False, climate_mask_2d_dum[:,:]==False))] = False
     try:
         all_budget
     except NameError:
         proclist = directory.get_files_with_str(folder, species[0].get_name().upper()+"*_order6*")
 
         dummy_nc = Dataset(proclist[0], 'r')
-        dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]    
+        dummy_name = os.path.splitext(os.path.basename(proclist[0]))[0][:-7]
 
         specie_budget = np.zeros(np.shape(dummy_nc[dummy_name]))
         all_budget = np.zeros(np.shape(dummy_nc[dummy_name]))
@@ -2753,8 +2753,8 @@ def map_net_budget(params):
         specie_budget = np.ma.array(specie_budget, mask=mask_3d)
         if ((specie.get_name().lower()!='alk') and (not 'tss' in specie.get_name().lower())):
           all_budget += np.add(all_budget, specie_budget)
-        
-    
+
+
         specie_budget_nc = Dataset(os.path.join(folder, specie.get_name()+"_budget.nc"), 'w')
         output_conversion.init_ncdata(folder, specie_budget_nc, specie.get_name()+"_budget", basinid, unit='Mmol/yr', long_name=specie.get_name()+"_budget")
         for itime in range(len(dummy_nc['time'])):
@@ -2769,7 +2769,7 @@ def map_net_budget(params):
 if __name__ == "__main__":
     # Set the general path for the own python modules
 
-    import general_path   
+    import general_path
     print(sys.path)
     # Parse command-line arguments and set parameters for script
     #try:
@@ -2778,5 +2778,5 @@ if __name__ == "__main__":
     params,log,s = general_startup.general_startup(sys.argv)
     #except SystemExit:
     #  raise MyError("Error has occured in the reading of the commandline options.")
-    
-    do(params)	
+
+    do(params)

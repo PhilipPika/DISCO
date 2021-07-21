@@ -60,6 +60,6 @@ if os.path.exists(path):
     sys.path.insert(0, path)
     print(path + " is added to the python search path for modules.")
 
-os.environ["DGNM_ROOT"] = "/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/DISCO/A_source_code"
-os.environ["DGNM_GENERALCODE"] = "/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/DISCO/A_source_code/generalcode/trunk"
-os.environ["DGNM_USER"] = "carbon"
+#os.environ["DGNM_ROOT"] = "/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/DISCO/A_source_code"
+#os.environ["DGNM_GENERALCODE"] = "/Users/pippo/Documents/SurfDrive/Research/Projects/DISCO_project/MyVersion/DISCO/A_source_code/generalcode/trunk"
+#os.environ["DGNM_USER"] = "carbon"
