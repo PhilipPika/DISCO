@@ -52,12 +52,12 @@ def start_process(p,jobs,max_number_of_processes):
     # The following while loop checks the number of processes which are active.
     # When more than the defined number of cpu are active, it stops with starting new jobs until
     # there are cpu cores available.
-    while (len(jobs) >= max_number_of_processes):
+    while len(jobs) >= max_number_of_processes:
         # This sleep is needed, otherwise this while loop consumes all cpu time.
         time.sleep(0.05)
         # Delete all jobs in the job list which are finished.
         for j in range(len(jobs)-1,-1,-1):
-            if not (jobs[j].is_alive()):
+            if not jobs[j].is_alive():
                 del jobs[j]
 
 
@@ -70,9 +70,9 @@ def get_number_of_cores(params,number_of_cells):
     if (params.mask_bool_operator=='EQ') and (params.lsensitivity == 0):
       fctr = 2
 
-    if (number_of_cells > 3 * params.minimal_number_of_cells):
+    if number_of_cells > 3 * params.minimal_number_of_cells:
        return 3*fctr
-    elif (number_of_cells > 2 * params.minimal_number_of_cells):
+    elif number_of_cells > 2 * params.minimal_number_of_cells:
        return 2*fctr
     else:
        return 1*fctr
@@ -82,7 +82,7 @@ def stryear(year):
     In order to avoid too long names in the case of monthly simulations...
     '''
 
-    if (isinstance(year, float)):
+    if isinstance(year, float):
         strtime = '%.3f' % round(year,3)
     else:
         strtime = str(year)
@@ -97,10 +97,10 @@ def path_conversion(path):
 
     # Get current directory from the system.
     currdir = os.getcwd()
-    if ("/" in currdir):
+    if "/" in currdir:
         # Change all "\" into "/"
         outpath = path.replace("\\","/")
-    elif ("\\" in currdir):
+    elif "\\" in currdir:
         # Change all "/" into "\\"
         outpath = path.replace("/","\\")
     else:
@@ -114,7 +114,7 @@ def avg_within_range_2dim(domain,values,begin,end):
     The calculate the average as the sum of the values divided by the number of values.
     domain must be sorted!
     '''
-    if (len(domain) != len(values)):
+    if len(domain) != len(values):
         raise MyError("avg_within_range_2dim: domain and values do not have same length.",\
                       "Domain: "+str(len(domain))+" Values: "+str(len(values)))
 
@@ -131,7 +131,7 @@ def sum_within_range_2dim(domain,values,begin,end):
     The calculate the sum of the selected values.
     domain must be sorted!
     '''
-    if (len(domain) != len(values)):
+    if len(domain) != len(values):
         raise MyError("sum_within_range_2dim: domain and values do not have same length.",\
                       "Domain: "+str(len(domain))+" Values: "+str(len(values)))
 
@@ -177,10 +177,10 @@ def find_within_range(list1,begin,end):
     ibegin = 0
     iend = len(list1)-1
     for item in range(1,len(list1)):
-        if (float(list1[item]) < begin):
+        if float(list1[item]) < begin:
             ibegin = item
     for item in range(len(list1)-2,-1,-1):
-        if (float(list1[item]) > end):
+        if float(list1[item]) > end:
             iend = item
     return ibegin,iend
 
@@ -217,7 +217,7 @@ def check_header(filename,species,year):
     # Read header of file, whether this file belongs to this situation
     header=pickle.load(fp)
     # Check year of startup file
-    if (abs(header[0] - year) > 0.01):
+    if abs(header[0] - year) > 0.01:
         #raise MyError("File " + filename + " does not have the year.",\
         #              "Year found in file: "+str(header[0]),\
         #              "Year needed in file: "+str(year))
@@ -227,7 +227,7 @@ def check_header(filename,species,year):
     # Check whether the speciesnames and order are equal
     for item in range(len(species)):
         try:
-            if (header[item+1] != species[item].get_name()):
+            if header[item+1] != species[item].get_name():
                 raise MyError("File " + filename + " does not have the same species or same order.",\
                               "Species found in file: "+str(header[item]),\
                               "Species needed in file: "+str(species[item-1].get_name()))
@@ -240,9 +240,9 @@ def check_header(filename,species,year):
 
 def read_header(fp=None,filename=None):
     # Read header of output file. Read year and name of all the species.
-    if (fp == None and filename != None):
+    if fp == None and filename != None:
         fp_loc = open(filename, 'rb')
-    elif (fp != None and filename == None):
+    elif fp != None and filename == None:
         # File is already open.
         fp_loc = fp
         pass
@@ -316,17 +316,17 @@ def add_budget_load(xbud, iorder, ispec, term, value):
     '''
     Add load terms in budget for a specified order
     '''
-    if (term == "loadIN"):
+    if term == "loadIN":
         xbud[iorder][6*ispec] += value
-    elif (term == "load_src"):
+    elif term == "load_src":
         xbud[iorder][6*ispec+1] += value
-    elif (term == "load_up"):
+    elif term == "load_up":
         xbud[iorder][6*ispec+2] += value
-    elif (term == "load_hw"):
+    elif term == "load_hw":
         xbud[iorder][6*ispec+3] += value
-    elif (term == "loadOUT"):
+    elif term == "loadOUT":
         xbud[iorder][6*ispec+4] += value
-    elif (term == "dvoldt"):
+    elif term == "dvoldt":
         xbud[iorder][6*ispec+5] += value
 
 def add_budget_procs(species, xbud, iorder, nrivers, dt, proc_rates):
@@ -360,8 +360,8 @@ def find_spec(list,name,lfatal=0):
     '''
     for i in range(len(list)):
         lab = list[i].get_name()
-        if (lab == name): return i
-    if (lfatal):
+        if lab == name: return i
+    if lfatal:
         raise MyError("Species " + name + " is not found in the list.")
     else:
         print("Species " + name + " is not found in the list.")
@@ -374,7 +374,7 @@ def is_spec(list,name):
     i = 0
     while ((found == False) & (i < len(list))):
         lab = list[i].get_name()
-        if (lab == name): found = True
+        if lab == name: found = True
         i = i + 1
     return found
 
@@ -384,7 +384,7 @@ def find_func(list,name):
     '''
     for i in range(len(list)):
         lab = list[i].get_val("name")
-        if (lab == name): return i
+        if lab == name: return i
 
     raise MyError("Process " + name + " is not found in the list.")
 
@@ -416,7 +416,7 @@ def MM(conc,half_sat):
     '''
     Michaelis-Menten equation
     '''
-    if ((half_sat + conc) > 0.):
+    if (half_sat + conc) > 0.:
         return (conc / (half_sat + conc))
     else:
         return 0.
@@ -433,7 +433,7 @@ def fT(topt, sigma, temperature):
 #    suspended sediments in the water column (light extinction)
 #    '''
 #    lext = 1.0
-#    if ((eta_ss * ss_conc * depth) > 0.0):
+#    if (eta_ss * ss_conc * depth) > 0.0):
 #        #print "eta_ss  " + str(eta_ss) + " -- ss_conc  " + str(ss_conc) + " -- depth  " + str(depth)
 #        lext = 1 - math.exp((-1) * eta_ss * ss_conc * depth)
 #        lext /= eta_ss * ss_conc * depth
@@ -450,7 +450,7 @@ def light_extinct(params, spec, species, I0, volume, depth):
         ispec = getattr(params, "i"+s.get_name().lower())
         eta_tot += s.get_val('eta')*(spec[ispec]/volume)*1e3*s.get_val('molarmass')
 
-    if ((eta_tot * depth) > 0.0):
+    if (eta_tot * depth) > 0.0):
         lext = 1-math.exp((-1) * eta_tot * depth)
         lext /= eta_tot * depth
     '''
@@ -492,7 +492,7 @@ def light_extinct_benthic(params, spec, species, volume, depth):
     for s in species:
         ispec = getattr(params, "i"+s.get_name().lower())
         eta_tot += s.get_val('eta')*((spec[ispec]*1e9)/(volume*1e12))*s.get_val('molarmass') #mg/l
-    if ((eta_tot * depth) > 0.0):
+    if (eta_tot * depth) > 0.0:
         #print("eta_ss  " + str(eta_ss) + " -- ss_conc  " + str(ss_conc) + " -- depth  " + str(depth)
         lext = math.exp((-1) * eta_tot * depth)
         #print('eta_tot=',eta_tot)
@@ -507,7 +507,7 @@ def calculate_vel(Q, width, depth):
     Q is in km3/yr, width and depth are in m
     '''
     vel = 0.
-    if (width * depth > 0.):
+    if width * depth > 0.:
         vel = Q * 1.e6 / (width * depth)
     return vel
 
@@ -522,16 +522,16 @@ def get_years(dirname,pre_text=None):
     years = os.listdir(dirname)
     # Throw away all objects which are not a year or a directory
     for item in range(len(years)-1,-1,-1):
-        if (not os.path.isdir(os.path.join(dirname,years[item]))):
+        if not os.path.isdir(os.path.join(dirname,years[item])):
             # Throw away all objects which not a directory
             del years[item]
         else:
             # Not a year
             try:
-                if (pre_text == None):
+                if pre_text == None:
                     qq = float(years[item])
                 else:
-                    if (years[item].startswith(pre_text)):
+                    if years[item].startswith(pre_text):
                         qq = float(years[item][len(pre_text):])
                         # Change the directory name without pre_text.
                         years[item] = years[item][len(pre_text):]
