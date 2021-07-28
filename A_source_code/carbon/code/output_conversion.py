@@ -269,6 +269,240 @@ def pkl2netcdf_allorders(filename,spec_data,netcdf_mask,basinid,fill_value=-9999
             manip.add_grid_time(spec_data[iorder][item],varname,netcdf_grids[iorder][item],t0)
 
 
+
+
+
+def Convert_concentration(outputfiles, filename, basinid, params, conc_outputfiles):
+    #### Convert species concentration
+    print("Conversion of the species concentration...")
+    starttime_Conc = ts.time()
+    if len(outputfiles) > 0:
+        filename = outputfiles[0][0]
+        # Read header of one output file to get species names
+        time,names = general_func.read_header(filename=filename)
+
+        # Create mask for NETCDF data
+        netcdf_mask = create_mask_from_pkl_file(filename, basinid)
+
+        # Use speciesnames to create NETCDF datasets in output directory
+        conc_spec_data = []
+        for name in names: # Create NETCDF output files
+            states_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STATES'))
+            ncfile = os.path.join(states_dir,'conc_'+name+'.nc')
+            conc_spec_data.append(Dataset(ncfile,'w'))
+            # Initialize each of the NETCDF files (metadata, dimensions...)
+            init_ncdata(inputdir,conc_spec_data[-1], 'conc_'+name, basinid)
+
+        # Fill in the NETCDF concentration output files
+        for filename,time in conc_outputfiles:
+            # Conversion of pkl file to ascraster files for each speciename
+            pkl2netcdf_allorders(filename,[conc_spec_data],netcdf_mask,basinid,label='conc_',norders=1)
+
+        for item in range(len(names)):
+            conc_spec_data[item].sync()
+            conc_spec_data[item].close()
+    endtime_Conc = ts.time()
+    print('...finished in (in s):  ' + str(endtime_Conc-starttime_Conc))
+
+
+
+def Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, params, outputfiles_allorders, norders):
+    #### Convert species concentration in subgrid orders
+    print("Conversion of the species concentration in subgrid orders ...")
+    starttime_ConcSub = ts.time()
+    if len(outputfiles_allorders) > 0:
+        filename = outputfiles_allorders[0][0]
+        # Read header of one output file to get species names
+        time,names = general_func.read_header(filename=filename)
+
+        # Create mask for NETCDF data
+        netcdf_mask = create_mask_from_pkl_file(filename, basinid)
+
+
+        # Calculates the concentration of the subgrid orders
+        conc_spec_data_allorders = []
+        for iorder in range(norders):
+            conc_spec_data_allorders.append([])
+            orderlabel = '_order'+str(iorder+1)
+
+            for name in names: # Create concentration files for subgrid orders
+                subgrid_states_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STATES', 'subgrid'))
+                ncfile = os.path.join(subgrid_states_dir,'conc_'+name+orderlabel+'.nc')
+                conc_spec_data_allorders[-1].append(Dataset(ncfile,'w'))
+                # Initialize each of the NETCDF files (metadata, dimensions...)
+                init_ncdata(inputdir, conc_spec_data_allorders[-1][-1], 'conc_'+name, basinid)
+
+        for filename,time in conc_outputfiles_allorders:
+            pkl2netcdf_allorders(filename,conc_spec_data_allorders,netcdf_mask,basinid,label='conc_',norders=norders)
+
+        for iorder in range(norders):
+            for item in range(len(names)):
+                conc_spec_data_allorders[iorder][item].sync()
+                conc_spec_data_allorders[iorder][item].close()
+
+        for fn in directory.get_files_with_str(subgrid_states_dir, "*order6*"):
+            shutil.copyfile(fn, os.path.join(subgrid_states_dir, '..', os.path.basename(fn).replace("_order6", "")))
+    endtime_ConcSub = ts.time()
+    print('...finished in (in s):  ' + str(endtime_ConcSub-starttime_ConcSub))
+
+
+
+def Convert_env_hydro(argumentfiles, filename, basinid, params, norders):
+    #### Convert environmental parameters and hydrology
+    print("Conversion of the environmental parameters and hydrology ...")
+    starttime_Env = ts.time()
+    if (len(argumentfiles)>0):
+        filename = argumentfiles[0][0]
+        # Read header of one output file to get argument names
+        time,names = general_func.read_header(filename=filename)
+
+        # Create mask for NETCDF data
+        netcdf_mask = create_mask_from_pkl_file(filename, basinid)
+
+        argument_data = []
+
+        for iorder in range(norders):
+            argument_data.append([])
+
+            orderlabel = '_order'+str(iorder+1)
+            for name in names: # Create NETCDF output files
+                subgrid_arg_dir = directory.ensure(\
+                  os.path.join(params.outputdir, '..', 'STREAM_ENV_CONDITIONS', 'subgrid'))
+                ncfile = os.path.join(subgrid_arg_dir,name+orderlabel+'.nc')
+                argument_data[-1].append(Dataset(ncfile,'w'))
+                # Initialize each of the NETCDF files (metadata, dimensions...)
+                u = 'None'
+                long_name = 'None'
+                ln = long_name
+                if name=='vol' or 'vol_' in name:
+                    u='[km3]'
+                    ln='volume of water'
+                elif name=='depth' or 'depth_' in name:
+                    u='[m]'
+                    ln='depth of waterbody'
+                elif name=='discharge' or 'discharge_' in name:
+                    u='[km3/yr]'
+                    ln='discharge of waterbody'
+                elif name=='dvoldt' or 'dvoldt_' in name:
+                    u='[km3/yr]'
+                    ln='volume change of waterbody'
+                elif name=='flow_velocity' or 'flow_velocity_' in name:
+                    u='[km/yr]'
+                    ln='flow velocity of waterbody'
+                elif name=='globrad' or 'globrad_' in name:
+                    u='[W/m2]'
+                    ln='global radiation upon waterbody'
+                elif name=='length' or 'length_' in name:
+                    u='[m]'
+                    ln='length of waterbody'
+                elif name=='residence_time' or 'residence_time_' in name:
+                    u='[yr]'
+                    ln='residence time of the waterbody'
+                elif name=='slope' or 'slope_' in name:
+                    u='[unknown unit]'
+                    ln='slope of the waterbody'
+                elif name=='temperature' or 'temperature_' in name:
+                    u='[K]'
+                    ln='temperature of the waterbody'
+                elif name=='width' or 'width_' in name:
+                    u='[m]'
+                    ln='width of the waterbody'
+                elif name=='windspeed' or 'windspeed_' in name:
+                    u='[m/s]'
+                    ln='windspeed 10 meter above waterbody'
+                elif name=='area' or 'area_' in name:
+                    u='[km2]'
+                    ln='area of the waterbody'
+                elif name=='icell' or 'icell_' in name:
+                    u='[#]'
+                    ln='cell id within mask'
+                init_ncdata(inputdir, argument_data[-1][-1], name, basinid, unit=u, long_name=ln)
+
+        for filename,time in argumentfiles:
+            pkl2netcdf_allorders(filename,argument_data,netcdf_mask,basinid, norders=norders)
+
+        for iorder in range(norders):
+            for item in range(len(names)):
+                argument_data[iorder][item].sync()
+                argument_data[iorder][item].close()
+
+        for fn in directory.get_files_with_str(subgrid_arg_dir, "*order6*"):
+            shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
+    endtime_Env = ts.time()
+    print('...finished in (in s):  ' + str(endtime_Env-starttime_Env))
+
+
+
+def Convert_budget(budgetfiles, filename, basinid, params, norders):
+    #### Convert of budgets
+    print("### Conversion of budgets ... ###")
+    starttime_Spec = ts.time()
+
+
+    if (len(budgetfiles)>0):
+        filename = budgetfiles[0][0]
+        # Read header of one output file to get argument names
+        time,names = general_func.read_header(filename=filename)
+        # Create mask for NETCDF data
+        netcdf_mask = create_mask_from_pkl_file(filename, basinid)
+
+        # Create converted NETCDF output files for each species
+        # Use speciesnames to create NETCDF datasets in output directory
+        budget_data = []
+
+        # starttime_iorder = ts.time()
+        for iorder in range(norders):
+
+            # print('Budget Order: ', iorder)
+            budget_data.append([])
+            orderlabel = '_order'+str(iorder+1)
+
+            for name in names: # Create NETCDF output files
+                # starttime_name = ts.time()
+                budget_dir = directory.ensure(os.path.join(params.outputdir, '..', 'BUDGET', 'subgrid'))
+                ncfile = os.path.join(budget_dir,name+orderlabel+'.nc')
+
+                budget_data[-1].append(Dataset(ncfile,'w'))
+                # Initialize each of the NETCDF files (metadata, dimensions...)
+                init_ncdata(inputdir, budget_data[-1][-1], name, basinid)
+                # endtime_name = ts.time()
+                # print('name lasted (in s):  ' + str(endtime_name-starttime_name))
+
+        starttime_iorder = ts.time()
+        # LV 12-07-2017
+        for filename,time in budgetfiles:
+            # print('Budgetfile Name: ', filename)
+            pkl2netcdf_allorders(filename,budget_data,netcdf_mask,basinid,label="budget_", norders=norders)
+        endtime_order = ts.time()
+        print('iorder lasted (in s):  ' + str(endtime_order-starttime_iorder))
+
+
+        # Parallelizing with Pool.starmap()
+        # import multiprocessing as mp
+        # pool = mp.Pool(mp.cpu_count())
+        # [pool.apply(pkl2netcdf_allorders, \
+        #     args = (budgetfiles,budget_data,netcdf_mask,basinid,"budget_", norders))]
+        # pool.close()
+
+
+        for iorder in range(norders):
+            for item in range(len(names)):
+                budget_data[iorder][item].sync()
+                budget_data[iorder][item].close()
+
+        for fn in directory.get_files_with_str(budget_dir, "*order6*"):
+            # print('copy file: ', fn)
+            shutil.copyfile(fn, os.path.join(budget_dir, '..', os.path.basename(fn).replace("_order6", "")))
+
+
+
+        endtime_Spec = ts.time()
+        print('...finished in (in s):  ' + str(endtime_Spec-starttime_Spec))
+
+
+
+
+
 def convert_output(inputdir,outformat,norders=6):
     print("Entering output_conversion >> convert_output()")
     '''
@@ -410,210 +644,30 @@ def convert_output(inputdir,outformat,norders=6):
             and (len(argumentfiles) ==0) and (len(budgetfiles) == 0):
             raise MyError("There is nothing to do!")
 
-        #### Conversion of the species concentration ###
-        print("Conversion of the species concentration...")
-        if len(outputfiles) > 0:
-            filename = outputfiles[0][0]
-            # Read header of one output file to get species names
-            time,names = general_func.read_header(filename=filename)
 
-            # Create mask for NETCDF data
-            netcdf_mask = create_mask_from_pkl_file(filename, basinid)
 
-            # Create converted NETCDF output files for each species
-            # Use speciesnames to create NETCDF datasets in output directory
-            conc_spec_data = []
-            for name in names:
-                #### Create NETCDF STATES files with species concentation ####
-                # in the STATES DIR
-                states_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STATES'))
-                ncfile = os.path.join(states_dir,'conc_'+name+'.nc')
-                conc_spec_data.append(Dataset(ncfile,'w'))
-                # Initialize each of the NETCDF files (metadata, dimensions...)
-                init_ncdata(inputdir,conc_spec_data[-1], 'conc_'+name, basinid)
 
-            # Fill in the NETCDF concentration output files
-            for filename,time in conc_outputfiles:
-                # Conversion of pkl file to ascraster files for each speciename
-                pkl2netcdf_allorders(filename,[conc_spec_data],netcdf_mask,basinid,label='conc_',norders=1)
+    #### Convert output
+    # Convert_concentration(outputfiles, filename, basinid, params, conc_outputfiles)
 
-            for item in range(len(names)):
-                conc_spec_data[item].sync()
-                conc_spec_data[item].close()
+    # Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, \
+    #                           params, outputfiles_allorders, norders)
 
-        #### Conversion of the species concentration in subgrid orders
-        print("Conversion of the species concentration in subgrid orders...")
-        if len(outputfiles_allorders) > 0:
-            filename = outputfiles_allorders[0][0]
-            # Read header of one output file to get species names
-            time,names = general_func.read_header(filename=filename)
+    # Convert_env_hydro(argumentfiles, filename, basinid, params, norders)
 
-            # Create mask for NETCDF data
-            netcdf_mask = create_mask_from_pkl_file(filename, basinid)
+    Convert_budget(budgetfiles, filename, basinid, params, norders)
 
-            conc_spec_data_allorders = []
+    ## Calcaulte diagnostic variables pH and pCO2
+    # post_processing.calc_ph_pco2(params, outformat) # PP This script converts pH and pCO2 for the given data
 
-            # Calculates the concentration of the subgrid orders
-            for iorder in range(norders):
-                conc_spec_data_allorders.append([])
-                orderlabel = '_order'+str(iorder+1)
 
-                for name in names:
-                    # Create concentration files for subgrid orders
-                    subgrid_states_dir = directory.ensure(os.path.join(params.outputdir, '..', 'STATES', 'subgrid'))
-                    ncfile = os.path.join(subgrid_states_dir,'conc_'+name+orderlabel+'.nc')
-                    conc_spec_data_allorders[-1].append(Dataset(ncfile,'w'))
-                    # Initialize each of the NETCDF files (metadata, dimensions...)
-                    init_ncdata(inputdir, conc_spec_data_allorders[-1][-1], 'conc_'+name, basinid)
 
-            for filename,time in conc_outputfiles_allorders:
-                pkl2netcdf_allorders(filename,conc_spec_data_allorders,netcdf_mask,basinid,label='conc_',norders=norders)
 
-            for iorder in range(norders):
-                for item in range(len(names)):
-                    conc_spec_data_allorders[iorder][item].sync()
-                    conc_spec_data_allorders[iorder][item].close()
 
-            for fn in directory.get_files_with_str(subgrid_states_dir, "*order6*"):
-                shutil.copyfile(fn, os.path.join(subgrid_states_dir, '..', os.path.basename(fn).replace("_order6", "")))
-
-        #### Conversion of the environmental parameters and hydrology
-        if(params.ldebug): print("Conversion of the environmental parameters and hydrology")
-        if (len(argumentfiles)>0):
-            filename = argumentfiles[0][0]
-            # Read header of one output file to get argument names
-            time,names = general_func.read_header(filename=filename)
-
-            # Create mask for NETCDF data
-            netcdf_mask = create_mask_from_pkl_file(filename, basinid)
-
-            argument_data = []
-
-            for iorder in range(norders):
-                argument_data.append([])
-
-                orderlabel = '_order'+str(iorder+1)
-                for name in names:
-                    # Create NETCDF output files
-                    subgrid_arg_dir = directory.ensure(\
-                      os.path.join(params.outputdir, '..', 'STREAM_ENV_CONDITIONS', 'subgrid'))
-                    ncfile = os.path.join(subgrid_arg_dir,name+orderlabel+'.nc')
-                    argument_data[-1].append(Dataset(ncfile,'w'))
-                    # Initialize each of the NETCDF files (metadata, dimensions...)
-                    u = 'None'
-                    long_name = 'None'
-                    ln = long_name
-                    if name=='vol' or 'vol_' in name:
-                        u='[km3]'
-                        ln='volume of water'
-                    elif name=='depth' or 'depth_' in name:
-                        u='[m]'
-                        ln='depth of waterbody'
-                    elif name=='discharge' or 'discharge_' in name:
-                        u='[km3/yr]'
-                        ln='discharge of waterbody'
-                    elif name=='dvoldt' or 'dvoldt_' in name:
-                        u='[km3/yr]'
-                        ln='volume change of waterbody'
-                    elif name=='flow_velocity' or 'flow_velocity_' in name:
-                        u='[km/yr]'
-                        ln='flow velocity of waterbody'
-                    elif name=='globrad' or 'globrad_' in name:
-                        u='[W/m2]'
-                        ln='global radiation upon waterbody'
-                    elif name=='length' or 'length_' in name:
-                        u='[m]'
-                        ln='length of waterbody'
-                    elif name=='residence_time' or 'residence_time_' in name:
-                        u='[yr]'
-                        ln='residence time of the waterbody'
-                    elif name=='slope' or 'slope_' in name:
-                        u='[unknown unit]'
-                        ln='slope of the waterbody'
-                    elif name=='temperature' or 'temperature_' in name:
-                        u='[K]'
-                        ln='temperature of the waterbody'
-                    elif name=='width' or 'width_' in name:
-                        u='[m]'
-                        ln='width of the waterbody'
-                    elif name=='windspeed' or 'windspeed_' in name:
-                        u='[m/s]'
-                        ln='windspeed 10 meter above waterbody'
-                    elif name=='area' or 'area_' in name:
-                        u='[km2]'
-                        ln='area of the waterbody'
-                    elif name=='icell' or 'icell_' in name:
-                        u='[#]'
-                        ln='cell id within mask'
-                    init_ncdata(inputdir, argument_data[-1][-1], name, basinid, unit=u, long_name=ln)
-
-            for filename,time in argumentfiles:
-                pkl2netcdf_allorders(filename,argument_data,netcdf_mask,basinid, norders=norders)
-
-            for iorder in range(norders):
-                for item in range(len(names)):
-                    argument_data[iorder][item].sync()
-                    argument_data[iorder][item].close()
-
-            for fn in directory.get_files_with_str(subgrid_arg_dir, "*order6*"):
-                shutil.copyfile(fn, os.path.join(subgrid_arg_dir, '..', os.path.basename(fn).replace("_order6", "")))
-
-        #### Conversion of the species processes
-        print("### Conversion of the species processes/budget ###")
-        if (len(budgetfiles)>0):
-            filename = budgetfiles[0][0]
-            # Read header of one output file to get argument names
-            time,names = general_func.read_header(filename=filename)
-            # Create mask for NETCDF data
-            netcdf_mask = create_mask_from_pkl_file(filename, basinid)
-
-            # Create converted NETCDF output files for each species
-            # Use speciesnames to create NETCDF datasets in output directory
-            budget_data = []
-
-            for iorder in range(norders):
-#                print('Budget Order: ', iorder)
-                budget_data.append([])
-                orderlabel = '_order'+str(iorder+1)
-
-                for name in names:
-                    # Create NETCDF output files
-                    budget_dir = directory.ensure(os.path.join(params.outputdir, '..', 'BUDGET', 'subgrid'))
-                    ncfile = os.path.join(budget_dir,name+orderlabel+'.nc')
-
-                    budget_data[-1].append(Dataset(ncfile,'w'))
-                    # Initialize each of the NETCDF files (metadata, dimensions...)
-                    init_ncdata(inputdir, budget_data[-1][-1], name, basinid)
-
-            # LV 12-07-2017
-            for filename,time in budgetfiles:
-#                print('Budgetfile Name: ', filename)
-                pkl2netcdf_allorders(filename,budget_data,netcdf_mask,basinid,label="budget_", norders=norders)
-
-            for iorder in range(norders):
-                for item in range(len(names)):
-                    budget_data[iorder][item].sync()
-                    budget_data[iorder][item].close()
-
-            for fn in directory.get_files_with_str(budget_dir, "*order6*"):
-#                print('copy file: ', fn)
-                shutil.copyfile(fn, os.path.join(budget_dir, '..', os.path.basename(fn).replace("_order6", "")))
-
-    #post_processing.post_processing_states(params,dformat='NETCDF')
-    starttime_main1 = ts.time()
-    post_processing.calc_ph_pco2(params, outformat) # PP This script converts pH and pCO2 for the given data
-    endtime_main1 = ts.time()
-    print('OUTPUT CONVERSION: calc_ph_pco2 lasted (in s):  ' + str(endtime_main1-starttime_main1))
-    #post_processing.post_processing_budgets(params, outformat)
-    #analysis.do(params)
 
 if __name__ == "__main__":
     # Set the general path for the own python modules
-#    import general_path
 
-    import optparse
-
-    #print(sys.argv)
     if (len(sys.argv) < 2):
         print("Not enough arguments on command line!")
         raise MyError("Command line should be: python output_conversion.py inputdir outformat")
