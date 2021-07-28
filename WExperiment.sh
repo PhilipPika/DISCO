@@ -15,16 +15,17 @@ export DGNM_USER=carbon
 cd $TOCODE/core; echo "MESS: Switching to Core Directory"
 
 echo "MESS: Removing current results"
-rm -r $DIR/OUT
-#Spinstart=1969 #SpinUpEnd=1971
+#rm -r $DIR/OUT
+Spinstart=1970
+SpinUpEnd=1980
 SimuEnd=1971 #Remember to also change the file name in params.ini
 ########################################################################################
-INI_file=species_bio_101.ini
+INI_file=species_abio_101.ini
 echo "MESS: $INI_file ######################################################## "
-#nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini
+#nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=$SpinUpEnd
 #nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=$SpinUpEnd --species_ini=$INI_file --parameter_ini=Params_m_united_CUT.ini
 #nice -n 19 python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=$SpinUpEnd --species_ini=$INI_file
-#cp $DIR/OUT/bio/pkl/start$SpinUpEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
+##cp $DIR/OUT/bio/pkl/start$SpinUpEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.pkl
 #cp $DIR/OUT/bio/pkl/start$SpinUpEnd.000.pkl $DIR/A_source_code/carbon/startups/start$Spinstart.000.$INI_file.pkl
 echo "MESS: START Actual run ######################################################## "
 #nice -n 19 python dgnm_main.py  --lspinup=0 --inifile ../ini/cmd_m_def.ini --species_ini=$INI_file
@@ -35,7 +36,7 @@ python output_conversion.py $DIR/OUT/bio/pkl/ NETCDF
 echo "MESS: START aggragate TS ######################################################## "
 cd $TOCODE/core
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=$INI_file
-python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd
+#python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --maskid=9999 --mask_bool_operator=EQ
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --maskid=10000 --mask_bool_operator=EQ
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --maskid=10001 --mask_bool_operator=EQ
