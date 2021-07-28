@@ -5,15 +5,16 @@
 
 # try:
 # import general Anaconda3 Python modules
-import copy
-from netCDF4 import Dataset, MFDataset
-import numpy as np
-import operator
+
 import os
 import pickle
 import random
 import shutil
 import sys
+import copy
+from netCDF4 import Dataset, MFDataset
+import numpy as np
+import operator
 
 # import own general modules
 import ascraster
@@ -100,7 +101,7 @@ def calc_carb_dat(conc_DIC, conc_ALK, T):
     if (conc_DIC<1/100000) or (conc_ALK<1/100000):
         conc_DIC = 1e-6
     with suppress_stdout_stderr():
-      carb_dat = np.dstack(mocsy.mvars(temp=T, sal=0, alk=conc_ALK/12, \
+        carb_dat = np.dstack(mocsy.mvars(temp=T, sal=0, alk=conc_ALK/12, \
                                        dic=conc_DIC/12, sil=0, phos=0, \
                                       patm=1., depth=1, lat=0, \
                                       optcon='mol/m3', optt='Tinsitu', \

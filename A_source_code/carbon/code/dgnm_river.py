@@ -86,7 +86,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                 rivmask.append(icell)
                 rivernum[cellnumber] = iround(id)
                 cellnumber += 1
-        
+
     # Set jobid for this collection of riverbasins.
     jobid = rivlist[0]
     print("Reading mask for riverids with jobid",jobid)
@@ -124,7 +124,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                              + "_" + specname + ".pkl"),"rb") as fp:
                 photo_list.append(list(general_func.pickleLoader(fp)))
 
-            
+
         for item in range(len(pointer1)):
             icell = pointer1[item].get_index()
             # Get the latitude from the cell
@@ -160,9 +160,9 @@ def calculate(iriv,lock,params,species,proc,sources):
         # Set the number of cpu that will be used.
         number_of_cpu = min(mp.cpu_count(),params.ncpu_read_files)
 
-        # Make a list of jobs which are active               
+        # Make a list of jobs which are active
         jobs= []
-            
+
         outlakes_dict = make_outlakes_dict.calculate(params,pointer1)
 
         # Calculate volume and depth.
@@ -182,7 +182,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         jobs.append(p)
         # Start the process
         general_func.start_process(p,jobs,number_of_cpu)
-        
+
         # Read lake/reservoir outflow id's for the whole period and put this time dependent object.
         p=mp.Process(target= get_dynamic_gridinfo.get_dynamic_gridinfo,\
                      args=(params,pointer1,os.path.join(params.water_inputdir,params.endo_lakes),params.endo_lakes_varname,None,\
@@ -191,7 +191,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         jobs.append(p)
         # Start the process
         general_func.start_process(p,jobs,number_of_cpu)
-            
+
         # Read endoreic lake/reservoir id's for the whole period and put this time dependent object.
         p=mp.Process(target= get_dynamic_gridinfo.get_dynamic_gridinfo,\
                      args=(params,pointer1,os.path.join(params.water_inputdir,params.outlakeid),params.outlakeid_varname,None,\
@@ -200,7 +200,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         jobs.append(p)
         # Start the process
         general_func.start_process(p,jobs,number_of_cpu)
-            
+
         # Read the discharge for the whole period and put this time dependent object km3/yr.
         p=mp.Process(target= get_dynamic_gridinfo.get_dynamic_gridinfo,\
                      args=(params,pointer1,os.path.join(params.water_inputdir,params.discharge),params.discharge_varname,None,\
@@ -218,7 +218,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         jobs.append(p)
         # Start the process
         general_func.start_process(p,jobs,number_of_cpu)
-            
+
         # Read the runoff for the whole period and put this time dependent object mm/yr.
         p=mp.Process(target= get_dynamic_gridinfo.get_dynamic_gridinfo,\
                      args=(params,pointer1,os.path.join(params.water_inputdir,params.pnet),params.pnet_varname,None,\
@@ -248,7 +248,7 @@ def calculate(iriv,lock,params,species,proc,sources):
 
         # Read the low vegetation fraction for the whole period and put this time dependent object in dimensionless
         p=mp.Process(target= get_dynamic_gridinfo.get_dynamic_gridinfo, args=(params,pointer1,\
-                             os.path.join(params.water_inputdir, '..', 'other', params.low_veg_fr),params.low_veg_fr_varname,None,\
+                             os.path.join(params.water_inputdir, params.low_veg_fr),params.low_veg_fr_varname,None,\
                              os.path.join(tmpdir,"low_veg_fr_"+str(jobid)+".pkl")))
         # Add the process handler to the jobs list.
         jobs.append(p)
@@ -257,7 +257,7 @@ def calculate(iriv,lock,params,species,proc,sources):
 
         # Read the high vegetation fraction for the whole period and put this time dependent object in dimensionless
         p=mp.Process(target= get_dynamic_gridinfo.get_dynamic_gridinfo, args=(params,pointer1,\
-                             os.path.join(params.water_inputdir, '..', 'other', params.high_veg_fr),params.high_veg_fr_varname,None,\
+                             os.path.join(params.water_inputdir, params.high_veg_fr),params.high_veg_fr_varname,None,\
                              os.path.join(tmpdir,"high_veg_fr_"+str(jobid)+".pkl")))
         # Add the process handler to the jobs list.
         jobs.append(p)
@@ -301,14 +301,14 @@ def calculate(iriv,lock,params,species,proc,sources):
         globrad_cells = general_func.get_content(os.path.join(tmpdir,"globrad_"+str(jobid)+".pkl"))
         low_veg_fr_cells = general_func.get_content(os.path.join(tmpdir,"low_veg_fr_"+str(jobid)+".pkl"))
         high_veg_fr_cells = general_func.get_content(os.path.join(tmpdir,"high_veg_fr_"+str(jobid)+".pkl"))
-            
+
         srcload = []
         for isrc in range(len(sources)):
             filename = os.path.join(tmpdir,sources[isrc].get_val('name')+"_"+str(jobid)+".pkl")
-            srcload.append(general_func.get_content(filename))                
-                
+            srcload.append(general_func.get_content(filename))
+
     else:
-            
+
         outlakes_dict = make_outlakes_dict.calculate(params,pointer1)
 
         # Calculate volume and depth.
@@ -368,12 +368,12 @@ def calculate(iriv,lock,params,species,proc,sources):
         # Set the number of cpu that will be used.
         number_of_cpu = min(mp.cpu_count(),number_of_cpu+1)
 
-        # Make a list of jobs which are active               
+        # Make a list of jobs which are active
         jobs= []
-     
+
         # Prev_order is needed to find out which cells can be run at the same time. Cells of the same order can run at the same time.
         prev_order = pointer1[0].get_iorder()
-        
+
         # Make lock for write and reading loads.
         lock_cell = {}
     else:
@@ -385,9 +385,9 @@ def calculate(iriv,lock,params,species,proc,sources):
     if ((params.lspinup == -1) or (params.lspinup == 0)):
         print("We have an inital condition")
         lfound = False
-        # Open output file for first cell of this riverbasin. 
+        # Open output file for first cell of this riverbasin.
         icell_prev = pointer1[0].get_index()
-        local_cell_number = rivmask.index(icell_prev) 
+        local_cell_number = rivmask.index(icell_prev)
         fp_out = open(os.path.join(tmpdir,str(local_cell_number)+"_-1.pkl"),"wb")
 
         # Make a dictionary which indicates whether a river is found or not.
@@ -412,7 +412,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                     if (icell != icell_prev):
                         # Now there is another cell found. So close the previous file and open a new one for the new cell.
                         fp_out.close()
-                        local_cell_number = rivmask.index(icell) 
+                        local_cell_number = rivmask.index(icell)
                         fp_out = open(os.path.join(tmpdir,str(local_cell_number)+"_-1.pkl"),"wb")
 
                     # Put starting year in the file by overwriting the cellnumber.
@@ -422,14 +422,14 @@ def calculate(iriv,lock,params,species,proc,sources):
                     icell_prev = icell
 
             fp_out.close()
- 
+
         lerror = False
         for key in rivlist:
             if (not lfound[key]):
                 print("Startup file has no information on riverbasin "+str(key))
                 lerror = True
-        if (lerror): 
-            raise MyError("Startup file has no information for riverbasins.") 
+        if (lerror):
+            raise MyError("Startup file has no information for riverbasins.")
 
     else:
         print("We have to MAKE an inital condition")
@@ -439,17 +439,17 @@ def calculate(iriv,lock,params,species,proc,sources):
         yearend   = min(yearstart + params.outputtime,params.endtime)
         #lakes_dict = {}
         #outlakes_dict = {}
-        # Loop over all cells:    
+        # Loop over all cells:
         for item in range(len(pointer1)):
             #icell = pointer1[item][1]
             icell = pointer1[item].get_local_index()
             direction = lddmap.get_data(icell)
             next_cell = accuflux.goto_nextcell(icell,direction,lddmap.ncols,mask=rivmask)
 
-            # Load is the time array of  all the sources       
+            # Load is the time array of  all the sources
             load = []
             for isrc in range(len(sources)):
-                load.append(srcload[isrc][icell])      
+                load.append(srcload[isrc][icell])
 
             # Check whether cell is a lake/reservoir.
             lakeid = interpolate_list.stepwise(yearstart,lakeid_cells[icell],extrapol=1)[-1]
@@ -466,14 +466,14 @@ def calculate(iriv,lock,params,species,proc,sources):
                 llake = False
                 llakeout = False
                 lendolake = False
-        
+
             if (number_of_cpu > 1):
 
                 try:
                     qq = lock_cell[next_cell]
                 except KeyError:
                     lock_cell[next_cell] = mp.Lock()
-            
+
                 if (prev_order != pointer1[item].get_iorder()):
                     # We have to wait untill all processes are ready, before we can continue
                     for p in jobs:
@@ -501,12 +501,12 @@ def calculate(iriv,lock,params,species,proc,sources):
                 jobs.append(p)
                 # Start the process
                 general_func.start_process(p,jobs,number_of_cpu)
-                
+
             else:
                 # Do the job one at the time.
                 width = channel_width_grid.get_data(icell)
                 slope = slopemap.get_data(icell)
- 
+
                 if (params.lstrahlergrids):
                     args_strahler_cell = args_strahler[icell]
                 dgnm_cell.calculate_cell(lsteady,None,icell,params,species,proc,sources,\
@@ -517,8 +517,8 @@ def calculate(iriv,lock,params,species,proc,sources):
                                               volume_cells[icell],water_area_cells[icell],depth_cells[icell],width,slope,\
                                               volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
                                               low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
-            
-        if (number_of_cpu > 1):            
+
+        if (number_of_cpu > 1):
             # Wait until all jobs are finished.
             for p in jobs:
                 p.join()
@@ -555,7 +555,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                 else:
                     if (i == (len(data_block)-1)):
                         outputlist.append(linestart)
-            
+
             # For concentrations
             with open(os.path.join(tmpdir,"conc_" + str(icell)+"_"+str(timeperiod)+".pkl"),"rb") as fp:
                 for line in general_func.pickleLoader(fp):
@@ -571,7 +571,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                 else:
                     if (i == (len(data_block1)-1)):
                         conclist.append(linestart)
-            
+
             # For interactions
             if (params.lbudget == 1):
                 with open(os.path.join(tmpdir,"budget_" + str(icell)+"_"+str(timeperiod)+".pkl"),"rb") as fp:
@@ -582,7 +582,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                     # Put riverid and cellnumber in front of the line and remove the time.
                     linestart = [rivernum[icell],rivmask[icell]]
                     linestart.extend(data_block2[i][1:])
-                    budlist.append(linestart)    
+                    budlist.append(linestart)
 
             # For arguments
             if (params.largs == 1):
@@ -594,7 +594,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                     # Put riverid and cellnumber in front of the line and remove the time.
                     linestart = [rivernum[icell],rivmask[icell]]
                     linestart.extend(data_block3[i][1:])
-                    argslist.append(linestart)         
+                    argslist.append(linestart)
 
         # Write all output of this riverbasin to the output file.
         stryearstart = general_func.stryear(yearstart)
@@ -643,7 +643,7 @@ def calculate(iriv,lock,params,species,proc,sources):
 
     # Now we can start with the dynamic calculations.
     starttime_calculate = time.time()
-    
+
     print("Starting dynamic calculations...")
     timeperiod = -1
     lsteady = False
@@ -657,16 +657,16 @@ def calculate(iriv,lock,params,species,proc,sources):
 
         #lakes_dict = {}
         #outlakes_dict = {}
-        # Loop over all cells:    
+        # Loop over all cells:
         for item in range(len(pointer1)):
             icell = pointer1[item].get_local_index()
             direction = lddmap.get_data(icell)
             next_cell = accuflux.goto_nextcell(icell,direction,lddmap.ncols,mask=rivmask)
 
-            # Load is the time array of  all the sources            
+            # Load is the time array of  all the sources
             load = []
             for isrc in range(len(sources)):
-                load.append(srcload[isrc][icell])       
+                load.append(srcload[isrc][icell])
 
             # Check whether cell is a lake/reservoir.
             lakeid = interpolate_list.stepwise(yearstart,lakeid_cells[icell],extrapol=1)[-1]
@@ -690,7 +690,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                     qq = lock_cell[next_cell]
                 except KeyError:
                     lock_cell[next_cell] = mp.Lock()
-            
+
                 #if (prev_order != pointer1[item][0]):
                 if (prev_order != pointer1[item].get_iorder()):
                     # We have to wait untill all processes are ready, before we can continue
@@ -713,12 +713,12 @@ def calculate(iriv,lock,params,species,proc,sources):
                                                      width, slope, \
                                                      volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
                                                      low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell))
-                
+
                 # Add the process handler to the jobs list.
                 jobs.append(p)
                 # Start the process
-                general_func.start_process(p,jobs,number_of_cpu)               
- 
+                general_func.start_process(p,jobs,number_of_cpu)
+
             else:
                 # Do the job one at the time.
                 width = channel_width_grid.get_data(icell)
@@ -733,9 +733,9 @@ def calculate(iriv,lock,params,species,proc,sources):
                                               volume_cells[icell],water_area_cells[icell],depth_cells[icell],\
                                               width, slope, \
                                               volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
-                                              low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell) 
-            
-        if (number_of_cpu > 1):            
+                                              low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
+
+        if (number_of_cpu > 1):
             # Wait until all jobs are finished.
             for p in jobs:
                 p.join()
@@ -826,7 +826,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                     linestart = [rivernum[icell],rivmask[icell]]
                     linestart.extend(data_block3[i][1:])
                     argslist.append(linestart)
-					
+
         # Write all output of this riverbasin to the output file.
         # Aquire lock
         strtime = general_func.stryear(yearend)
@@ -866,7 +866,7 @@ def calculate(iriv,lock,params,species,proc,sources):
             for i in range(len(argslist)):
                 pickle.dump(argslist[i],fp, -1)
             fp.close()
-		
+
         # Release lock
         file_locking.release_lock(params,lock,locktext="riverbasin"+strtime)
 
@@ -876,7 +876,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         yearend   = min(yearstart + params.outputtime,params.endtime)
         if (abs(yearstart - yearend) < params.timestep):
             # This was the last timestep.
-            break 
+            break
 
     # Remove the temporary directory with the output of this riverbasin
     my_sys.my_rmdir(tmpdir)
@@ -904,7 +904,7 @@ if __name__ == '__main__':
             raise MyError("Specified inputfile: " + numfile,\
                           "does not exist.")
 
-        # Get the general settings.   
+        # Get the general settings.
         fp = open(parfile,"rb")
         params =  pickle.load(fp)
         species = pickle.load(fp)

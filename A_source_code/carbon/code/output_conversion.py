@@ -3,18 +3,19 @@
 ## Reuse permitted under Gnu Public License, GPL v3.
 # ******************************************************
 
-import general_path
-
-  # Import general python modules
+# Import general python modules
 import os
 import sys
 import shutil
-import traceback
+#import traceback
 import pickle
+import time as ts
+
 import numpy as np
 from netCDF4 import Dataset
 
 # Import own general modules
+import general_path
 import ascraster
 import directory
 import manip
@@ -25,7 +26,7 @@ import general_func
 #import analysis
 import post_processing
 
-import time as ts
+
 
 def pkl_to_ascraster_allorders(filename,outputdir,unmask_raster,new_raster=None,label='',norders=6):
     # Convert output file in pkl format from rive_framework to ascraster format for each specie.
@@ -52,7 +53,8 @@ def pkl_to_ascraster_allorders(filename,outputdir,unmask_raster,new_raster=None,
         order = 1
         while True:
             line = pickle.load(fp)
-            # First element contains riverid, second the cell number in unmasked environment and then for each specie a value.
+            # First element contains riverid, second the cell number in
+            # unmasked environment and then for each specie a value.
             icell = line[1]
 
             # Get index in output raster.
@@ -162,15 +164,15 @@ def init_ncdata(inputdir, ncdata, varname, basinid, unit='Mmol', long_name='None
         var.long_name = 'Amount of ' + varname[5:]
         var.unit = unit
     elif 'loadIN' in varname:
-        v = varname[:varname.find('loadIN')]
+        v_name = varname[:varname.find('loadIN')]
         vdum = str()
-        for j in [i for i, c in enumerate(v) if c.isupper()]:
+        for j in [i for i, c in enumerate(v_name) if c.isupper()]:
             vdum+=str(varname[j])
         var.long_name = "imported "+vdum+" from upstream"
     elif 'loadOUT' in varname:
-        v = varname[:varname.find('loadOUT')]
+        v_name = varname[:varname.find('loadOUT')]
         vdum = str()
-        for j in [i for i, c in enumerate(v) if c.isupper()]:
+        for j in [i for i, c in enumerate(v_name) if c.isupper()]:
             vdum+=str(varname[j])
         var.long_name = "exported "+vdum+" to downstream"
     elif '_dvoldt' in varname:
@@ -179,9 +181,9 @@ def init_ncdata(inputdir, ncdata, varname, basinid, unit='Mmol', long_name='None
             vdum+=str(varname[j])
         var.long_name = 'change of '+vdum+' due to volume change'
     elif 'atm_exch' in varname:
-        v = varname[:varname.find('atm_exch')]
+        v_name = varname[:varname.find('atm_exch')]
         vdum = str()
-        for j in [i for i, c in enumerate(v) if c.isupper()]:
+        for j in [i for i, c in enumerate(v_name) if c.isupper()]:
             vdum+=str(varname[j])
         var.long_name = "exchange of "+vdum+" with atmosphere"
     elif 'doc_excretion' in varname:
@@ -248,7 +250,7 @@ def pkl2netcdf_allorders(filename,spec_data,netcdf_mask,basinid,fill_value=-9999
             order += 1
             if (order > norders):
                 order = 1
-
+        fp.close()
     except(EOFError):
         # End of file encountered.
         pass
@@ -332,7 +334,9 @@ def convert_output(inputdir,outformat,norders=6):
                             time = float(basename[:-10])
                             outputfiles_allorders.append([fullname,time])
                     else:
-                        if (not basename.startswith("conc_") and not basename.startswith("arguments_") and not "budget_" in basename):
+                        if (not basename.startswith("conc_") and not \
+                            basename.startswith("arguments_") and not \
+                              "budget_" in basename):
                             time = float(basename)
                             # This is a file which we want to convert.
                             outputfiles.append([fullname,time])
@@ -395,6 +399,10 @@ def convert_output(inputdir,outformat,norders=6):
 
         for filename,time in argumentfiles:
             pkl_to_ascraster_allorders(filename,params.outputdir,dummy,label='arguments_')
+
+
+
+
 
     if ((outformat == 'NETCDF') or (outformat == 'ALL')):
 
@@ -619,18 +627,4 @@ if __name__ == "__main__":
     convert_output(inputdir,outformat)
 
     endtime_main = ts.time()
-    print('Toal OUTPUT CONVERSION lasted (in s):  ' + str(endtime_main-starttime_main))
-
-    #except MyError, val:
-    #    val.write()
-    #except (optparse.OptionValueError,
-    #        ascraster.ASCIIGridError,
-    #        Exception), val:
-    #    print str(val)
-    #    print sys.exc_type
-    #    print traceback.print_exc()
-    #except:
-    #    print("***** ERROR ******")
-    #    print("output_conversion.py failed.")
-    #    print(sys.exc_type)
-    #    print(traceback.print_exc())
+    print('Total OUTPUT CONVERSION lasted (in s):  ' + str(endtime_main-starttime_main))
