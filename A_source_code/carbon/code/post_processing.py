@@ -3,7 +3,6 @@
 ## Reuse permitted under Gnu Public License, GPL v3.
 # ******************************************************
 
-# try:
 # import general Anaconda3 Python modules
 
 import os
@@ -15,6 +14,7 @@ import copy
 from netCDF4 import Dataset, MFDataset
 import numpy as np
 import operator
+import time
 
 # import own general modules
 import ascraster
@@ -32,37 +32,7 @@ import mocsy
 import output_conversion
 import pointer_class
 import read_parameter
-import time
-# except:
-#     # set the general path for the own python modules
-#     import general_path
 
-#     # import general Anaconda3 Python modules
-#     from netCDF4 import Dataset, MFDataset
-#     import numpy as np
-#     import operator
-#     import os
-#     import pickle
-#     import random
-#     import shutil
-#     import sys
-
-#     # import own general modules
-#     import ascraster
-#     import cmd_options_dgnm
-#     import define_subgrid_streamorder
-#     import directory
-#     import general_func
-#     import get_dynamic_gridinfo
-#     import interpolate_list
-#     import make_index_species
-#     import manip
-#     import make_mask
-#     import mocsy_module
-#     import mocsy
-#     import output_conversion
-#     import pointer_class
-#     import read_parameter
 
 class suppress_stdout_stderr(object):
     def __enter__(self):

@@ -17,4 +17,4 @@ def do(icell, dum_asc, type="icell"):
                 elif type=="irow_icol":
                     nbs.append([row, col])
     return nbs
-  
+
