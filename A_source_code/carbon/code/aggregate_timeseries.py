@@ -264,7 +264,7 @@ def make_time_indices(params, dummy_nc):
           all_dat_endindex +=1
     else:
         print("ALTERNATE 101 DATA")
-        waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_101.nc"), 'r')
+        waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_201yrs.nc"), 'r')
         modelrun_dummy_start = max(dummy_nc['time'][0],0)
         modelrun_dummy_end = dummy_nc['time'][-1]
         all_dat_startindex = np.where(waterbodyid['time'][:] >= modelrun_dummy_start)[0][0]

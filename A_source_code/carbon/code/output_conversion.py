@@ -648,17 +648,17 @@ def convert_output(inputdir,outformat,norders=6):
 
 
     #### Convert output
-    # Convert_concentration(outputfiles, filename, basinid, params, conc_outputfiles)
+    Convert_concentration(outputfiles, filename, basinid, params, conc_outputfiles)
 
-    # Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, \
-    #                           params, outputfiles_allorders, norders)
+    Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, \
+                              params, outputfiles_allorders, norders)
 
-    # Convert_env_hydro(argumentfiles, filename, basinid, params, norders)
+    Convert_env_hydro(argumentfiles, filename, basinid, params, norders)
 
     Convert_budget(budgetfiles, filename, basinid, params, norders)
 
     ## Calcaulte diagnostic variables pH and pCO2
-    # post_processing.calc_ph_pco2(params, outformat) # PP This script converts pH and pCO2 for the given data
+    post_processing.calc_ph_pco2(params, outformat) # PP This script converts pH and pCO2 for the given data
 
 
 
