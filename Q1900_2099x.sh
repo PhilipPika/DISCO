@@ -13,26 +13,26 @@ export DGNM_GENERALCODE=$TOCODE/generalcode/trunk
 export DGNM_USER=carbon
 
 Addon=test_Test
-INI_file=species_abio_101 && echo "MESS: $INI_file"
+INI_file=species_bio_101 && echo "MESS: $INI_file"
 
 echo "MESS: Removing current results" && rm -r $DIR/${Addon}_${INI_file}
 echo "$DIR/${Addon}_${INI_file}"
-SimuEnd=1981 #Remember to also change the file name in params.ini
+SimuEnd=2011 #Remember to also change the file name in params.ini
 cd $TOCODE/core && echo "MESS: Switching to Core Directory"
 ########################################################################################
-#python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=1971 --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
-#cp $DIR/${Addon}_${INI_file}/bio/pkl/start1971.000.pkl $DIR/A_source_code/carbon/startups/start1971.000.pkl
-#python dgnm_main.py --lspinup=0 --inifile ../ini/cmd_m_def.ini --endtime=1971 --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
-#cp $DIR/${Addon}_${INI_file}/bio/pkl/start1971.000.pkl $DIR/A_source_code/carbon/startups/start1971.000.pkl
-python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
-#cp $DIR/${Addon}_${INI_file}/bio/pkl/start1971.000.pkl $DIR/A_source_code/carbon/startups/start1971.000.pkl
-
+python dgnm_main.py --lspinup=1 --inifile ../ini/cmd_m_def.ini --endtime=1912 --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
+#cp $DIR/${Addon}_${INI_file}/bio/pkl/start1901.000.pkl $DIR/A_source_code/carbon/startups/start1971.000.pkl
+#python dgnm_main.py --lspinup=0 --inifile ../ini/cmd_m_def.ini --endtime=1900 --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
+#cp $DIR/${Addon}_${INI_file}/bio/pkl/start1901.000.pkl $DIR/A_source_code/carbon/startups/start1971.000.pkl
+#python dgnm_main.py --lspinup=0 --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
+#cp $DIR/${Addon}_${INI_file}/bio/pkl/start${SimuEnd}.000.pkl $DIR/A_source_code/carbon/startups/start1971.000.pkl
+#
 #cd $TOCODE/carbon/code/ && echo "MESS: START output conversion"
-#python output_conversion.py $DIR/${Addon}_${INI_file}/bio/pkl/ NETCDF
+##python output_conversion.py $DIR/${Addon}_${INI_file}/bio/pkl/ NETCDF
 #cd $TOCODE/core && echo "MESS: START aggragate TS"
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/ --maskid=9999 --mask_bool_operator=EQ
-#python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
-#python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --maskid=55 --mask_bool_operator=EQ
-
-echo "MESS: FINISHED ${Addon}_$INI_file"
-#########################################################################################
+##python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
+##python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --maskid=55 --mask_bool_operator=EQ
+#
+#echo "MESS: FINISHED ${Addon}_$INI_file"
+##########################################################################################
