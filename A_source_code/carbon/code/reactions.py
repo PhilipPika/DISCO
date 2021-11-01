@@ -321,14 +321,14 @@ def atmospheric_exchange_DIC(spec,params,species,temperature,windspeed,Q, flow_v
       pCO2 = operator.itemgetter(1)(carb_dat)
 
     elif conc_DIC<=0:
-      pCO2 = 0
+        pCO2 = 0
     else:
-      with suppress_stdout_stderr(): # suppressing printed output of mocsy module when concentrations of either ALK or DIC are more than 1M
-        carb_dat = np.dstack(mocsy.mvars(temp=temperature-params.tempcorrection, sal=0, alk=conc_ALK, dic=conc_DIC, sil=0, phos=0, patm=1., depth=1, lat=0, optcon='mol/m3', optt='Tinsitu', optp='db', optb="u74", optk1k2='l', optkf="dg", optgas='Pinsitu'))[0][0]
-      # [micro atmosphere]
-      pCO2 = operator.itemgetter(1)(carb_dat)
-      if pCO2>1e6:
-        pCO2=1e6
+        with suppress_stdout_stderr(): # suppressing printed output of mocsy module when concentrations of either ALK or DIC are more than 1M
+          carb_dat = np.dstack(mocsy.mvars(temp=temperature-params.tempcorrection, sal=0, alk=conc_ALK, dic=conc_DIC, sil=0, phos=0, patm=1., depth=1, lat=0, optcon='mol/m3', optt='Tinsitu', optp='db', optb="u74", optk1k2='l', optkf="dg", optgas='Pinsitu'))[0][0]
+        # [micro atmosphere]
+        pCO2 = operator.itemgetter(1)(carb_dat)
+        if pCO2>1e6:
+          pCO2=1e6
 
     # [mol/m3]
     CO2_conc = pCO2*math.pow(10,-6)*species[params.idic].get_val("kH")*1000
@@ -610,6 +610,10 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
     # if these conditions meet it is a stream without floodplains
     if (params.lfloodplains == 0) or (fp_arguments==None) or len(spec)==len(species):
       out = []
+      # print('spec')
+      # print(spec)
+      # print('species')
+      # print(species)
 
       dvoldt = arguments.get_val("dvoldt")
       vol = arguments.get_val("vol")
@@ -702,6 +706,15 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
               out[getattr(params, 'i'+species[item].get_name().lower())+len(species)] = change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc)+load[item+len(species)]\
                                                                            +through_fp_volIN_amount-through_fp_volOUT_amount
 
+              #if params.debug and species[item].get_name()=='DIC':
+              #  print(species[item].get_name())
+              #  print('amount=', spec[item])
+              #  print('fp_proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, roc))
+              #  print('load=', load[item])
+              #  print('conc*dvoldt=', conc*dvoldt)
+              #  print('conc*fp_dvoldt=', conc*fp_dvoldt)
+              #  print('Q*conc=', Q*conc)
+              #  setattr(params, 'debug', False)
             else:
               try:
                 from_fp_dvoldt_amount = fp_conc*fp_dvoldt
@@ -732,11 +745,52 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
               out[getattr(params, 'i'+species[item].get_name().lower())+len(species)] = change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc)+load[item+len(species)]\
                                                                                         +through_fp_volIN_amount-through_fp_volOUT_amount\
 
+
+
+              #if params.debug and species[item].get_name()=='DETRITUShighCN':
+              #  print(species[item].get_name())
+              #  print('amount=', spec[item])
+              #  print('fp_proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc))
+              #  print('load=', load[item])
+              #  print('conc*dvoldt=', conc*dvoldt)
+              #  print('conc*fp_dvoldt=', conc*fp_dvoldt)
+              #  print('Q*conc=', Q*conc)
+            if species[item].get_name()=='DIC' and params.debug:
+              print('fp_IN', through_fp_volIN_amount)
+              print('fp_OUT', through_fp_volOUT_amount)
+              print('dvoldt_amount', conc*dvoldt)
+              #print('from_fp_dvoldt_amount', from_fp_dvoldt_amount)
+              print('flow_velocity', arguments.get_val('flow_velocity'))
+              print('fp_flow_velocity', fp_arguments.get_val('flow_velocity'))
+              print('fp_proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc))
+              print('proc=', change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc))
+              print('vol', arguments.get_val('vol'))
+              print('fp_vol', fp_arguments.get_val('vol'))
+              print('main_IN', load[item])
+              print('main_OUT', Q*conc)
+              print('amount=', spec[item])
+              print('out=', out[getattr(params, 'i'+species[item].get_name().lower())])
+              setattr(params, 'debug', False)
+
           # all benthic (surface attached) contents are calculated within this condition
           else:
-
+            #if params.debug and species[item].get_name()=='DETRITUShighCN_benth':
+            #    print(species[item].get_name())
+            #    print('amount=', spec[item])
+            #    print('fp_amount=', spec[item+len(species)])
+            #    print('proc=', change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc))
+            #    print('fp_proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc))
+            #    print('load=', load[item])
+            #    print('fp_load=', load[item+len(species)])
             out[getattr(params, 'i'+species[item].get_name().lower())] = change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc)
             out[getattr(params, 'i'+species[item].get_name().lower())+len(species)] = change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc)
+            if species[item].get_name()=='DIC' and params.debug:
+              print('proc=', change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc))
+              print('main_IN', load[item])
+              print('main_OUT', Q*conc)
+              print('amount=', spec[item])
+              print('out=', out[getattr(params, 'i'+species[item].get_name().lower())])
+              setattr(params, 'debug', False)
 
         return out
       else:
@@ -756,7 +810,13 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
               out[getattr(params, 'i'+species[item].get_name().lower())] = change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc) + load[item] - outflow
           else:
               out[getattr(params, 'i'+species[item].get_name().lower())] = change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc)
-
+          if params.debug and species[item].get_name()=='DIC':
+                print(species[item].get_name())
+                print('amount=', spec[item])
+                print('proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), funcs, proc))
+                print('load=', load[item])
+                print('conc*dvoldt=', conc*dvoldt)
+                print('Q*conc=', Q*conc)
         return out
 
 
@@ -777,4 +837,12 @@ def dy(y,t,params,species,proc,load,Q,arguments,fp_arguments=None):
     '''
     return dy_list(y,params,species,proc,load,Q,arguments, fp_arguments)
 
-
+def dy2(t,y,params,species,proc,load,Q,arguments,fp_arguments=None):
+    '''
+    This function is the same as reactions.dy function. but the 1st & second
+    arguments are swapped: t and y.
+    This function is used in the solver, depending on y (list of species) and t (time).
+    It returns a list of changing_rate function for each species.
+    Process change rates are expressed in amounts (not in concentrations)
+    '''
+    return dy_list(y,params,species,proc,load,Q,arguments, fp_arguments)

@@ -42,6 +42,7 @@ import time
 global_colors = cm.Set1(np.linspace(0,1,8))
 
 def do(params):
+    starttime_main_all = time.time()
     ## make all tables
     starttime_main = time.time()
     all_inputs_to_table(params)
@@ -71,9 +72,11 @@ def do(params):
     starttime_main = time.time()
     conv_all_tables_to_Tg(params)
     endtime_main = time.time()
-    print('aggregate timeseries.py finished (in s):  ' + str(endtime_main-starttime_main))
+    print('conv_all_tables_to_Tg finished (in s):  ' + str(endtime_main-starttime_main))
 
-    #all_stream_env_conditions_to_table(params)
+    print('aggregate timeseries.py finished (in s):  ' + str(endtime_main-starttime_main_all))
+
+    # all_stream_env_conditions_to_table(params) # function exists but unused
 
 def get_river_name(params):
     if (not 'country' in params.file_mask) and (params.mask_bool_operator=='EQ'):
@@ -165,6 +168,7 @@ def make_3d_mask(params, species, folder, mask_kind):
     #invariant
     dummy_nc = Dataset(proclist[-1], 'r')
     dummy_name = os.path.splitext(os.path.basename(proclist[-1]))[0][:-7]
+
     modeldat_startindex, modeldat_endindex, wbody_startindex, wbody_endindex, waterbodyid = \
     make_time_indices(params, dummy_nc)
 
@@ -213,7 +217,8 @@ def make_time_indices(params, dummy_nc):
        #This parameter 'waterbodyid' needs to have the same hourly dt (time step) as the DISC model output.
        # In my case hours/month, while chosing days/month, as with the new hydrology input, won't work.
 
-        waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1970_2010.nc"), 'r')
+        # waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_1970_2010.nc"), 'r')
+        waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_2399months.nc"), 'r')
 
         debugprint(params,'Print waterbody id time vector')
         debugprint(params,waterbodyid['time'][:])

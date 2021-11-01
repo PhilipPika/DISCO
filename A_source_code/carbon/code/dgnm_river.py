@@ -489,12 +489,12 @@ def calculate(iriv,lock,params,species,proc,sources):
                     args_strahler_cell = args_strahler[icell]
                 p=mp.Process(target= dgnm_cell.calculate_cell,\
                              args=(lsteady,lock_cell[next_cell],icell,params,species,proc,sources,\
-                                   tmpdir,next_cell,yearstart,yearend,timeperiod,\
-                                   runoff_cells[icell],load,temperature_cells[icell],\
-                                   globrad_cells[icell], discharge_cells[icell],\
-                                   volume_cells[icell],water_area_cells[icell],depth_cells[icell],width,slope,\
-                                   volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
-                                   low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell))
+                                 tmpdir,next_cell,yearstart,yearend,timeperiod,\
+                                 runoff_cells[icell],load,temperature_cells[icell],\
+                                 globrad_cells[icell], discharge_cells[icell],\
+                                 volume_cells[icell],water_area_cells[icell],depth_cells[icell],width,slope,\
+                                 volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
+                                 low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell))
 
 
                 # Add the process handler to the jobs list.
@@ -510,13 +510,12 @@ def calculate(iriv,lock,params,species,proc,sources):
                 if (params.lstrahlergrids):
                     args_strahler_cell = args_strahler[icell]
                 dgnm_cell.calculate_cell(lsteady,None,icell,params,species,proc,sources,\
-                                              tmpdir,\
-                                              next_cell,yearstart,yearend,timeperiod,\
-                                              runoff_cells[icell],load,temperature_cells[icell],\
-                                              globrad_cells[icell], discharge_cells[icell],\
-                                              volume_cells[icell],water_area_cells[icell],depth_cells[icell],width,slope,\
-                                              volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
-                                              low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
+                                 tmpdir,next_cell,yearstart,yearend,timeperiod,\
+                                 runoff_cells[icell],load,temperature_cells[icell],\
+                                 globrad_cells[icell], discharge_cells[icell],\
+                                 volume_cells[icell],water_area_cells[icell],depth_cells[icell],width,slope,\
+                                 volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
+                                 low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
 
         if (number_of_cpu > 1):
             # Wait until all jobs are finished.
