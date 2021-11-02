@@ -7,20 +7,20 @@
 import os
 import sys
 import traceback
-import optparse
+# import optparse
 import numpy as np
-from netCDF4 import Dataset
+# from netCDF4 import Dataset
 #from netCDF4 import MFDataset #read data from multiple NETCDF files at once
 from netCDF4 import date2num,num2date,date2index
-import time
+# import time
 import datetime as dt
-import pickle
+# import pickle
 
 # From general module
-import general_path
+# import general_path
 import ascraster
 import general_class
-from error import *
+from error import MyError
 
 # Raise division by zero errors when using numpy
 np.seterr(divide='raise')

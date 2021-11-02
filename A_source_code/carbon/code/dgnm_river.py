@@ -383,7 +383,7 @@ def calculate(iriv,lock,params,species,proc,sources):
     # store all information of the cells in separate input files.
     # In case of lspinup == 1 there is no startup file, so we have to create one ourselves.
     if ((params.lspinup == -1) or (params.lspinup == 0)):
-        print("We have an inital condition")
+        print("We have an initial condition")
         lfound = False
         # Open output file for first cell of this riverbasin.
         icell_prev = pointer1[0].get_index()
@@ -432,7 +432,7 @@ def calculate(iriv,lock,params,species,proc,sources):
             raise MyError("Startup file has no information for riverbasins.")
 
     else:
-        print("We have to MAKE an inital condition")
+        print("We have to MAKE an initial condition")
         lsteady = True
         timeperiod = -1
         yearstart = params.starttime
@@ -639,6 +639,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         # Release lock
         file_locking.release_lock(params,lock,locktext="riverbasin"+stryearstart)
 
+    print('Initial condition prepared')
 
     # Now we can start with the dynamic calculations.
     starttime_calculate = time.time()

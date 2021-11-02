@@ -16,11 +16,11 @@ import math
 
 # Import own general modules
 try:
-    from error import *
+    from error import MyError
 except ImportError:
     # Set the general path for the own python modules
     import general_path
-    from error import *
+    from error import MyError
 
 def calc_o2_sat(temperature):
     '''
@@ -603,5 +603,3 @@ if __name__ == "__main__":
          print("Error handling went okay.")
     except:
          print("Error handling of sum_within_range_2dim went wrong! ERROR")
-
-

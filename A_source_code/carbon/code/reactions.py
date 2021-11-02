@@ -755,6 +755,7 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
               #  print('conc*dvoldt=', conc*dvoldt)
               #  print('conc*fp_dvoldt=', conc*fp_dvoldt)
               #  print('Q*conc=', Q*conc)
+
             if species[item].get_name()=='DIC' and params.debug:
               print('fp_IN', through_fp_volIN_amount)
               print('fp_OUT', through_fp_volOUT_amount)
@@ -782,6 +783,7 @@ def dy_list(spec,params,species,proc,load,Q,arguments,fp_arguments):
             #    print('fp_proc=', change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc))
             #    print('load=', load[item])
             #    print('fp_load=', load[item+len(species)])
+
             out[getattr(params, 'i'+species[item].get_name().lower())] = change_spec(spec[:len(species)], params, species, species[item].get_name(), funcs, proc)
             out[getattr(params, 'i'+species[item].get_name().lower())+len(species)] = change_spec(spec[-len(species):], params, species, species[item].get_name(), fp_funcs, proc)
             if species[item].get_name()=='DIC' and params.debug:

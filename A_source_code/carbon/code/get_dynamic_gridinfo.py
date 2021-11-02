@@ -19,7 +19,7 @@ import manip_netcdf
 import pointer_class
 import general_class
 import directory
-from error import *
+from error import MyError
 
 # Import local modules.
 import interpolate_list

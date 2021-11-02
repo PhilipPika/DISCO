@@ -885,7 +885,7 @@ def all_stream_env_conditions_to_table(params):
 if __name__ == "__main__":
     # Set the general path for the own python modules
 
-    import general_path
+    # import general_path
     # Parse command-line arguments and set parameters for script
     #try:
     # Parse command-line arguments and set parameters for script
