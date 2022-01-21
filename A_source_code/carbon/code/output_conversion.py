@@ -149,7 +149,7 @@ def init_ncdata(inputdir, ncdata, varname, basinid, unit='Mmol', long_name='None
     lon.units = 'degrees east'
     lon[:] = manip.initialize_lon(basinid.ncols, basinid.xllcorner, basinid.cellsize)
 
-    var = ncdata.createVariable(varname,'f4',('time','lat','lon',) ,fill_value=fill_value,zlib=zlib)
+    var = ncdata.createVariable(varname,'f4',('time','lat','lon',) ,fill_value=fill_value,zlib=zlib, complevel=4)
     var.standard_name = varname
     if (varname.startswith('conc_')):
         var.long_name = 'Concentration of ' + varname[5:]

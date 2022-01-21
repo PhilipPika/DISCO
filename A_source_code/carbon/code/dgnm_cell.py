@@ -525,7 +525,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                     #  print('JW DEBUG',icell, Yy.message,(Yy.t[-1]-Yy.t[-2]),y0,Y[-1],[species0.get_name() for species0 in species])
 
                 elif (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
-                    print ("Solving 2: icell_"+str(icell) + ': iorder_' + str(iorder)) #JW 30-1-2021.
+                    #print ("Solving 2: icell_"+str(icell) + ': iorder_' + str(iorder)) #JW 30-1-2021.
                     Y,outdict = itg.odeint(reactions.dy, y0,\
                                            timerange,\
                                            args=(params,species,proc,load_reach,\

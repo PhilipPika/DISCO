@@ -14,15 +14,15 @@ import numpy as np
 import operator
 import os
 import sys
-import time
-from contextlib import contextmanager
+# import time
+# from contextlib import contextmanager
 
 
 # Import local modules.
 import general_func
 
 # Generalcode module
-from error import *
+from error import MyError
 
 class suppress_stdout_stderr(object):
     def __enter__(self):
