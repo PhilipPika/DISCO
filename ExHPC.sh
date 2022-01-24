@@ -37,6 +37,7 @@ cp $DIR/${Addon}_${INI_file}/bio/pkl/start${SimuEnd}.000.pkl $DIR/A_source_code/
 
 echo " ";cd $TOCODE/carbon/code/ && echo "MESS: START output conversion";echo " "
 python output_conversion.py $DIR/${Addon}_${INI_file}/bio/pkl/ NETCDF
+
 cd $TOCODE/core && echo "MESS: START aggragate TS"
 python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/
 #python ../carbon/code/aggregate_timeseries.py --inifile ../ini/cmd_m_def.ini --endtime=$SimuEnd --species_ini=${INI_file}.ini --outputdir=../../${Addon}_${INI_file}/bio/pkl/ --maskid=7 --mask_bool_operator=EQ

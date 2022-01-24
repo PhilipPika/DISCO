@@ -274,7 +274,7 @@ def pkl2netcdf_allorders(filename,spec_data,netcdf_mask,basinid,fill_value=-9999
 
 def Convert_concentration(outputfiles, filename, basinid, params, conc_outputfiles):
     #### Convert species concentration
-    print("Conversion of the species concentration...")
+    print("### Conversion of the species concentration... ###")
     starttime_Conc = ts.time()
     if len(outputfiles) > 0:
         filename = outputfiles[0][0]
@@ -308,7 +308,7 @@ def Convert_concentration(outputfiles, filename, basinid, params, conc_outputfil
 
 def Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, params, outputfiles_allorders, norders):
     #### Convert species concentration in subgrid orders
-    print("Conversion of the species concentration in subgrid orders ...")
+    print("### Conversion of the species concentration in subgrid orders ... ###")
     starttime_ConcSub = ts.time()
     if len(outputfiles_allorders) > 0:
         filename = outputfiles_allorders[0][0]
@@ -349,7 +349,7 @@ def Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, par
 
 def Convert_env_hydro(argumentfiles, filename, basinid, params, norders):
     #### Convert environmental parameters and hydrology
-    print("Conversion of the environmental parameters and hydrology ...")
+    print(" ### Conversion of the environmental parameters and hydrology ... ###")
     starttime_Env = ts.time()
     if (len(argumentfiles)>0):
         filename = argumentfiles[0][0]
@@ -504,6 +504,7 @@ def Convert_budget(budgetfiles, filename, basinid, params, norders):
 
 
 def convert_output(inputdir,outformat,norders=6):
+    #### Initial setup - file containers
     print("Entering output_conversion >> convert_output()")
     '''
     Read output of rive model and create output grids in wanted format (ASCII, NETCDF or both).
@@ -647,7 +648,7 @@ def convert_output(inputdir,outformat,norders=6):
 
 
 
-    #### Convert output
+    #### Convert output - calling functions
     Convert_concentration(outputfiles, filename, basinid, params, conc_outputfiles)
 
     Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, \
@@ -657,7 +658,7 @@ def convert_output(inputdir,outformat,norders=6):
 
     Convert_budget(budgetfiles, filename, basinid, params, norders)
 
-    ## Calcaulte diagnostic variables pH and pCO2
+    #### Calcaulte diagnostic variables pH and pCO2
     post_processing.calc_ph_pco2(params, outformat) # PP This script converts pH and pCO2 for the given data
 
 

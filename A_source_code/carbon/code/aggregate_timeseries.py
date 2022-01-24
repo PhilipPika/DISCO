@@ -204,6 +204,7 @@ def make_3d_mask(params, species, folder, mask_kind):
 
 def make_time_indices(params, dummy_nc):
     if params.outputtime < 1:
+        print("MONTHLY DATA - from waterbodyid_2399months")
         debugprint(params,'Time step')
         debugprint(params,params.outputtime)
         debugprint(params,"find index for outputtime ")
@@ -273,7 +274,7 @@ def make_time_indices(params, dummy_nc):
         if modeldat_endindex==len(dummy_nc['time'][:]):
           wbody_endindex +=1
     else:
-        print("ALTERNATE 101 DATA")
+        print("MONTHLY DATA - from waterbodyid_201yrs")
         waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_201yrs.nc"), 'r')
         modelrun_dummy_start = max(dummy_nc['time'][0],0)
         modelrun_dummy_end = dummy_nc['time'][-1]
