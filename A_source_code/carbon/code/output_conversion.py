@@ -349,7 +349,7 @@ def Convert_concentration_sub(conc_outputfiles_allorders, filename, basinid, par
 
 def Convert_env_hydro(argumentfiles, filename, basinid, params, norders):
     #### Convert environmental parameters and hydrology
-    print(" ### Conversion of the environmental parameters and hydrology ... ###")
+    print("### Conversion of the environmental parameters and hydrology ... ###")
     starttime_Env = ts.time()
     if (len(argumentfiles)>0):
         filename = argumentfiles[0][0]
