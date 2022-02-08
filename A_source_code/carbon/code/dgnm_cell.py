@@ -96,10 +96,10 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
 
     # For each time point interpolate runoff, temperature and loads for all the sources (values in main channel)
     Qmid,volume,depth,width,vel,dvoldt,volume_fp,depth_fp,dvoldt_fp = \
-      calculate_subgrid_hydro.calculate_subgrid_hydro(lsteady,params,species,\
-                                                      timeint,yearstart,yearend,runoff_in,discharge_in,volume_in,water_area_in,\
-                                                      depth_in,width_in,volume_fp_in,vel_in,depth_fp_in,llake,\
-                                                      llakeout,lendolake,args_strahler_cell=args_strahler_cell)
+      calculate_subgrid_hydro.calculate_subgrid_hydro(\
+      lsteady,params,species,timeint,yearstart,yearend,runoff_in,discharge_in,\
+      volume_in,water_area_in,depth_in,width_in,volume_fp_in,vel_in,\
+      depth_fp_in,llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
 
     # PAY ATTENTION: the arguments related to floodplain, i.e. volumn_fp, depth_fp, dvoldt_fp are only for iorder=5, and are only one-level list: volumn_fp[i] instead of volumn_fp[i][j]
     #JW add the lines above 21-2-2021.
@@ -510,7 +510,9 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
 
                 if params.lfloodplains==0 or iorder<(params.norder-1) or llake==True:
                     try:
-                        Yy = itg.solve_ivp(reactions.dy2, timerange, y0, method='BDF',args=(params,species,proc,load_reach, Qmid[item][iorder],arguments))
+                        Yy = itg.solve_ivp(reactions.dy2, timerange, y0, \
+                                           method='BDF',args=(\
+                                           params,species,proc,load_reach, Qmid[item][iorder],arguments))
                         Y = (Yy.y).T # means Yy.status == 0:  i.e. integration succeeds.
                         if Yy.status != 0:  # If the integration fails (usually when the step is alrealy smaller than the different of y0 values between steps), take the Y values of timeini[0] (last year or last month).
                             Y = []
@@ -526,33 +528,33 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
 
                 elif (params.lfloodplains==1) and (iorder==params.norder-1) and (llake==False):
                     #print ("Solving 2: icell_"+str(icell) + ': iorder_' + str(iorder)) #JW 30-1-2021.
-                    Y,outdict = itg.odeint(reactions.dy, y0,\
-                                           timerange,\
-                                           args=(params,species,proc,load_reach,\
-                                                 Qmid[item][iorder],arguments,floodplain_arguments), full_output=True,printmessg=False,mxstep=8760, rtol=1e-3, atol=1e-3)
+                    Y,outdict = itg.odeint(reactions.dy, y0, timerange,\
+                                args=(params,species,proc,load_reach,\
+                                Qmid[item][iorder],arguments,floodplain_arguments), \
+                                  full_output=True,printmessg=False,mxstep=8760, rtol=1e-3, atol=1e-3)
 
                 else:
                     #print ("Solving 3: icell_"+str(icell) + ': iorder_' + str(iorder)) #JW 30-1-2021.
-                    Y,outdict = itg.odeint(reactions.dy, y0,\
-                                           timerange,\
-                                           args=(params,species,proc,load_reach,\
-                                                Qmid[item][iorder],arguments), full_output=1,printmessg=True,mxstep=8760, rtol=1e-6, atol=1e-6) #full_output=True, rtol=1e-3, atol=1e-3
+                    Y,outdict = itg.odeint(reactions.dy, y0, timerange,\
+                                args=(params,species,proc,load_reach,\
+                                Qmid[item][iorder],arguments), full_output=1,\
+                                  printmessg=True,mxstep=8760, rtol=1e-6, atol=1e-6) #full_output=True, rtol=1e-3, atol=1e-3
             #JW comment: Y is finially a list of time series: Y[itime][ispec]
             #### Ending solver part
 
 
 
             setattr(params, 'debug', False)
-            # Convert to load
+            #### Convert to load
             # Convert amount Y(Mmol) using Qmid(runoff, km3/yr) and volume (km3) into load (Mmol/yr)
             # Y[-1][0:len(species)] is used to account for the transporting in streams only  and exclude the floodplain transport in the extended Y (in the highest order only)
             load_out[-1].append([])
             for i in range(len(Y[-1][:len(species)])):
-              try:
-                load_out[-1][-1].append((Qmid[item][iorder]/volume[item][iorder])*Y[-1][:len(species)][i]*params.number_of_rivers[iorder])
-                #load_out[-1][-1].append((Qmid[item][iorder]/arguments.get_val('vol')*Y[-1][:len(species)][i]*params.number_of_rivers[iorder])
-              except(FloatingPointError):
-                  load_out[-1][-1].append(0.)
+                try:
+                  load_out[-1][-1].append((Qmid[item][iorder]/volume[item][iorder])*Y[-1][:len(species)][i]*params.number_of_rivers[iorder])
+                  #load_out[-1][-1].append((Qmid[item][iorder]/arguments.get_val('vol')*Y[-1][:len(species)][i]*params.number_of_rivers[iorder])
+                except(FloatingPointError):
+                    load_out[-1][-1].append(0.)
             # Set outflow to zero for benthic species - LV 17-07-2017
             for ispec in range(len(species)):
                 if (species[ispec].get_name().endswith("_benth")):
@@ -568,7 +570,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
             # Set y0 for the next small timestep
             y0 = deepcopy(Y[-1])
 
-            # Add budget fluxes for current internal timestep
+            #### Add budget fluxes for current internal timestep
             if (params.lbudget) and (not lsteady): #lbudget==1 and not lsteady (dt > 0.)
                 for ispec in range(len(species)):
                     try:
@@ -605,7 +607,7 @@ def calculate_cell(lsteady,lock,icell,params,species,proc,sources,tmpdir,next_ce
                 else:
                     general_func.add_budget_procs(species, xbud, iorder, 1, dt, len(proc_rates)*[0])
 
-        # Save last state situation
+        #### Save last state situation
         # Y is a numpy array, so first make it a list.
         #x = Y[-1].tolist() # This line is the same to the line below.
         x = Y[-1][0:len(species)].tolist() #Y is array([[a,b,...,h]]) Y[-1] is array([a,b,...,h]), Y[-1][0:len(species)] is the same as Y[-1].

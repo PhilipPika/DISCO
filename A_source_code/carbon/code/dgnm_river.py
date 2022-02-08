@@ -62,7 +62,7 @@ def calculate(iriv,lock,params,species,proc,sources):
     '''
     Main function to calculate a riverbasin or a set of riverbasins.
     '''
-    # Get the river id's which are being calculated.
+    #### Get the river id's which are being calculated.
     if (type(iriv) == list):
         rivlist = iriv
     else:
@@ -150,7 +150,7 @@ def calculate(iriv,lock,params,species,proc,sources):
 
     #outlakes_dict = make_outlakes_dict.calculate(params,pointer1)
 
-    # Get all data from the input files with multiprocessing.
+    #### Get all data from the input files with multiprocessing.
     if (params.ncpu_read_files > 1):
 
         # Make preparations for multiprocessing this part of the code.
@@ -352,12 +352,12 @@ def calculate(iriv,lock,params,species,proc,sources):
                                                                      sources[isrc].get_val('name'),\
                                                                      temp_distrib=temp_distrib))
 
-    # Create strahler argument list if gridded chracteristics
+    #### Create strahler argument list if gridded chracteristics
     args_strahler_cell = None
     if (params.lstrahlergrids):
         args_strahler = define_subgrid_streamorder.define_subgrid_streamorder_riverbasin(params,rivmask)
 
-    # Make preparations for multiprocessing of riverbasin dynamic calculations.
+    #### Make preparations for multiprocessing of riverbasin dynamic calculations.
     number_of_cpu = general_func.get_number_of_cores(params,len(pointer1))
 
     if (params.ncpu_riverbasin > 1 and number_of_cpu > 1):
@@ -383,6 +383,7 @@ def calculate(iriv,lock,params,species,proc,sources):
     # store all information of the cells in separate input files.
     # In case of lspinup == 1 there is no startup file, so we have to create one ourselves.
     if ((params.lspinup == -1) or (params.lspinup == 0)):
+        #### Initial condition available
         print("We have an initial condition")
         lfound = False
         # Open output file for first cell of this riverbasin.
@@ -432,6 +433,7 @@ def calculate(iriv,lock,params,species,proc,sources):
             raise MyError("Startup file has no information for riverbasins.")
 
     else:
+        #### Make initial conditions
         print("We have to MAKE an initial condition")
         lsteady = True
         timeperiod = -1
@@ -502,7 +504,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                 # Start the process
                 general_func.start_process(p,jobs,number_of_cpu)
 
-            else:
+            else: # From number_of_cpu
                 # Do the job one at the time.
                 width = channel_width_grid.get_data(icell)
                 slope = slopemap.get_data(icell)
@@ -639,8 +641,10 @@ def calculate(iriv,lock,params,species,proc,sources):
         # Release lock
         file_locking.release_lock(params,lock,locktext="riverbasin"+stryearstart)
 
+    #### Initial conditions prepared
     print('Initial condition prepared')
 
+    #### Dynamic calculation
     # Now we can start with the dynamic calculations.
     starttime_calculate = time.time()
 
@@ -704,36 +708,37 @@ def calculate(iriv,lock,params,species,proc,sources):
                 slope = slopemap.get_data(icell)
                 if (params.lstrahlergrids):
                     args_strahler_cell = args_strahler[icell]
-                p=mp.Process(target= dgnm_cell.calculate_cell, args=(lsteady,lock_cell[next_cell],\
-                                                     icell,params,species,proc,sources,\
-                                                     tmpdir,next_cell,yearstart,yearend,timeperiod,\
-                                                     runoff_cells[icell],load,temperature_cells[icell],\
-                                                     globrad_cells[icell], discharge_cells[icell],\
-                                                     volume_cells[icell],water_area_cells[icell],depth_cells[icell],\
-                                                     width, slope, \
-                                                     volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
-                                                     low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell))
+                p=mp.Process(target= dgnm_cell.calculate_cell, \
+                             args=(lsteady,lock_cell[next_cell],\
+                                 icell,params,species,proc,sources,\
+                                 tmpdir,next_cell,yearstart,yearend,timeperiod,\
+                                 runoff_cells[icell],load,temperature_cells[icell],\
+                                 globrad_cells[icell], discharge_cells[icell],\
+                                 volume_cells[icell],water_area_cells[icell],depth_cells[icell],width, slope, \
+                                 volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
+                                 low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell))
 
                 # Add the process handler to the jobs list.
                 jobs.append(p)
                 # Start the process
                 general_func.start_process(p,jobs,number_of_cpu)
 
-            else:
+            else: # From number_of_cpu
                 # Do the job one at the time.
                 width = channel_width_grid.get_data(icell)
                 slope = slopemap.get_data(icell)
                 if (params.lstrahlergrids):
                     args_strahler_cell = args_strahler[icell]
-                dgnm_cell.calculate_cell(lsteady,None,icell,params,species,proc,sources,\
-                                              tmpdir,\
-                                              next_cell,yearstart,yearend,timeperiod,\
-                                              runoff_cells[icell],load,temperature_cells[icell],\
-                                              globrad_cells[icell], discharge_cells[icell],\
-                                              volume_cells[icell],water_area_cells[icell],depth_cells[icell],\
-                                              width, slope, \
-                                              volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
-                                              low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
+                dgnm_cell.calculate_cell(\
+                    lsteady,None,icell,params,species,proc,sources,\
+                    tmpdir,\
+                    next_cell,yearstart,yearend,timeperiod,\
+                    runoff_cells[icell],load,temperature_cells[icell],\
+                    globrad_cells[icell], discharge_cells[icell],\
+                    volume_cells[icell],water_area_cells[icell],depth_cells[icell],\
+                    width, slope, \
+                    volume_fp_cells[icell],depth_fp_cells[icell],vel_cells[icell],\
+                    low_veg_fr_cells[icell],high_veg_fr_cells[icell],llake,llakeout,lendolake,args_strahler_cell=args_strahler_cell)
 
         if (number_of_cpu > 1):
             # Wait until all jobs are finished.
@@ -755,7 +760,7 @@ def calculate(iriv,lock,params,species,proc,sources):
         #            my_sys.my_copyfile(os.path.join(tmpdir,"budget_"+str(outflowcell)+"_"+str(timeperiod)+".pkl"),\
         #                               os.path.join(tmpdir,"budget_"+str(icell)+"_"+str(timeperiod)+".pkl")) #LV 17-07-2017
 
-        # Put cell information of the last time step into the world map.
+        #### Put cell information of the last time step into the world map.
         data_block3 = []
         data_block2 = []
         data_block1 = []
@@ -827,7 +832,7 @@ def calculate(iriv,lock,params,species,proc,sources):
                     linestart.extend(data_block3[i][1:])
                     argslist.append(linestart)
 
-        # Write all output of this riverbasin to the output file.
+        #### Write all output of this riverbasin to the output file.
         # Aquire lock
         strtime = general_func.stryear(yearend)
         file_locking.aquire_lock(params,lock,jobid,locktext="riverbasin"+strtime)
