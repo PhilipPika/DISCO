@@ -19,11 +19,11 @@ class Spec(general_class.General):
                      basedlim=0.0, vsed=0.0, ldistrib=1, exch_rate=0.0, exch_a1=0.0, exch_b1=0.0, exch_a2=0.0, exch_b2=0.0, kH=0.0, eta=0.0, kero1=0.0, kdiss=0.0, \
                      atmospheric_conc=0, a=0, b=0, phylim=0.0, budget=[],
                      color=None):
-        general_class.General.__init__(self)             
-        
+        general_class.General.__init__(self)
+
         if lake_amount==0.0:
             lake_amount=amount
-        
+
         self.add_item('name', name)
         self.add_item('unit', unit)
         self.add_item('type',type)
@@ -48,7 +48,7 @@ class Spec(general_class.General):
         self.add_item('Tref_resp',Tref_resp)
         self.add_item('Q10_resp',Q10_resp)
         self.add_item('Tref_mort',Tref_mort)
-        self.add_item('Q10_mort',Q10_mort)        
+        self.add_item('Q10_mort',Q10_mort)
         self.add_item('max_growth_r',max_growth_r)
         self.add_item('max_grazing_r',max_grazing_r)
         self.add_item('max_resp_r',max_resp_r)
@@ -66,11 +66,11 @@ class Spec(general_class.General):
         self.add_item('exch_a1',exch_a1)
         self.add_item('exch_b1',exch_b1)
         self.add_item('exch_a2',exch_a2)
-        self.add_item('exch_b2',exch_b2)  
+        self.add_item('exch_b2',exch_b2)
         self.add_item('sed_r', sed_r)
         self.add_item('diss_r', diss_r)
-        self.add_item('bur_r', bur_r)   
-        self.add_item('dens', dens)   
+        self.add_item('bur_r', bur_r)
+        self.add_item('dens', dens)
         self.add_item('poro', poro)
         self.add_item('compmax', compmax)
         self.add_item('bsedlim', bsedlim)
@@ -95,19 +95,19 @@ class Spec(general_class.General):
         self.add_item('color', color)
 
     def check_type(self):
-        if (self.name         != None):    
+        if (self.name         != None):
             self.name          = str(self.name)
-        if (self.amount       != None): 
+        if (self.amount       != None):
             self.amount        = float(self.amount)
-        if (self.molarmass    != None): 
+        if (self.molarmass    != None):
             self.molarmass     = float(self.molarmass)
-        if (self.conv2dm      != None): 
+        if (self.conv2dm      != None):
             self.conv2dm       = float(self.conv2dm)
         if (self.k_I          != None):
             self.k_I           = float(self.k_I)
-        if (self.kmax         != None): 
+        if (self.kmax         != None):
             self.kmax          = float(self.kmax)
-        if (self.alpha        != None): 
+        if (self.alpha        != None):
             self.alpha         = float(self.alpha)
         if (self.vsed         != None):
             self.vsed          = float(self.vsed)
@@ -134,10 +134,10 @@ class Spec(general_class.General):
 
     def get_alpha(self):
         return float(self.alpha)
-        
+
     def get_kI(self):
         return self.k_I
-    
+
     def get_kDIC(self):
         return self.k_DIC
 
@@ -146,24 +146,24 @@ class Spec(general_class.General):
 
     def get_kDIP(self):
         return self.k_DIP
-        
+
     def get_exch_a(self):
         return self.exch_a
-        
+
     def get_exch_b(self):
-        return self.exch_b        
+        return self.exch_b
 
     def get_kH(self):
         return self.kH
 
     def get_vsed(self):
         return float(self.vsed)
-    
+
     def get_ldistrib(self):
         return int(self.ldistrib)
 
     def get_exch_rate(self):
-        return float(self.exch_rate) 
+        return float(self.exch_rate)
 
     def set_exch_rate(self, val):
         self.exch_rate = val
