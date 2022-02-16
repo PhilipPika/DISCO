@@ -119,7 +119,7 @@ def get_river_name(params):
         elif params.maskid==4634:
             rivername = 'Shanghai'
         else:
-          rivername = str(params.maskid)
+            rivername = str(params.maskid)
     elif params.maskid==0 and params.mask_bool_operator=='GT':
         rivername = 'Global'
     elif 'country' in params.file_mask:
@@ -272,7 +272,7 @@ def make_time_indices(params, dummy_nc):
         debugprint(params,modeldat_endindex)
 
         if modeldat_endindex==len(dummy_nc['time'][:]):
-          wbody_endindex +=1
+            wbody_endindex +=1
     else:
         print("MONTHLY DATA - from waterbodyid_201yrs")
         waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_201yrs.nc"), 'r')
