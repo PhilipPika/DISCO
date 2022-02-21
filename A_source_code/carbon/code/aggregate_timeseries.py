@@ -274,7 +274,7 @@ def make_time_indices(params, dummy_nc):
         if modeldat_endindex==len(dummy_nc['time'][:]):
             wbody_endindex +=1
     else:
-        print("MONTHLY DATA - from waterbodyid_201yrs")
+        print("YEARLY DATA - from waterbodyid_201yrs")
         waterbodyid = Dataset(os.path.join(params.water_inputdir, "waterbodyid_201yrs.nc"), 'r')
         modelrun_dummy_start = max(dummy_nc['time'][0],0)
         modelrun_dummy_end = dummy_nc['time'][-1]
@@ -352,7 +352,7 @@ def all_inputs_to_dict(params,add_color=False):
 
       debugprint(params,'src_nc shape post modification')
       debugprint(params,src_grid.shape)
-      debugprint(params,'Mask size')
+      debugprint(params,'Created Mask Size from make_3d_mask()')
       debugprint(params,mask_3d.shape)
 
       # src_series[source.get_val('name')] = np.nansum(np.nansum(np.ma.array(src_grid, mask=mask_3d),axis=2),axis=1).tolist()
